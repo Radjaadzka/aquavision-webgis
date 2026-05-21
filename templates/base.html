@@ -1,0 +1,95 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}AQUAVISION{% endblock %}</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet">
+
+    <link rel="icon" type="image/png" href="{% static 'images/logo_webgis.png' %}">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+<!-- ================= NAVBAR ================= -->
+<nav class="navbar">
+    <div class="nav-inner">
+
+        <!-- LEFT: Logo -->
+        <a href="/" class="nav-logo">
+            <img src="{% static 'images/logo_webgis.png' %}" alt="Logo" class="nav-logo-img">
+            <span class="nav-logo-text">AQUAVISION</span>
+        </a>
+
+        <!-- CENTER: Nav Links -->
+        <div class="nav-links">
+            <a href="/" class="nav-link {% if request.resolver_match.url_name == 'landing' %}active{% endif %}">Beranda</a>
+            <a href="/map/" class="nav-link {% if request.resolver_match.url_name == 'map' %}active{% endif %}">WebGIS</a>
+            <a href="/data/" class="nav-link {% if request.resolver_match.url_name == 'data_list' or request.resolver_match.url_name == 'dataset_detail' %}active{% endif %}">Data Portal</a>
+        </div>
+
+        <!-- RIGHT: Auth -->
+        <div class="nav-auth">
+            {% if user.is_authenticated %}
+                <div class="nav-user">
+                    <div class="nav-avatar">
+                        {{ user.username|make_list|first|upper }}
+                    </div>
+                    <span class="nav-username">{{ user.username }}</span>
+                </div>
+                <form method="post" action="{% url 'logout' %}" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="nav-btn nav-btn-logout">Logout</button>
+                </form>
+            {% else %}
+                <a href="{% url 'login' %}" class="nav-btn nav-btn-login">Login</a>
+                <a href="{% url 'register' %}" class="nav-btn nav-btn-register">Daftar</a>
+            {% endif %}
+        </div>
+
+        <!-- MOBILE TOGGLE -->
+        <button class="nav-mobile-toggle" id="navToggle">
+            <span></span><span></span><span></span>
+        </button>
+    </div>
+</nav>
+
+<!-- ================= MAIN CONTENT ================= -->
+<div class="main-content">
+    {% block content %}{% endblock %}
+</div>
+
+<!-- ================= FOOTER ================= -->
+<footer class="footer">
+    <div class="footer-inner">
+        <div class="footer-left">
+            <img src="{% static 'images/logo_itb.png' %}" class="footer-logo-itb" alt="Logo ITB">
+            <div class="footer-info">
+                <p class="footer-title">Teknik Geodesi dan Geomatika</p>
+                <p class="footer-subtitle">Institut Teknologi Bandung</p>
+                <p class="footer-address">Labtek IX-C, Jl. Ganesa No.10, Bandung 40132</p>
+            </div>
+        </div>
+        <div class="footer-right">
+            <p class="footer-caption">Capstone Design Project 2025</p>
+        </div>
+    </div>
+</footer>
+
+{% block extra_js %}{% endblock %}
+
+<script>
+document.getElementById('navToggle')?.addEventListener('click', function() {
+    document.querySelector('.nav-links').classList.toggle('nav-open');
+    document.querySelector('.nav-auth').classList.toggle('nav-open');
+    this.classList.toggle('active');
+});
+</script>
+
+</body>
+</html>

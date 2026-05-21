@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+{% load static custom_tags %}
+{% block content %}
+
+<div class="portal-section">
+<div class="portal-container">
+
+    <!-- HEADER -->
+    <div class="dataset-header">
+        <div>
+            <h2>{{ model_name|title }}</h2>
+            <div class="dataset-subinfo">
+                Total Records: <span class="summary-badge">{{ total_records }} data</span>
+                {% if not is_admin %}
+                    <span style="margin-left:8px; font-size:12px; color:var(--gray-400);">(Tampilan terbatas)</span>
+                {% endif %}
+            </div>
+        </div>
+        <a href="{% url 'data_list' %}" class="btn-secondary" style="text-decoration:none;">← Kembali</a>
+    </div>
+
+    <!-- TOOLBAR -->
+    <div class="dataset-toolbar">
+        <form method="get" class="search-form">
+            <input type="text" name="q" value="{{ request.GET.q }}" placeholder="Cari data..." class="search-input">
+            <button type="submit" class="btn-secondary">Cari</button>
+        </form>
+
+        <div class="download-buttons">
+            <a href="{% url 'download_csv' model_name %}"><button class="btn-primary">CSV</button></a>
+            <a href="{% url 'download_geojson' model_name %}"><button class="btn-secondary">GeoJSON</button></a>
+            <a href="{% url 'download_kml' model_name %}"><button class="btn-secondary">KML</button></a>
+            <a href="{% url 'download_shp' model_name %}"><button class="btn-primary" style="background:#2c3e50;">SHP</button></a>
+        </div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-wrapper">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    {% for field in fields %}
+                        <th>{{ field|title }}</th>
+                    {% endfor %}
+                    {% if is_admin %}
+                        <th style="text-align:center;">Aksi</th>
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in data_rows %}
+                <tr>
+                    {% for field in fields %}
+                        <td>{{ row|get_item:field|default:"-" }}</td>
+                    {% endfor %}
+                    {% if is_admin %}
+                        <td style="text-align:center; white-space:nowrap;">
+                            <button class="btn-edit" data-model="{{ model_name }}" data-id="{{ row.id|default:'0' }}" title="Edit">✏️</button>
+                            <button class="btn-delete" data-model="{{ model_name }}" data-id="{{ row.id|default:'0' }}" title="Hapus">🗑️</button>
+                        </td>
+                    {% endif %}
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="{{ fields|length|add:1 }}" style="text-align:center; padding:20px; color:#999;">
+                        Tidak ada data ditemukan.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- PAGINATION -->
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">← Sebelumnya</a>
+        {% endif %}
+        <span>Halaman {{ page_obj.number }} dari {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">Selanjutnya →</a>
+        {% endif %}
+    </div>
+
+</div>
+</div>
+
+{% if is_admin %}
+<style>
+    .btn-edit, .btn-delete {
+        background: none;
+        border: 1px solid var(--gray-300);
+        border-radius: 6px;
+        padding: 4px 8px;
+        cursor: pointer;
+        font-size: 14px;
+        margin: 0 2px;
+        width: auto;
+    }
+    .btn-edit:hover { background: #e8f6f3; }
+    .btn-delete:hover { background: #fdedec; }
+    .confirm-overlay { position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:9999; }
+    .confirm-box { background:white;padding:28px 32px;border-radius:16px;max-width:400px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.3);text-align:center; }
+    .confirm-box h4 { margin:0 0 8px;font-size:18px;color:#2c3e50; }
+    .confirm-box p { font-size:14px;color:#666;margin:0 0 20px;line-height:1.5; }
+    .confirm-actions { display:flex;gap:10px;justify-content:center; }
+    .confirm-actions button { padding:10px 24px;border-radius:8px;border:none;cursor:pointer;font-size:14px;font-weight:500; }
+    .btn-confirm-yes { background:#e74c3c;color:white; }
+    .btn-confirm-yes:hover { background:#c0392b; }
+    .btn-confirm-no { background:#f4f6f9;color:#555;border:1px solid #ddd; }
+    .btn-confirm-no:hover { background:#e8ecf0; }
+    @keyframes slideIn { from{transform:translateX(120%);opacity:0;} to{transform:translateX(0);opacity:1;} }
+</style>
+{% endif %}
+
+{% endblock %}
+
+{% block extra_js %}
+{% if is_admin %}
+<script src="{% static 'js/portal_admin.js' %}"></script>
+{% endif %}
+{% endblock %}

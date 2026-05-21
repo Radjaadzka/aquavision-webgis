@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block content %}
+
+<section class="portal-section">
+    <div class="portal-container">
+
+        <div class="portal-header">
+            <h2>📊 Portal Data WebGIS</h2>
+            <p class="portal-subtitle">
+                Kumpulan dataset spasial dan non-spasial yang digunakan dalam sistem WebGIS
+            </p>
+        </div>
+
+        <div class="portal-toolbar">
+            <form method="get" class="search-form">
+                <input type="text" name="q"
+                    placeholder="Cari dataset..."
+                    value="{{ query|default:'' }}">
+                <button type="submit">Cari</button>
+            </form>
+
+            <div class="dataset-summary">
+                <span class="summary-badge">
+                    Total Dataset: {{ datasets|length }}
+                </span>
+            </div>
+        </div>
+
+        {% if datasets %}
+        <div class="dataset-grid">
+            {% for d in datasets %}
+            <div class="dataset-card">
+
+                <div class="dataset-card-header">
+                    <h3>{{ d.name }}</h3>
+                    <span class="dataset-badge">
+                        {{ d.count }} data
+                    </span>
+                </div>
+
+                <p class="dataset-description">
+                    {{ d.description }}
+                </p>
+
+                <div class="dataset-meta">
+                    <div><strong>Records:</strong> {{ d.count }}</div>
+                    <div><strong>Last update:</strong> {{ d.last_update }}</div>
+                </div>
+
+                <div class="dataset-actions">
+                    <a href="{% url 'dataset_detail' d.slug %}">
+                        <button class="btn-primary">Lihat Dataset</button>
+                    </a>
+                </div>
+
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+            <div class="empty-state">
+                <h4>Tidak ada dataset ditemukan</h4>
+                <p>Coba gunakan kata kunci pencarian yang berbeda.</p>
+            </div>
+        {% endif %}
+
+    </div>
+</section>
+
+{% endblock %}
