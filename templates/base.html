@@ -15,6 +15,23 @@
     {% block extra_css %}{% endblock %}
 </head>
 <body>
+<button id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" style="display:none;position:fixed;bottom:24px;right:24px;z-index:999;background:var(--primary,#1a5276);color:white;border:none;width:44px;height:44px;border-radius:50%;font-size:20px;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,0.2);">↑</button>
+<script>
+window.addEventListener("scroll",function(){
+    document.getElementById("scrollTop").style.display=window.scrollY>300?"block":"none";
+});
+</script>
+<script>
+// Smooth scroll fallback untuk browser yang tidak support CSS scroll-behavior
+document.querySelectorAll('a[href^="#"]').forEach(function(a) {
+    a.addEventListener('click', function(e) {
+        var target = document.querySelector(this.getAttribute('href'));
+        if (!target) return;
+        e.preventDefault();
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+});
+</script>
 
 <!-- ================= NAVBAR ================= -->
 <nav class="navbar">
@@ -76,7 +93,7 @@
             </div>
         </div>
         <div class="footer-right">
-            <p class="footer-caption">Capstone Design Project 2025</p>
+            <p class="footer-caption">Capstone Design Project 2026</p>
         </div>
     </div>
 </footer>

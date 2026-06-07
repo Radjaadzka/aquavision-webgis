@@ -1,48 +1,314 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Login — AQUAVISION{% endblock %}
+{% block title %}Masuk — AQUAVISION{% endblock %}
+
+{% block extra_css %}
+<style>
+    body { background: #07111F; }
+
+    /* ── Layout ─────────────────────────────────────────────── */
+    .auth-section {
+        min-height: calc(100vh - 56px);
+        display: flex;
+        align-items: stretch;
+    }
+
+    /* ── Kiri — branding ────────────────────────────────────── */
+    .auth-left {
+        flex: 1;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 56px 52px;
+        background: linear-gradient(160deg, #0E2238 0%, #07111F 70%);
+    }
+
+    .auth-left-bg {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background:
+            radial-gradient(ellipse 80% 60% at 20% 40%, rgba(59,130,246,.06) 0%, transparent 55%),
+            radial-gradient(ellipse 60% 50% at 80% 70%, rgba(99,102,241,.04) 0%, transparent 50%);
+    }
+
+    .auth-left-grid {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background-image:
+            linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+        background-size: 64px 64px;
+        -webkit-mask-image: radial-gradient(ellipse 80% 80% at 30% 50%, black 0%, transparent 70%);
+        -webkit-mask-image: radial-gradient(ellipse 80% 80% at 30% 50%, black 0%, transparent 70%);
+        mask-image: radial-gradient(ellipse 80% 80% at 30% 50%, black 0%, transparent 70%);
+    }
+
+    .auth-left-content { position: relative; z-index: 2; }
+
+    .auth-left-brand {
+        font-family: 'Fraunces', serif;
+        font-size: 32px;
+        font-weight: 200;
+        font-style: italic;
+        color: rgba(255,255,255,.85);
+        margin-bottom: 6px;
+    }
+    .auth-left-brand em { color: rgba(59,130,246,.7); }
+
+    .auth-left-sub {
+        font-size: 12px;
+        color: rgba(255,255,255,.25);
+        margin-bottom: 36px;
+        letter-spacing: 1px;
+    }
+
+    .auth-left-desc {
+        font-size: 14px;
+        font-weight: 300;
+        color: rgba(255,255,255,.4);
+        margin-bottom: 24px;
+        line-height: 1.7;
+        max-width: 360px;
+    }
+
+    /* Feature list */
+    .af {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        margin-bottom: 14px;
+    }
+    .af-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #3B82F6;
+        margin-top: 6px;
+        flex-shrink: 0;
+    }
+    .af p        { font-size: 13px; color: rgba(255,255,255,.38); font-weight: 300; line-height: 1.6; }
+    .af strong   { color: rgba(255,255,255,.65); font-weight: 500; }
+
+    /* ── Kanan — form ───────────────────────────────────────── */
+    .auth-right {
+        width: 440px;
+        flex-shrink: 0;
+        background: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 48px 44px;
+    }
+
+    .afw { width: 100%; max-width: 340px; }
+
+    .afw-title {
+        font-family: 'Fraunces', serif;
+        font-size: 26px;
+        font-weight: 300;
+        font-style: italic;
+        color: #0F172A;
+        margin-bottom: 6px;
+    }
+    .afw-sub {
+        font-size: 13px;
+        color: #64748B;
+        font-weight: 300;
+        margin-bottom: 32px;
+    }
+
+    /* Form fields */
+    .auth-field             { margin-bottom: 14px; }
+    .auth-field label {
+        display: block;
+        font-size: 11px;
+        font-weight: 500;
+        letter-spacing: .8px;
+        text-transform: uppercase;
+        color: #94A3B8;
+        margin-bottom: 6px;
+    }
+    .auth-field input {
+        width: 100%;
+        padding: 12px 14px;
+        border: 1.5px solid #E2E8F0;
+        border-radius: 8px;
+        font-size: 14px;
+        font-family: 'Inter', sans-serif;
+        background: #F8FAFC;
+        color: #0F172A;
+        transition: all .15s;
+    }
+    .auth-field input:focus {
+        outline: none;
+        border-color: #3B82F6;
+        background: white;
+        box-shadow: 0 0 0 3px rgba(59,130,246,.08);
+    }
+
+    .auth-submit {
+        width: 100%;
+        padding: 12px;
+        background: #07111F;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        font-family: 'Inter', sans-serif;
+        transition: background .15s;
+        margin-top: 4px;
+    }
+    .auth-submit:hover { background: #0E2238; }
+
+    .auth-error {
+        background: #FEF2F2;
+        border-left: 3px solid #DC2626;
+        padding: 10px 13px;
+        border-radius: 7px;
+        margin-bottom: 14px;
+        font-size: 13px;
+        color: #991B1B;
+        font-weight: 300;
+    }
+
+    /* Divider */
+    .divider {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 20px 0;
+    }
+    .divider-line { flex: 1; height: 1px; background: #E2E8F0; }
+    .divider span { font-size: 12px; color: #94A3B8; }
+
+    /* Google button */
+    .btn-google {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        width: 100%;
+        padding: 11px;
+        border: 1.5px solid #E2E8F0;
+        border-radius: 8px;
+        background: white;
+        color: #374151;
+        font-size: 13px;
+        font-weight: 500;
+        font-family: 'Inter', sans-serif;
+        text-decoration: none;
+        transition: all .15s;
+        cursor: pointer;
+    }
+    .btn-google:hover { background: #F8FAFC; border-color: #CBD5E1; }
+
+    .auth-footer {
+        text-align: center;
+        margin-top: 20px;
+        font-size: 13px;
+        color: #94A3B8;
+        font-weight: 300;
+    }
+    .auth-footer a { color: #3B82F6; font-weight: 500; }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .auth-left    { display: none; }
+        .auth-right   { width: 100%; }
+        .auth-section { background: white; }
+    }
+</style>
+{% endblock %}
+
 
 {% block content %}
-
 <section class="auth-section">
-    <div class="auth-card">
 
-        <div class="auth-logo">
-            <img src="{% static 'images/logo_webgis.png' %}" alt="Logo" style="height:48px; margin-bottom:12px;">
+    <!-- Kiri: branding -->
+    <div class="auth-left">
+        <div class="auth-left-bg"></div>
+        <div class="auth-left-grid"></div>
+        <div class="auth-left-content">
+
+            <div class="auth-left-brand">AQUA<em>VISION</em></div>
+            <p class="auth-left-sub">Platform Informasi Sumber Daya Air · Desa Wonotoro</p>
+
+            <p class="auth-left-desc">
+                Sistem WebGIS terintegrasi untuk pemantauan dan pengelolaan sumber daya air berbasis data spasial.
+            </p>
+
+            <div class="af"><div class="af-dot"></div><p><strong>Peta interaktif</strong> dengan 8 lapisan data yang dapat dikombinasikan</p></div>
+            <div class="af"><div class="af-dot"></div><p><strong>Neraca air real-time</strong> dengan indikator status dan simulasi skenario</p></div>
+            <div class="af"><div class="af-dot"></div><p><strong>Data terbuka</strong> dalam format CSV, GeoJSON, KML, dan Shapefile</p></div>
+            <div class="af"><div class="af-dot"></div><p><strong>Standar OGC</strong> — WMS/WFS, RFC 7946, ISO/IEC 25010</p></div>
+
         </div>
-
-        <h2>Login WebGIS</h2>
-        <p>Masuk untuk mengakses peta dan data sumber daya air</p>
-
-        {% if form.errors %}
-            <div class="auth-error">
-                Username atau password salah.
-            </div>
-        {% endif %}
-
-        <form method="post">
-            {% csrf_token %}
-
-            <div class="auth-field">
-                <label for="id_username">Username</label>
-                <input type="text" name="username" id="id_username" placeholder="Masukkan username" required autofocus>
-            </div>
-
-            <div class="auth-field">
-                <label for="id_password">Password</label>
-                <input type="password" name="password" id="id_password" placeholder="Masukkan password" required>
-            </div>
-
-            <button type="submit" class="auth-submit">Login</button>
-        </form>
-
-        <div class="auth-links">
-            <p>Belum punya akun? <a href="{% url 'register' %}">Daftar di sini</a></p>
-            <a href="/" class="auth-back">← Kembali ke Beranda</a>
-        </div>
-
     </div>
-</section>
 
+    <!-- Kanan: form -->
+    <div class="auth-right">
+        <div class="afw">
+
+            <p class="afw-title">Selamat datang</p>
+            <p class="afw-sub">Masuk untuk mengakses platform AQUAVISION</p>
+
+            {% if form.errors %}
+            <div class="auth-error">Username atau password salah. Silakan coba lagi.</div>
+            {% endif %}
+
+            {% if messages %}
+            {% for message in messages %}
+            <div style="background:#F0FDF4; border-left:3px solid #16A34A; padding:10px 13px; border-radius:7px; margin-bottom:14px; font-size:13px; color:#166534;">
+                {{ message }}
+            </div>
+            {% endfor %}
+            {% endif %}
+
+            <form method="post">
+                {% csrf_token %}
+                <div class="auth-field">
+                    <label>Username</label>
+                    <input type="text" name="username" placeholder="Masukkan username" autofocus autocomplete="username">
+                </div>
+                <div class="auth-field">
+                    <label>Password</label>
+                    <input type="password" name="password" placeholder="Masukkan password" autocomplete="current-password">
+                </div>
+                <input type="hidden" name="next" value="{{ next }}">
+                <button type="submit" class="auth-submit">Masuk</button>
+            </form>
+
+            {% if google_auth_enabled %}
+            <div class="divider">
+                <div class="divider-line"></div>
+                <span>atau</span>
+                <div class="divider-line"></div>
+            </div>
+
+            <a href="{% url 'social:begin' 'google-oauth2' %}" class="btn-google">
+                <svg width="17" height="17" viewBox="0 0 18 18">
+                    <path fill="#4285F4" d="M16.51 8H8.98v3h4.3c-.18 1-.74 1.48-1.6 2.04v2.01h2.6a7.8 7.8 0 0 0 2.38-5.88c0-.57-.05-.66-.15-1.18z"/>
+                    <path fill="#34A853" d="M8.98 17c2.16 0 3.97-.72 5.3-1.94l-2.6-2a4.8 4.8 0 0 1-7.18-2.54H1.83v2.07A8 8 0 0 0 8.98 17z"/>
+                    <path fill="#FBBC05" d="M4.5 10.52a4.8 4.8 0 0 1 0-3.04V5.41H1.83a8 8 0 0 0 0 7.18l2.67-2.07z"/>
+                    <path fill="#EA4335" d="M8.98 4.18c1.17 0 2.23.4 3.06 1.2l2.3-2.3A8 8 0 0 0 1.83 5.4L4.5 7.49a4.77 4.77 0 0 1 4.48-3.3z"/>
+                </svg>
+                Masuk dengan Google
+            </a>
+            {% endif %}
+
+            <p class="auth-footer">
+                Belum punya akun? <a href="{% url 'register' %}">Daftar di sini</a>
+            </p>
+
+        </div>
+    </div>
+
+</section>
 {% endblock %}

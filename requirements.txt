@@ -11,5 +11,7 @@ packaging==26.2
 pillow==12.2.0
 psycopg2-binary==2.9.11
 pyshp==3.0.3
+social-auth-app-django==5.4.3
+social-auth-core==4.5.4
 sqlparse==0.5.5
 whitenoise==6.12.0

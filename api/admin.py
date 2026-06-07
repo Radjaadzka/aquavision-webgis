@@ -1,5 +1,4 @@
 from django.contrib import admin
-from .models import Feedback
 from .models import (
     SumberAir,
     FasilitasWisata,
@@ -9,6 +8,8 @@ from .models import (
     Reservoir,
     RechargeArea,
     CatchmentArea,
+    AdministrasiDesa,
+    Feedback,
 )
 
 admin.site.register(SumberAir)
@@ -19,9 +20,12 @@ admin.site.register(JaringanPipa)
 admin.site.register(Reservoir)
 admin.site.register(RechargeArea)
 admin.site.register(CatchmentArea)
+admin.site.register(AdministrasiDesa)
+
+
 @admin.register(Feedback)
 class FeedbackAdmin(admin.ModelAdmin):
-    list_display = ['nama', 'pesan', 'tanggal']
-    list_filter = ['tanggal']
+    list_display  = ['nama', 'pesan', 'tanggal']
+    list_filter   = ['tanggal']
     search_fields = ['nama', 'pesan']
     readonly_fields = ['tanggal']

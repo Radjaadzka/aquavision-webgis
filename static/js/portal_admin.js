@@ -1,5 +1,13 @@
 // portal_admin.js — Admin functions for Data Portal
 
+function getCsrfToken() {
+    var name  = "csrftoken";
+    var value = "; " + document.cookie;
+    var parts = value.split("; " + name + "=");
+    if (parts.length === 2) return parts.pop().split(";").shift();
+    return "";
+}
+
 function showToast(title, message, type) {
     var existing = document.getElementById("toastNotif");
     if (existing) existing.remove();
@@ -83,7 +91,7 @@ function showEditModal(modelName, pk) {
         fetch("/api/edit/" + modelName + "/" + pk + "/", {
             method: "PUT",
             credentials: "include",
-            headers: { "Content-Type": "application/json" },
+            headers: { "Content-Type": "application/json", "X-CSRFToken": getCsrfToken() },
             body: JSON.stringify({ nama: newName }),
         })
         .then(function(r) { return r.json(); })
@@ -120,6 +128,7 @@ document.addEventListener("click", function(e) {
             fetch("/api/delete/" + model2 + "/" + id2 + "/", {
                 method: "DELETE",
                 credentials: "include",
+                headers: { "X-CSRFToken": getCsrfToken() },
             })
             .then(function(r) { return r.json(); })
             .then(function(data) {

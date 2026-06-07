@@ -3,60 +3,313 @@
 
 {% block title %}Daftar — AQUAVISION{% endblock %}
 
+{% block extra_css %}
+<style>
+    body { background: #07111F; }
+
+    /* ── Layout ─────────────────────────────────────────────── */
+    .auth-section {
+        min-height: calc(100vh - 56px);
+        display: flex;
+        align-items: stretch;
+    }
+
+    /* ── Kiri — onboarding ──────────────────────────────────── */
+    .auth-left {
+        flex: 1;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 56px 52px;
+        background: linear-gradient(160deg, #0E2238 0%, #07111F 70%);
+    }
+
+    .auth-left-bg {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background: radial-gradient(ellipse 80% 60% at 25% 45%, rgba(59,130,246,.06) 0%, transparent 55%);
+    }
+
+    .auth-left-grid {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background-image:
+            linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+        background-size: 64px 64px;
+        -webkit-mask-image: radial-gradient(ellipse 80% 80% at 30% 50%, black 0%, transparent 70%);
+        mask-image: radial-gradient(ellipse 80% 80% at 30% 50%, black 0%, transparent 70%);
+    }
+
+    .auth-left-content { position: relative; z-index: 2; }
+
+    .auth-left-brand {
+        font-family: 'Fraunces', serif;
+        font-size: 32px;
+        font-weight: 200;
+        font-style: italic;
+        color: rgba(255,255,255,.85);
+        margin-bottom: 6px;
+    }
+    .auth-left-brand em { color: rgba(59,130,246,.7); }
+
+    .auth-left-sub {
+        font-size: 12px;
+        color: rgba(255,255,255,.25);
+        margin-bottom: 36px;
+        letter-spacing: 1px;
+    }
+
+    /* Onboarding steps */
+    .onboard-steps { display: flex; flex-direction: column; }
+
+    .step {
+        display: flex;
+        align-items: flex-start;
+        gap: 16px;
+        padding: 18px 0;
+        border-bottom: 1px solid rgba(255,255,255,.05);
+    }
+    .step:last-child { border-bottom: none; }
+
+    .step-num {
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+        background: rgba(59,130,246,.1);
+        border: 1px solid rgba(59,130,246,.2);
+        color: rgba(59,130,246,.7);
+        font-size: 12px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .step-body h4 { font-size: 13px; font-weight: 500; color: rgba(255,255,255,.65); margin-bottom: 4px; }
+    .step-body p  { font-size: 12px; color: rgba(255,255,255,.3); font-weight: 300; line-height: 1.5; }
+
+    /* ── Kanan — form ───────────────────────────────────────── */
+    .auth-right {
+        width: 440px;
+        flex-shrink: 0;
+        background: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 48px 44px;
+    }
+
+    .afw { width: 100%; max-width: 340px; }
+
+    .afw-title {
+        font-family: 'Fraunces', serif;
+        font-size: 26px;
+        font-weight: 300;
+        font-style: italic;
+        color: #0F172A;
+        margin-bottom: 6px;
+    }
+    .afw-sub {
+        font-size: 13px;
+        color: #64748B;
+        font-weight: 300;
+        margin-bottom: 32px;
+    }
+
+    /* Form fields */
+    .auth-field             { margin-bottom: 13px; }
+    .auth-field label {
+        display: block;
+        font-size: 11px;
+        font-weight: 500;
+        letter-spacing: .8px;
+        text-transform: uppercase;
+        color: #94A3B8;
+        margin-bottom: 6px;
+    }
+    .auth-field input {
+        width: 100%;
+        padding: 12px 14px;
+        border: 1.5px solid #E2E8F0;
+        border-radius: 8px;
+        font-size: 14px;
+        font-family: 'Inter', sans-serif;
+        background: #F8FAFC;
+        color: #0F172A;
+        transition: all .15s;
+    }
+    .auth-field input:focus {
+        outline: none;
+        border-color: #3B82F6;
+        background: white;
+        box-shadow: 0 0 0 3px rgba(59,130,246,.08);
+    }
+
+    .auth-hint {
+        display: block;
+        font-size: 11px;
+        color: #94A3B8;
+        margin-top: 4px;
+        font-weight: 300;
+    }
+
+    .auth-error {
+        background: #FEF2F2;
+        border-left: 3px solid #DC2626;
+        padding: 10px 13px;
+        border-radius: 7px;
+        margin-bottom: 14px;
+        font-size: 13px;
+        color: #991B1B;
+        font-weight: 300;
+    }
+
+    .auth-submit {
+        width: 100%;
+        padding: 12px;
+        background: #07111F;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        font-family: 'Inter', sans-serif;
+        transition: background .15s;
+        margin-top: 4px;
+    }
+    .auth-submit:hover { background: #0E2238; }
+
+    .auth-footer {
+        text-align: center;
+        margin-top: 16px;
+        font-size: 13px;
+        color: #94A3B8;
+        font-weight: 300;
+    }
+    .auth-footer a { color: #3B82F6; font-weight: 500; }
+
+    .auth-back {
+        font-size: 12px;
+        color: #CBD5E1;
+        display: block;
+        text-align: center;
+        margin-top: 8px;
+        transition: color .15s;
+    }
+    .auth-back:hover { color: #94A3B8; }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .auth-left    { display: none; }
+        .auth-right   { width: 100%; }
+        .auth-section { background: white; }
+    }
+</style>
+{% endblock %}
+
+
 {% block content %}
-
 <section class="auth-section">
-    <div class="auth-card">
 
-        <div class="auth-logo">
-            <img src="{% static 'images/logo_webgis.png' %}" alt="Logo" style="height:48px; margin-bottom:12px;">
+    <!-- Kiri: onboarding -->
+    <div class="auth-left">
+        <div class="auth-left-bg"></div>
+        <div class="auth-left-grid"></div>
+        <div class="auth-left-content">
+
+            <div class="auth-left-brand">AQUA<em>VISION</em></div>
+            <p class="auth-left-sub">Platform Informasi Sumber Daya Air · Desa Wonotoro</p>
+
+            <div class="onboard-steps">
+                <div class="step">
+                    <div class="step-num">1</div>
+                    <div class="step-body">
+                        <h4>Buat akun</h4>
+                        <p>Daftarkan username dan password untuk mengakses platform.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-num">2</div>
+                    <div class="step-body">
+                        <h4>Akses peta interaktif</h4>
+                        <p>Jelajahi seluruh lapisan data spasial sumber daya air Desa Wonotoro.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-num">3</div>
+                    <div class="step-body">
+                        <h4>Unduh dan analisis data</h4>
+                        <p>Ekspor dataset dalam format CSV, GeoJSON, KML, atau Shapefile.</p>
+                    </div>
+                </div>
+            </div>
+
         </div>
+    </div>
 
-        <h2>Daftar Akun</h2>
-        <p>Buat akun untuk mengakses WebGIS Desa Wonotoro</p>
+    <!-- Kanan: form -->
+    <div class="auth-right">
+        <div class="afw">
 
-        {% if form.errors %}
+            <p class="afw-title">Buat akun baru</p>
+            <p class="afw-sub">Akses platform AQUAVISION secara gratis</p>
+
+            {% if form.errors %}
             <div class="auth-error">
                 {% for field in form %}
-                    {% for error in field.errors %}
-                        <div>{{ error }}</div>
-                    {% endfor %}
+                    {% for error in field.errors %}<div>{{ error }}</div>{% endfor %}
                 {% endfor %}
                 {% for error in form.non_field_errors %}
                     <div>{{ error }}</div>
                 {% endfor %}
             </div>
-        {% endif %}
+            {% endif %}
 
-        <form method="post">
-            {% csrf_token %}
+            <form method="post">
+                {% csrf_token %}
 
-            <div class="auth-field">
-                <label for="id_username">Username</label>
-                <input type="text" name="username" id="id_username" placeholder="Pilih username" required autofocus
-                       value="{{ form.username.value|default:'' }}">
-            </div>
+                <div class="auth-field">
+                    <label>Username</label>
+                    <input
+                        type="text"
+                        name="username"
+                        id="id_username"
+                        placeholder="Pilih username"
+                        required
+                        autofocus
+                        value="{{ form.username.value|default:'' }}"
+                    >
+                </div>
 
-            <div class="auth-field">
-                <label for="id_password1">Password</label>
-                <input type="password" name="password1" id="id_password1" placeholder="Buat password" required>
-                <span class="auth-hint">Minimal 8 karakter, tidak boleh terlalu umum</span>
-            </div>
+                <div class="auth-field">
+                    <label>Password</label>
+                    <input type="password" name="password1" id="id_password1" placeholder="Buat password" required>
+                    <span class="auth-hint">Minimal 8 karakter, tidak boleh terlalu umum</span>
+                </div>
 
-            <div class="auth-field">
-                <label for="id_password2">Konfirmasi Password</label>
-                <input type="password" name="password2" id="id_password2" placeholder="Ketik ulang password" required>
-            </div>
+                <div class="auth-field">
+                    <label>Konfirmasi Password</label>
+                    <input type="password" name="password2" id="id_password2" placeholder="Ketik ulang password" required>
+                </div>
 
-            <button type="submit" class="auth-submit">Daftar</button>
-        </form>
+                <button type="submit" class="auth-submit">Daftar</button>
+            </form>
 
-        <div class="auth-links">
-            <p>Sudah punya akun? <a href="{% url 'login' %}">Login di sini</a></p>
+            <p class="auth-footer">
+                Sudah punya akun? <a href="{% url 'login' %}">Masuk di sini</a>
+            </p>
+
             <a href="/" class="auth-back">← Kembali ke Beranda</a>
+
         </div>
-
     </div>
-</section>
 
+</section>
 {% endblock %}

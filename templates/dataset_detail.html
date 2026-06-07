@@ -55,8 +55,8 @@
                     {% endfor %}
                     {% if is_admin %}
                         <td style="text-align:center; white-space:nowrap;">
-                            <button class="btn-edit" data-model="{{ model_name }}" data-id="{{ row.id|default:'0' }}" title="Edit">✏️</button>
-                            <button class="btn-delete" data-model="{{ model_name }}" data-id="{{ row.id|default:'0' }}" title="Hapus">🗑️</button>
+                            <button class="btn-edit" data-model="{{ model_name }}" data-id="{{ row|get_item:'id'|default:'0' }}" title="Edit">✏️</button>
+                            <button class="btn-delete" data-model="{{ model_name }}" data-id="{{ row|get_item:'id'|default:'0' }}" title="Hapus">🗑️</button>
                         </td>
                     {% endif %}
                 </tr>

@@ -1,282 +1,615 @@
 {% extends "base.html" %}
 {% load static %}
-{% block title %}AQUAVISION — Sistem Informasi Sumber Daya Air{% endblock %}
+{% block title %}AQUAVISION — Platform Informasi Sumber Daya Air{% endblock %}
+
+{% block extra_css %}
+<style>
+body { background: #07111F; }
+
+/* ── HERO ─────────────────────────────────────────────── */
+.hero {
+  min-height: 100vh;
+  position: relative;
+  display: flex; flex-direction: column;
+  background: #07111F;
+  overflow: hidden;
+}
+.hero-noise {
+  position: absolute; inset: 0; pointer-events: none; z-index: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");
+  opacity: .5;
+}
+.hero-aurora {
+  position: absolute; inset: 0; pointer-events: none; z-index: 0;
+  background:
+    radial-gradient(ellipse 120% 70% at 70% -10%, rgba(59,130,246,.08) 0%, transparent 55%),
+    radial-gradient(ellipse 80% 60% at 10% 80%, rgba(14,45,71,.6) 0%, transparent 50%),
+    radial-gradient(ellipse 60% 50% at 90% 90%, rgba(99,102,241,.04) 0%, transparent 50%);
+}
+.hero-topo {
+  position: absolute; inset: 0; pointer-events: none; z-index: 0;
+  opacity: .04;
+  background-image:
+    repeating-radial-gradient(ellipse 200% 80% at 65% 110%,
+      transparent 0px, transparent 34px,
+      rgba(255,255,255,.7) 35px, transparent 36px,
+      transparent 69px, rgba(255,255,255,.5) 70px,
+      transparent 71px, transparent 104px,
+      rgba(255,255,255,.35) 105px, transparent 106px
+    );
+}
+
+.hero-body {
+  position: relative; z-index: 2;
+  display: grid; grid-template-columns: 1fr 1fr;
+  align-items: center; gap: 60px;
+  padding: 100px 7% 70px;
+  flex: 1;
+}
+
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-size: 11px; font-weight: 500; letter-spacing: 2.5px;
+  text-transform: uppercase; color: rgba(59,130,246,.7);
+  margin-bottom: 28px;
+  animation: hUp .9s ease both;
+}
+.hero-eyebrow::before { content:''; width: 28px; height: 1px; background: rgba(59,130,246,.5); }
+
+.hero-h1 {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(52px, 8vw, 96px);
+  font-weight: 200; line-height: .9;
+  letter-spacing: -3px; color: rgba(255,255,255,.95);
+  margin-bottom: 10px;
+  animation: hUp .9s ease .08s both;
+}
+.hero-h1 em { font-style: italic; color: rgba(59,130,246,.85); }
+
+.hero-loc {
+  font-size: 12px; font-weight: 400; letter-spacing: 2.5px;
+  text-transform: uppercase; color: rgba(255,255,255,.2);
+  margin-bottom: 36px;
+  animation: hUp .9s ease .14s both;
+}
+
+.hero-desc {
+  font-size: 16px; font-weight: 300; line-height: 1.85;
+  color: rgba(255,255,255,.45); max-width: 420px;
+  margin-bottom: 48px;
+  animation: hUp .9s ease .2s both;
+}
+
+.hero-btns {
+  display: flex; gap: 12px; flex-wrap: wrap;
+  animation: hUp .9s ease .26s both;
+}
+.btn-hero-fill {
+  padding: 12px 28px; border-radius: 8px;
+  background: #3B82F6; color: white;
+  font-size: 14px; font-weight: 500;
+  font-family: 'Inter', sans-serif;
+  text-decoration: none; border: none; cursor: pointer;
+  transition: all .2s; display: inline-block;
+}
+.btn-hero-fill:hover { background: #2563EB; transform: translateY(-1px); }
+.btn-hero-ghost {
+  padding: 12px 28px; border-radius: 8px;
+  background: transparent; color: rgba(255,255,255,.5);
+  font-size: 14px; font-weight: 400;
+  font-family: 'Inter', sans-serif;
+  text-decoration: none;
+  border: 1px solid rgba(255,255,255,.1);
+  transition: all .2s; display: inline-block;
+}
+.btn-hero-ghost:hover { color: rgba(255,255,255,.8); border-color: rgba(255,255,255,.25); }
+
+/* Hero right panel */
+.hero-panel {
+  background: rgba(255,255,255,.03);
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: 20px; padding: 28px;
+  backdrop-filter: blur(8px);
+  animation: hUp .9s ease .32s both;
+}
+.hero-panel-lbl {
+  font-size: 10px; font-weight: 500; letter-spacing: 2px;
+  text-transform: uppercase; color: rgba(255,255,255,.2);
+  margin-bottom: 20px;
+}
+.stat-quad {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 1px; background: rgba(255,255,255,.05);
+  border-radius: 12px; overflow: hidden; margin-bottom: 20px;
+}
+.sq {
+  background: rgba(255,255,255,.03);
+  padding: 20px 14px; text-align: center;
+  transition: background .2s;
+}
+.sq:hover { background: rgba(59,130,246,.06); }
+.sq-num {
+  font-family: 'Fraunces', serif;
+  font-size: 38px; font-weight: 200; color: rgba(255,255,255,.9);
+  display: block; margin-bottom: 4px; line-height: 1;
+}
+.sq-lbl { font-size: 11px; color: rgba(255,255,255,.25); letter-spacing: .3px; }
+.hero-panel-footer {
+  font-size: 12px; font-weight: 300; color: rgba(255,255,255,.2);
+  line-height: 1.6; text-align: center;
+  border-top: 1px solid rgba(255,255,255,.05); padding-top: 16px;
+}
+.hero-panel-footer strong { color: rgba(255,255,255,.4); font-weight: 400; }
+
+/* Hero bottom */
+.hero-bottom {
+  position: relative; z-index: 2;
+  display: grid; grid-template-columns: repeat(4,1fr);
+  border-top: 1px solid rgba(255,255,255,.05);
+}
+.hb-item {
+  padding: 20px 32px;
+  border-right: 1px solid rgba(255,255,255,.05);
+  animation: hUp .9s ease .4s both;
+}
+.hb-item:last-child { border-right: none; }
+.hb-num {
+  font-family: 'Fraunces', serif;
+  font-size: 11px; font-weight: 400;
+  color: rgba(255,255,255,.25); margin-bottom: 4px;
+  letter-spacing: .5px; text-transform: uppercase;
+}
+.hb-val { font-size: 13px; color: rgba(255,255,255,.55); font-weight: 300; line-height: 1.4; }
+
+/* Wave */
+.hero-wave { position: relative; z-index: 2; line-height: 0; }
+.hero-wave svg { display: block; width: 100%; }
+
+@keyframes hUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ── SECTIONS ─────────────────────────────────────────── */
+.sec { padding: 96px 7%; background: #F8FAFC; }
+.sec-white { background: #fff; }
+.sec-dark  { background: #07111F; }
+.sec-deep  { background: #0E2238; }
+.sec-mid   { background: #0F1C2D; }
+
+.lbl {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 10px; font-weight: 600; letter-spacing: 3px;
+  text-transform: uppercase; color: #3B82F6;
+  margin-bottom: 16px;
+}
+.lbl::before { content:''; width: 18px; height: 1px; background: #3B82F6; }
+.lbl-lt { color: rgba(59,130,246,.6); }
+.lbl-lt::before { background: rgba(59,130,246,.5); }
+
+.sec-h {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(30px, 4vw, 50px);
+  font-weight: 300; letter-spacing: -1.5px; line-height: 1.05;
+  margin-bottom: 14px;
+}
+.sec-h em { font-style: italic; }
+.sec-h-lt { color: rgba(255,255,255,.92); }
+.sec-p {
+  font-size: 15px; font-weight: 300; color: #64748B;
+  line-height: 1.85; max-width: 500px; margin-bottom: 52px;
+}
+.sec-p-lt { color: rgba(255,255,255,.4); }
+
+/* Reveal */
+.rv { opacity: 0; transform: translateY(18px); transition: opacity .65s ease, transform .65s ease; }
+.rv.on { opacity: 1; transform: none; }
+.d1{transition-delay:.07s;} .d2{transition-delay:.14s;} .d3{transition-delay:.21s;}
+.d4{transition-delay:.28s;} .d5{transition-delay:.35s;}
+
+/* ── MASALAH ──────────────────────────────────────────── */
+.prob-layout {
+  display: grid; grid-template-columns: 1fr 1fr;
+  border-radius: 16px; overflow: hidden;
+  border: 1px solid #E2E8F0;
+}
+.prob-cell {
+  padding: 44px 40px;
+  border-right: 1px solid #E2E8F0;
+  border-bottom: 1px solid #E2E8F0;
+  background: #fff; position: relative; overflow: hidden;
+  transition: background .25s;
+}
+.prob-cell:nth-child(even) { border-right: none; }
+.prob-cell:nth-child(3), .prob-cell:nth-child(4) { border-bottom: none; }
+.prob-cell:hover { background: #F8FAFC; }
+.prob-line {
+  position: absolute; top: 0; left: 0;
+  width: 2px; height: 0;
+  background: #3B82F6;
+  transition: height .4s ease;
+}
+.prob-cell:hover .prob-line { height: 100%; }
+.prob-n {
+  font-family: 'Fraunces', serif;
+  font-size: 52px; font-weight: 200; line-height: 1;
+  color: rgba(59,130,246,.08); margin-bottom: 20px;
+  transition: color .3s;
+}
+.prob-cell:hover .prob-n { color: rgba(59,130,246,.14); }
+.prob-cell h3 { font-size: 16px; font-weight: 600; color: #0F172A; margin-bottom: 10px; }
+.prob-cell p  { font-size: 14px; font-weight: 300; color: #64748B; line-height: 1.8; }
+
+/* ── FITUR ────────────────────────────────────────────── */
+.feat-layout {
+  display: grid; grid-template-columns: repeat(3,1fr); gap: 14px;
+}
+.fc {
+  background: #fff; border: 1px solid #E2E8F0;
+  border-radius: 14px; padding: 28px 24px;
+  transition: all .25s; display: flex; flex-direction: column; gap: 12px;
+}
+.fc.span2 { grid-column: span 2; }
+.fc:hover {
+  border-color: rgba(59,130,246,.25);
+  box-shadow: 0 8px 32px rgba(59,130,246,.06);
+  transform: translateY(-2px);
+}
+.fc-icon {
+  width: 40px; height: 40px; border-radius: 10px;
+  background: rgba(59,130,246,.07);
+  display: flex; align-items: center; justify-content: center; font-size: 18px;
+}
+.fc h3 { font-size: 14px; font-weight: 600; color: #0F172A; }
+.fc p  { font-size: 13px; font-weight: 300; color: #64748B; line-height: 1.8; flex: 1; }
+
+/* ── LAYER PILLS ──────────────────────────────────────── */
+.lp-wrap { display: flex; flex-wrap: wrap; gap: 10px; }
+.lp {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 16px; border-radius: 40px;
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.08);
+  transition: all .2s; cursor: default;
+}
+.lp:hover { background: rgba(59,130,246,.08); border-color: rgba(59,130,246,.25); transform: translateY(-1px); }
+.lp-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+.lp span { font-size: 13px; font-weight: 300; color: rgba(255,255,255,.6); }
+
+/* ── LOKASI ───────────────────────────────────────────── */
+.lokasi-wrap {
+  display: grid; grid-template-columns: 1fr 1.4fr; gap: 60px; align-items: center;
+}
+.map-embed {
+  border-radius: 16px; overflow: hidden; position: relative;
+  border: 1px solid rgba(255,255,255,.08);
+  box-shadow: 0 32px 80px rgba(0,0,0,.5);
+}
+.map-embed iframe { display: block; width: 100%; height: 380px; border: none; filter: saturate(.6) brightness(.85); }
+.map-pin {
+  position: absolute; bottom: 16px; left: 16px;
+  background: rgba(7,17,31,.92); backdrop-filter: blur(8px);
+  border: 1px solid rgba(59,130,246,.2);
+  border-radius: 8px; padding: 9px 13px;
+  display: flex; align-items: center; gap: 8px;
+}
+.pin-dot { width: 7px; height: 7px; border-radius: 50%; background: #EF4444; box-shadow: 0 0 0 3px rgba(239,68,68,.2); animation: pp 2s infinite; }
+@keyframes pp { 0%,100%{box-shadow:0 0 0 3px rgba(239,68,68,.2);}50%{box-shadow:0 0 0 6px rgba(239,68,68,.07);} }
+.map-pin span { font-size: 12px; color: rgba(255,255,255,.7); }
+
+/* ── PREVIEW ──────────────────────────────────────────── */
+.prev-wrap {
+  border-radius: 16px; overflow: hidden;
+  border: 1px solid rgba(255,255,255,.08);
+  box-shadow: 0 40px 100px rgba(0,0,0,.5);
+}
+.prev-wrap img { width: 100%; display: block; max-height: 460px; object-fit: cover; }
+.prev-bar {
+  background: #0D2236; padding: 18px 24px;
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 12px;
+  border-top: 1px solid rgba(255,255,255,.05);
+}
+.prev-bar h4 { font-size: 13px; font-weight: 400; color: rgba(255,255,255,.65); }
+.prev-bar p  { font-size: 11px; color: rgba(255,255,255,.25); margin-top: 2px; }
+.btn-prev {
+  padding: 9px 20px; border-radius: 7px;
+  background: #3B82F6; color: white;
+  font-size: 13px; font-weight: 500;
+  font-family: 'Inter', sans-serif; text-decoration: none;
+  transition: all .2s; white-space: nowrap;
+}
+.btn-prev:hover { background: #2563EB; transform: translateY(-1px); }
+
+/* ── CTA ──────────────────────────────────────────────── */
+.cta-wrap { text-align: center; max-width: 500px; margin: 0 auto; }
+.cta-wrap .sec-h { margin-bottom: 16px; }
+.cta-wrap .sec-p { text-align: center; margin: 0 auto 40px; }
+.cta-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.btn-cta-fill {
+  padding: 13px 32px; border-radius: 8px;
+  background: #1a5276; color: white;
+  font-size: 14px; font-weight: 500;
+  font-family: 'Inter', sans-serif;
+  text-decoration: none; border: none; cursor: pointer; transition: all .2s;
+}
+.btn-cta-fill:hover { background: #0E2238; }
+.btn-cta-out {
+  padding: 13px 32px; border-radius: 8px;
+  background: transparent; color: #1a5276;
+  font-size: 14px; font-weight: 400;
+  font-family: 'Inter', sans-serif;
+  text-decoration: none;
+  border: 1.5px solid rgba(26,82,118,.2);
+  transition: all .2s;
+}
+.btn-cta-out:hover { border-color: #1a5276; }
+
+/* ── FEEDBACK ─────────────────────────────────────────── */
+.fb-wrap { max-width: 480px; margin: 0 auto; }
+.fb-lbl { display: block; font-size: 11px; font-weight: 500; letter-spacing: 1.2px; text-transform: uppercase; color: #94A3B8; margin-bottom: 6px; }
+.fb-in {
+  width: 100%; padding: 12px 14px;
+  background: white; border: 1.5px solid #E2E8F0;
+  border-radius: 8px; font-size: 14px;
+  font-family: 'Inter', sans-serif; color: #0F172A;
+  transition: border-color .15s; margin-bottom: 12px;
+}
+.fb-in:focus { outline: none; border-color: #3B82F6; box-shadow: 0 0 0 3px rgba(59,130,246,.07); }
+.fb-btn {
+  width: 100%; padding: 12px;
+  background: #1a5276; color: white; border: none;
+  border-radius: 8px; font-size: 14px; font-weight: 500;
+  cursor: pointer; font-family: 'Inter', sans-serif; transition: all .2s;
+}
+.fb-btn:hover { background: #0E2238; }
+.fb-btn:disabled { opacity: .4; cursor: not-allowed; }
+
+/* ── TIM ──────────────────────────────────────────────── */
+.team-row { display: flex; justify-content: center; gap: 28px; flex-wrap: wrap; margin-bottom: 32px; }
+.tc { text-align: center; }
+.tav {
+  width: 56px; height: 56px; border-radius: 13px;
+  background: linear-gradient(135deg, #1a5276, #2e86c1);
+  color: white; font-family: 'Fraunces', serif;
+  font-size: 17px; font-weight: 300; font-style: italic;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 11px; transition: transform .25s;
+}
+.tc:hover .tav { transform: rotate(-4deg) scale(1.06); }
+.tn { font-size: 14px; font-weight: 500; color: #0F172A; }
+.tnim { font-size: 11px; color: #94A3B8; margin-top: 2px; }
+.pmb {
+  background: white; border: 1px solid #E2E8F0;
+  border-radius: 12px; padding: 22px 36px;
+  max-width: 560px; margin: 0 auto; text-align: center;
+}
+.pmb p { font-size: 13px; font-weight: 300; color: #64748B; line-height: 1.9; }
+.pmb strong { font-weight: 600; color: #0F172A; }
+
+/* Responsive */
+@media (max-width: 900px) {
+  .hero-body { grid-template-columns: 1fr; padding: 80px 6% 40px; }
+  .hero-panel { display: none; }
+  .hero-bottom { grid-template-columns: repeat(2,1fr); }
+  .hb-item:nth-child(2) { border-right: none; }
+  .hb-item:nth-child(3) { border-top: 1px solid rgba(255,255,255,.05); }
+  .prob-layout { grid-template-columns: 1fr; }
+  .prob-cell { border-right: none !important; }
+  .feat-layout { grid-template-columns: 1fr; }
+  .fc.span2 { grid-column: span 1; }
+  .lokasi-wrap { grid-template-columns: 1fr; gap: 36px; }
+  .sec { padding: 64px 6%; }
+  .lnd-foot { flex-direction: column; text-align: center; }
+}
+@media (max-width: 540px) {
+  .hero-btns, .cta-btns { flex-direction: column; }
+  .hero-bottom { grid-template-columns: repeat(2,1fr); }
+  .hb-item { padding: 14px 20px; }
+  .lp-wrap { gap: 8px; }
+}
+</style>
+{% endblock %}
 
 {% block content %}
 
-<!-- ================= HERO ================= -->
+<!-- HERO -->
 <section class="hero">
-    <div class="hero-inner">
-        <div class="hero-badge">WebGIS Sumber Daya Air</div>
-        <h1 class="hero-title">AQUAVISION</h1>
-        <p class="hero-subtitle">
-            Sistem informasi sumber daya air berbasis WebGIS untuk mendukung
-            pengelolaan air terpadu di Desa Wonotoro — kawasan penyangga Bromo
-        </p>
-        <div class="hero-actions">
-            {% if user.is_authenticated %}
-                <a href="/map/" class="btn-primary-lg">Masuk ke WebGIS</a>
-                <a href="/data/" class="btn-outline-lg">Data Portal</a>
-            {% else %}
-                <a href="/login/" class="btn-primary-lg">Login untuk Akses</a>
-                <a href="/register/" class="btn-outline-lg">Daftar Akun</a>
-            {% endif %}
-        </div>
+  <div class="hero-noise"></div>
+  <div class="hero-aurora"></div>
+  <div class="hero-topo"></div>
+  <div class="hero-body">
+    <div>
+      <div class="hero-eyebrow">Platform Informasi Sumber Daya Air</div>
+      <h1 class="hero-h1">AQUA<em>VISION</em></h1>
+      <p class="hero-loc">Desa Wonotoro · Sukapura · Probolinggo</p>
+      <p class="hero-desc">Platform pemetaan dan analisis sumber daya air berbasis WebGIS untuk mendukung pengelolaan air yang berkelanjutan di kawasan wisata Bromo Tengger Semeru.</p>
+      <div class="hero-btns">
+        {% if user.is_authenticated %}
+          <a href="/map/" class="btn-hero-fill">Buka Peta</a>
+          <a href="/data/" class="btn-hero-ghost">Data Portal</a>
+        {% else %}
+          <a href="/login/" class="btn-hero-fill">Masuk ke Sistem</a>
+          <a href="/register/" class="btn-hero-ghost">Daftar Akun</a>
+        {% endif %}
+      </div>
     </div>
+    <div class="hero-panel">
+      <p class="hero-panel-lbl">Ringkasan Data</p>
+      <div class="stat-quad">
+        <div class="sq"><span class="sq-num" id="statAir" data-t="{{ jumlah_air }}">—</span><span class="sq-lbl">Sumber Air</span></div>
+        <div class="sq"><span class="sq-num" id="statFasilitas" data-t="{{ jumlah_fasilitas }}">—</span><span class="sq-lbl">Fasilitas Wisata</span></div>
+        <div class="sq"><span class="sq-num" id="statPermukiman" data-t="{{ jumlah_permukiman }}">—</span><span class="sq-lbl">Permukiman</span></div>
+        <div class="sq"><span class="sq-num" id="statSungai" data-t="28">—</span><span class="sq-lbl">Jaringan Sungai</span></div>
+      </div>
+      <p class="hero-panel-footer">Data diperbarui secara <strong>real-time</strong> dari sistem basis data spasial.</p>
+    </div>
+  </div>
+  <div class="hero-bottom">
+    <div class="hb-item"><div class="hb-num">Sistem</div><div class="hb-val">WebGIS berbasis Leaflet, Django, PostGIS</div></div>
+    <div class="hb-item"><div class="hb-num">Standar</div><div class="hb-val">OGC WMS/WFS, RFC 7946 GeoJSON, ISO/IEC 25010</div></div>
+    <div class="hb-item"><div class="hb-num">Proyeksi</div><div class="hb-val">WGS 84 / EPSG:4326 · UTM Zone 49S</div></div>
+    <div class="hb-item"><div class="hb-num">Kawasan</div><div class="hb-val">KSPN Bromo Tengger Semeru</div></div>
+  </div>
+  <div class="hero-wave">
+    <svg viewBox="0 0 1440 48" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+      <path d="M0,24 C480,48 960,0 1440,24 L1440,48 L0,48 Z" fill="#F8FAFC"/>
+    </svg>
+  </div>
 </section>
 
-<!-- ================= STATISTIK ================= -->
-<section class="stats-row">
-    <div class="stat-item">
-        <span class="stat-number">{{ jumlah_air }}</span>
-        <span class="stat-label">Sumber Air</span>
-    </div>
-    <div class="stat-divider"></div>
-    <div class="stat-item">
-        <span class="stat-number">{{ jumlah_fasilitas }}</span>
-        <span class="stat-label">Fasilitas Wisata</span>
-    </div>
-    <div class="stat-divider"></div>
-    <div class="stat-item">
-        <span class="stat-number">{{ jumlah_permukiman }}</span>
-        <span class="stat-label">Permukiman</span>
-    </div>
+<!-- MASALAH -->
+<section class="sec">
+  <span class="lbl rv">Konteks</span>
+  <div style="display:flex;align-items:baseline;gap:24px;flex-wrap:wrap;margin-bottom:32px;">
+    <h2 class="sec-h rv d1" style="margin-bottom:0;white-space:nowrap;">Tantangan pengelolaan air <em>di Desa Wonotoro</em></h2>
+    <p class="rv d2" style="font-size:14px;font-weight:300;color:#64748B;line-height:1.7;margin:0;">Setiap permasalahan di bawah ini terdokumentasi, terukur, dan berdampak langsung pada kehidupan warga serta keberlanjutan sektor wisata.</p>
+  </div>
+  <div class="prob-layout">
+    <div class="prob-cell rv d1"><div class="prob-line"></div><div class="prob-n">01</div><h3>Kekeringan saat musim kemarau</h3><p>Debit air alami turun drastis saat kemarau. Di waktu bersamaan, kebutuhan air melonjak akibat kunjungan wisatawan dan pertanian hortikultura. Persaingan penggunaan air antara warga, petani, dan pengelola wisata menjadi tidak terkendali.</p></div>
+    <div class="prob-cell rv d2"><div class="prob-line"></div><div class="prob-n">02</div><h3>Jaringan pipa tidak terstruktur</h3><p>Pipa dibangun sendiri oleh warga tanpa perencanaan teknis. Kebocoran tinggi dan distribusi tidak merata memicu konflik antarwarga, terutama saat debit mengecil dan semua pihak bersaing mendapatkan aliran air.</p></div>
+    <div class="prob-cell rv d3"><div class="prob-line"></div><div class="prob-n">03</div><h3>Data aset air tidak terintegrasi</h3><p>Kebakaran hutan Bromo 2023 membuktikan kerapuhan sistem: warga harus menyusuri pipa belasan kilometer secara manual karena tidak ada peta aset digital. Informasi lokasi sumber air, pipa, dan tandon tersebar tanpa dokumentasi terpadu.</p></div>
+    <div class="prob-cell rv d4"><div class="prob-line"></div><div class="prob-n">04</div><h3>Topografi curam membatasi akses</h3><p>Sumber mata air utama berada di kawasan pegunungan terjal yang jauh dari permukiman. Pembangunan jaringan baru berbiaya tinggi, sementara pemeliharaan infrastruktur eksisting sulit dilakukan secara berkala.</p></div>
+  </div>
 </section>
 
-<!-- ================= MASALAH ================= -->
-<section class="section">
-    <div class="section-inner">
-        <p class="section-overline">Latar belakang</p>
-        <h2 class="section-title">Mengapa AQUAVISION dibutuhkan?</h2>
-        <p class="section-desc">
-            Desa Wonotoro sebagai penyangga wisata internasional Bromo menghadapi
-            tantangan serius dalam pengelolaan sumber daya air.
-        </p>
-
-        <div class="problem-grid">
-            <div class="problem-card">
-                <div class="problem-icon problem-icon-red">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C8 8 4 12 4 16a8 8 0 0016 0c0-4-4-8-8-14z"/></svg>
-                </div>
-                <h3 class="problem-title">Krisis air kemarau</h3>
-                <p class="problem-desc">Penurunan Ketersediaan air alami berbenturan dengan lonjakan kebutuhan wisata dan pertanian hortikultura</p>
-            </div>
-
-            <div class="problem-card">
-                <div class="problem-icon problem-icon-amber">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4v16M8 4v16M4 10h4M4 16h12M12 10v6M16 12v4"/></svg>
-                </div>
-                <h3 class="problem-title">Jaringan pipa informal</h3>
-                <p class="problem-desc">Infrastruktur swadaya tanpa perencanaan teknis menyebabkan kebocoran dan konflik sosial antarwarga</p>
-            </div>
-
-            <div class="problem-card">
-                <div class="problem-icon problem-icon-purple">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
-                </div>
-                <h3 class="problem-title">Data terfragmentasi</h3>
-                <p class="problem-desc">Pasca kebakaran Bromo 2023, warga harus susuri jalur pipa belasan kilometer tanpa panduan peta digital</p>
-            </div>
-        </div>
-    </div>
+<!-- FITUR -->
+<section class="sec sec-white">
+  <span class="lbl rv">Sistem</span>
+  <div style="display:flex;align-items:baseline;gap:24px;flex-wrap:wrap;margin-bottom:32px;">
+    <h2 class="sec-h rv d1" style="margin-bottom:0;white-space:nowrap;">Platform terintegrasi <em>untuk pengelolaan air</em></h2>
+    <p class="rv d2" style="font-size:14px;font-weight:300;color:#64748B;line-height:1.7;margin:0;">Semua informasi sumber daya air tersedia dalam satu platform yang dapat diakses dari browser, tanpa perlu perangkat lunak tambahan.</p>
+  </div>
+  <div class="feat-layout">
+    <div class="fc span2 rv d1"><div class="fc-icon">🗺️</div><h3>Peta interaktif multi-layer</h3><p>Aktifkan dan kombinasikan lapisan peta sesuai kebutuhan: data debit puncak aliran per bulan, zonasi potensi air tanah, jaringan sungai, jalur pipa distribusi, lokasi sumber air, tandon, hingga fasilitas wisata. Nilai piksel ditampilkan real-time saat kursor bergerak.</p></div>
+    <div class="fc rv d2"><div class="fc-icon">💧</div><h3>Neraca ketersediaan air</h3><p>Pantau perbandingan ketersediaan dan kebutuhan harian dengan indikator AMAN, WASPADA, atau KRITIS beserta simulasi skenario multi-parameter.</p></div>
+    <div class="fc rv d1"><div class="fc-icon">📏</div><h3>Pengukuran jarak spasial</h3><p>Ukur jarak dari sumber air ke tandon atau permukiman langsung di peta untuk memperkirakan kebutuhan material jaringan pipa baru.</p></div>
+    <div class="fc rv d2"><div class="fc-icon">🌿</div><h3>Analisis potensi air tanah</h3><p>Zonasi daerah resapan dan tangkapan air berbasis metode AHP untuk mengidentifikasi lokasi sumber air potensial baru.</p></div>
+    <div class="fc rv d3"><div class="fc-icon">📥</div><h3>Unduh data terbuka</h3><p>Semua dataset tersedia dalam format CSV, GeoJSON, KML, dan Shapefile untuk analisis lebih lanjut.</p></div>
+    <div class="fc rv d4"><div class="fc-icon">✏️</div><h3>Manajemen aset lapangan</h3><p>Admin dapat menambah dan memperbarui data langsung melalui peta atau dengan upload Shapefile hasil survei.</p></div>
+  </div>
 </section>
 
-<!-- ================= FITUR ================= -->
-<section class="section section-alt">
-    <div class="section-inner">
-        <p class="section-overline">Solusi</p>
-        <h2 class="section-title">Fitur utama sistem</h2>
-        <p class="section-desc">
-            WebGIS yang mengintegrasikan data spasial, analisis hidrologi,
-            dan manajemen aset dalam satu platform terpadu.
-        </p>
-
-        <div class="feature-grid">
-            <div class="feature-card">
-                <div class="feature-icon feature-icon-blue">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 010 20M12 2a15 15 0 000 20"/></svg>
-                </div>
-                <h3>Dashboard peta</h3>
-                <p>Visualisasi catchment area, recharge area, jaringan pipa, sumber air, dan reservoir dalam peta interaktif</p>
-            </div>
-
-            <div class="feature-card">
-                <div class="feature-icon feature-icon-teal">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10M6 20V4M18 20v-6"/></svg>
-                </div>
-                <h3>Neraca air</h3>
-                <p>Analisis keseimbangan supply dan demand air per DAS dengan simulasi skenario dan grafik interaktif</p>
-            </div>
-
-            <div class="feature-card">
-                <div class="feature-icon feature-icon-amber">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-                </div>
-                <h3>Pengukuran jarak</h3>
-                <p>Mengukur jarak spasial dari sumber air ke reservoir dan lokasi pengguna untuk estimasi kebutuhan material pipa</p>
-            </div>
-
-            <div class="feature-card">
-                <div class="feature-icon feature-icon-purple">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8"/></svg>
-                </div>
-                <h3>Input data aset</h3>
-                <p>Manajemen data sumber air, fasilitas wisata, permukiman, dan reservoir langsung melalui antarmuka peta</p>
-            </div>
-
-            <div class="feature-card">
-                <div class="feature-icon feature-icon-pink">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 3v18"/></svg>
-                </div>
-                <h3>Data portal</h3>
-                <p>Akses dan download seluruh dataset dalam format CSV dan GeoJSON untuk keperluan analisis lanjutan</p>
-            </div>
-
-            <div class="feature-card">
-                <div class="feature-icon feature-icon-coral">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s-8-4.5-8-11.8A8 8 0 0112 2a8 8 0 018 8.2c0 7.3-8 11.8-8 11.8z"/><circle cx="12" cy="10" r="3"/></svg>
-                </div>
-                <h3>Pemetaan potensi air</h3>
-                <p>Zonasi catchment dan recharge area menggunakan metode AHP untuk identifikasi lokasi sumber air baru</p>
-            </div>
-        </div>
-    </div>
+<!-- LAYER DATA -->
+<section class="sec sec-dark">
+  <span class="lbl lbl-lt rv">Dataset Spasial</span>
+  <h2 class="sec-h sec-h-lt rv d1" style="margin-bottom:8px;">Lapisan data <em>yang dapat diakses</em></h2>
+  <p class="rv d2" style="font-size:14px;font-weight:300;color:rgba(255,255,255,.35);line-height:1.7;margin-bottom:36px;">Setiap lapisan dapat diaktifkan, dinonaktifkan, dan dikombinasikan bebas di peta interaktif.</p>
+  <div class="lp-wrap rv d3">
+    <div class="lp"><div class="lp-dot" style="background:linear-gradient(135deg,#c7e9ff,#022d4d);"></div><span>Debit Puncak Aliran — 12 Bulan</span></div>
+    <div class="lp"><div class="lp-dot" style="background:linear-gradient(135deg,#DC2626,#16A34A);"></div><span>Daerah Potensi Air Tanah</span></div>
+    <div class="lp"><div class="lp-dot" style="background:#2980b9;"></div><span>Daerah Aliran Sungai</span></div>
+    <div class="lp"><div class="lp-dot" style="background:#F59E0B;"></div><span>Jaringan Pipa Distribusi</span></div>
+    <div class="lp"><div class="lp-dot" style="background:#3B82F6;border-radius:50%;"></div><span>Sumber Air</span></div>
+    <div class="lp"><div class="lp-dot" style="background:#16A34A;border-radius:50%;"></div><span>Tandon Air</span></div>
+    <div class="lp"><div class="lp-dot" style="background:#DC2626;border-radius:50%;"></div><span>Fasilitas Wisata</span></div>
+    <div class="lp"><div class="lp-dot" style="border:2px dashed rgba(220,38,38,.5);border-radius:3px;"></div><span>Batas Administrasi Desa</span></div>
+  </div>
 </section>
 
-<!-- ================= PREVIEW PETA ================= -->
-<section class="section">
-    <div class="section-inner">
-        <p class="section-overline">Preview</p>
-        <h2 class="section-title">Peta interaktif Desa Wonotoro</h2>
-
-        <div class="preview-card">
-            <img src="{% static 'images/webgis_preview.png' %}" alt="Preview WebGIS" class="preview-img">
-            <div class="preview-bottom">
-                <div>
-                    <p class="preview-location">Desa Wonotoro, Kab. Probolinggo</p>
-                    <p class="preview-sublocation">Kawasan penyangga KSPN Bromo Tengger Semeru</p>
-                </div>
-                {% if user.is_authenticated %}
-                    <a href="/map/" class="btn-primary-sm">Buka peta</a>
-                {% else %}
-                    <a href="/login/" class="btn-primary-sm">Login untuk akses</a>
-                {% endif %}
-            </div>
-        </div>
+<!-- LOKASI -->
+<section class="sec sec-deep">
+  <div class="lokasi-wrap">
+    <div>
+      <span class="lbl lbl-lt rv">Wilayah Kajian</span>
+      <h2 class="sec-h sec-h-lt rv d1">Desa Wonotoro,<br><em>kaki Gunung Bromo</em></h2>
+      <p class="sec-p sec-p-lt rv d2">Kecamatan Sukapura, Kabupaten Probolinggo. Kawasan penyangga KSPN Bromo Tengger Semeru yang dikunjungi lebih dari 300.000 wisatawan per tahun.</p>
     </div>
+    <div class="map-embed rv d3">
+      <div class="map-pin"><div class="pin-dot"></div><span>Desa Wonotoro, Sukapura</span></div>
+      <iframe src="https://www.openstreetmap.org/export/embed.html?bbox=112.93%2C-7.95%2C113.07%2C-7.81&layer=mapnik&marker=-7.88%2C113.00" allowfullscreen loading="lazy"></iframe>
+    </div>
+  </div>
 </section>
 
-<!-- ================= FEEDBACK ================= -->
-<section class="section">
-    <div class="section-inner">
-        <p class="section-overline">Masukan</p>
-        <h2 class="section-title">Sampaikan pendapat Anda</h2>
-        <p class="section-desc">
-            Kami terbuka terhadap masukan dari masyarakat untuk meningkatkan pengelolaan sumber daya air di Desa Wonotoro.
-        </p>
-
-        <div style="max-width:560px; margin:0 auto;">
-            <div style="margin-bottom:14px;">
-                <label style="display:block; font-size:13px; font-weight:500; color:#333; margin-bottom:6px;">Nama</label>
-                <input type="text" id="feedbackNama" placeholder="Nama Anda" style="width:100%; padding:12px 14px; border:1.5px solid #dde1e6; border-radius:8px; font-size:14px; font-family:inherit;">
-            </div>
-            <div style="margin-bottom:14px;">
-                <label style="display:block; font-size:13px; font-weight:500; color:#333; margin-bottom:6px;">Pesan</label>
-                <textarea id="feedbackPesan" rows="4" placeholder="Tulis masukan, saran, atau keluhan Anda..." style="width:100%; padding:12px 14px; border:1.5px solid #dde1e6; border-radius:8px; font-size:14px; font-family:inherit; resize:vertical;"></textarea>
-            </div>
-            <button id="btnFeedback" class="btn-primary-lg" style="width:100%; cursor:pointer;">Kirim Masukan</button>
-            <div id="feedbackStatus" style="margin-top:10px; font-size:14px; text-align:center;"></div>
-        </div>
-
-        <div id="feedbackList" style="max-width:560px; margin:30px auto 0;"></div>
+<!-- PREVIEW -->
+<section class="sec sec-dark">
+  <span class="lbl lbl-lt rv">Preview</span>
+  <h2 class="sec-h sec-h-lt rv d1">Tampilan sistem</h2>
+  <div class="prev-wrap rv d2">
+    <img src="{% static 'images/webgis_preview.png' %}" alt="Preview WebGIS AQUAVISION">
+    <div class="prev-bar">
+      <div>
+        <h4>📍 Desa Wonotoro, Kec. Sukapura, Kab. Probolinggo</h4>
+        <p>WGS84 / EPSG:4326 · Kawasan penyangga KSPN Bromo Tengger Semeru</p>
+      </div>
+      {% if user.is_authenticated %}<a href="/map/" class="btn-prev">Buka Peta →</a>
+      {% else %}<a href="/login/" class="btn-prev">Masuk untuk Akses →</a>{% endif %}
     </div>
+  </div>
 </section>
 
-<!-- ================= TIM ================= -->
-<section class="section section-alt">
-    <div class="section-inner">
-        <p class="section-overline">Tim pengembang</p>
-        <h2 class="section-title">Capstone Design Project 2025</h2>
-        <p class="section-desc">
-            Program Studi Teknik Geodesi dan Geomatika — Fakultas Ilmu dan Teknologi Kebumian, Institut Teknologi Bandung
-        </p>
-
-        <div class="team-grid">
-            <div class="team-card">
-                <div class="team-avatar">NM</div>
-                <p class="team-name">Najwa Maharani</p>
-                <p class="team-nim">15122103</p>
-            </div>
-            <div class="team-card">
-                <div class="team-avatar">RF</div>
-                <p class="team-name">Rayhan Fadhil M.</p>
-                <p class="team-nim">15122106</p>
-            </div>
-            <div class="team-card">
-                <div class="team-avatar">MR</div>
-                <p class="team-name">M. Radja Adzka</p>
-                <p class="team-nim">15122115</p>
-            </div>
-        </div>
-
-        <div class="team-pembimbing">
-            <p>Pembimbing: <strong>Dr. Ratri Widyastuti, S.T., M.T.</strong></p>
-            <p>Dr., Ir., Bambang Setyadji, M.Si &nbsp;·&nbsp; Miga Magentika Julian, S.T., M.T.</p>
-        </div>
+<!-- CTA -->
+<section class="sec sec-white">
+  <div class="cta-wrap">
+    <span class="lbl rv" style="display:inline-flex;">Mulai</span>
+    <h2 class="sec-h rv d1">Kelola data air Wonotoro<br><em>secara digital</em></h2>
+    <p class="sec-p rv d2" style="text-align:center;margin:0 auto 40px;">Satu platform untuk semua informasi sumber daya air — dapat diakses kapan saja dari perangkat apapun.</p>
+    <div class="cta-btns rv d3">
+      {% if user.is_authenticated %}
+        <a href="/map/" class="btn-cta-fill">Buka WebGIS</a>
+        <a href="/data/" class="btn-cta-out">Lihat Data Portal</a>
+      {% else %}
+        <a href="/login/" class="btn-cta-fill">Masuk ke Sistem</a>
+        <a href="/register/" class="btn-cta-out">Daftar Akun</a>
+      {% endif %}
     </div>
+  </div>
 </section>
+
+<!-- FEEDBACK -->
+<section class="sec" style="background:#F8FAFC;">
+  <div style="text-align:center;max-width:440px;margin:0 auto 44px;">
+    <span class="lbl rv" style="display:inline-flex;">Masukan</span>
+    <h2 class="sec-h rv d1">Sampaikan<br><em>pendapat Anda</em></h2>
+    <p class="sec-p rv d2" style="text-align:center;margin:0 auto;">Kami terbuka terhadap masukan dari masyarakat, pengelola wisata, dan semua pihak yang berkepentingan.</p>
+  </div>
+  <div class="fb-wrap rv d3">
+    <label class="fb-lbl">Nama</label>
+    <input type="text" class="fb-in" id="feedbackNama" placeholder="Nama Anda">
+    <label class="fb-lbl">Pesan</label>
+    <textarea class="fb-in" id="feedbackPesan" rows="4" placeholder="Tulis masukan atau saran Anda..."></textarea>
+    <button id="btnFeedback" class="fb-btn">Kirim Masukan</button>
+    <div id="feedbackStatus" style="margin-top:10px;font-size:13px;text-align:center;"></div>
+  </div>
+  <div id="feedbackList" style="max-width:480px;margin:28px auto 0;"></div>
+</section>
+
+<!-- TIM -->
+<section class="sec sec-white">
+  <div style="text-align:center;">
+    <span class="lbl rv" style="display:inline-flex;">Tim</span>
+    <h2 class="sec-h rv d1">Capstone Design Project<br><em>2026</em></h2>
+    <p class="sec-p rv d2" style="text-align:center;margin:0 auto 44px;">Program Studi Teknik Geodesi dan Geomatika<br>Fakultas Ilmu dan Teknologi Kebumian, Institut Teknologi Bandung</p>
+    <div class="team-row">
+      <div class="tc rv d1"><div class="tav">NM</div><p class="tn">Najwa Maharani</p><p class="tnim">15122103</p></div>
+      <div class="tc rv d2"><div class="tav">RF</div><p class="tn">Rayhan Fadhil M.</p><p class="tnim">15122106</p></div>
+      <div class="tc rv d3"><div class="tav">MR</div><p class="tn">M. Radja Adzka</p><p class="tnim">15122115</p></div>
+    </div>
+    <div class="pmb rv d4">
+      <p>Koordinator Pembimbing: <strong>Dr. Ratri Widyastuti, S.T., M.T.</strong></p>
+      <p>Dosen Pembimbing: <strong>Dr., Ir., Bambang Setyadji, M.Si</strong> dan <strong>Miga Magentika Julian, S.T., M.T.</strong></p>
+    </div>
+  </div>
+</section>
+
 {% endblock %}
 {% block extra_js %}
 <script>
-document.getElementById("btnFeedback")?.addEventListener("click", function() {
-    var nama = document.getElementById("feedbackNama").value.trim();
-    var pesan = document.getElementById("feedbackPesan").value.trim();
-    var status = document.getElementById("feedbackStatus");
-
-    if (!nama || !pesan) {
-        status.innerHTML = '<span style="color:#e74c3c;">Nama dan pesan wajib diisi.</span>';
-        return;
-    }
-
-    fetch("/api/feedback/", {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({nama: nama, pesan: pesan})
-    })
-    .then(function(r) { return r.json(); })
-    .then(function(data) {
-        if (data.message) {
-            status.innerHTML = '<span style="color:#27ae60;">' + data.message + '</span>';
-            document.getElementById("feedbackNama").value = "";
-            document.getElementById("feedbackPesan").value = "";
-            loadFeedbacks();
-        } else {
-            status.innerHTML = '<span style="color:#e74c3c;">' + (data.error || "Gagal mengirim.") + '</span>';
-        }
-    })
-    .catch(function() {
-        status.innerHTML = '<span style="color:#e74c3c;">Gagal mengirim masukan.</span>';
-    });
+function cnt(el,t,d){if(!el)return;var t0=null;(function tick(ts){if(!t0)t0=ts;var p=Math.min((ts-t0)/d,1),e=1-Math.pow(1-p,4);el.textContent=Math.floor(e*t);if(p<1)requestAnimationFrame(tick);else el.textContent=t;})(performance.now());}
+[['Air','/api/sumber-air-geojson/'],['Fasilitas','/api/fasilitas-geojson/'],['Permukiman','/api/permukiman-geojson/']].forEach(function(k,i){var el=document.getElementById('stat'+k[0]);fetch(k[1]).then(r=>r.json()).then(d=>cnt(el,d.features?d.features.length:(+el.dataset.t||0),1200+i*200)).catch(()=>cnt(el,+el.dataset.t||0,1200+i*200));});
+cnt(document.getElementById('statSungai'),28,1800);
+var obs=new IntersectionObserver(function(e){e.forEach(function(x){if(x.isIntersecting){x.target.classList.add('on');obs.unobserve(x.target);}});},{threshold:.1,rootMargin:'0px 0px -20px 0px'});
+document.querySelectorAll('.rv').forEach(function(el){obs.observe(el);});
+document.getElementById('btnFeedback')?.addEventListener('click',function(){
+  var nama=document.getElementById('feedbackNama').value.trim(),pesan=document.getElementById('feedbackPesan').value.trim(),st=document.getElementById('feedbackStatus');
+  if(!nama||!pesan){st.innerHTML='<span style="color:#DC2626;">⚠️ Nama dan pesan wajib diisi.</span>';return;}
+  this.disabled=true;this.textContent='Mengirim...';var btn=this;
+  fetch('/api/feedback/',{method:'POST',headers:{'Content-Type':'application/json','X-CSRFToken':(document.cookie.match(/csrftoken=([^;]+)/)||['',''])[1]},body:JSON.stringify({nama,pesan})})
+  .then(r=>r.json()).then(d=>{btn.disabled=false;btn.textContent='Kirim Masukan';if(d.message){st.innerHTML='<span style="color:#16A34A;">✅ '+d.message+'</span>';document.getElementById('feedbackNama').value='';document.getElementById('feedbackPesan').value='';loadFb();}else st.innerHTML='<span style="color:#DC2626;">'+(d.error||'Gagal.')+'</span>';})
+  .catch(()=>{btn.disabled=false;btn.textContent='Kirim Masukan';st.innerHTML='<span style="color:#DC2626;">Gagal.</span>';});
 });
-
-function loadFeedbacks() {
-    fetch("/api/feedback/list/").then(function(r){return r.json();}).then(function(data) {
-        var container = document.getElementById("feedbackList");
-        if (!container || data.length === 0) return;
-        var html = '<h3 style="font-size:16px; margin-bottom:12px; color:#333;">Masukan terbaru</h3>';
-        data.forEach(function(f) {
-            html += '<div style="background:#f8f9fa; padding:14px 18px; border-radius:10px; margin-bottom:10px; border-left:3px solid #1a5276;">' +
-                '<div style="display:flex; justify-content:space-between; margin-bottom:4px;">' +
-                    '<span style="font-weight:600; font-size:14px; color:#333;">' + f.nama + '</span>' +
-                    '<span style="font-size:12px; color:#999;">' + f.tanggal + '</span>' +
-                '</div>' +
-                '<p style="font-size:13px; color:#555; margin:0; line-height:1.5;">' + f.pesan + '</p>' +
-            '</div>';
-        });
-        container.innerHTML = html;
-    });
-}
-loadFeedbacks();
+function loadFb(){fetch('/api/feedback/list/').then(r=>r.json()).then(data=>{var c=document.getElementById('feedbackList');if(!c||!data.length)return;var h='<p style="font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#94A3B8;margin-bottom:12px;">Masukan Terbaru</p>';data.forEach(f=>{h+='<div style="background:white;padding:14px 18px;border-radius:10px;margin-bottom:8px;border:1px solid #E2E8F0;border-left:2px solid #3B82F6;"><div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;margin-bottom:6px;"><span style="font-weight:600;font-size:13px;color:#0F172A;">'+f.nama+'</span><span style="font-size:11px;color:#94A3B8;background:#F1F5F9;padding:2px 8px;border-radius:4px;">'+f.tanggal+'</span></div><p style="font-size:13px;color:#64748B;line-height:1.7;font-weight:300;">'+f.pesan+'</p></div>';});c.innerHTML=h;}).catch(()=>{});}
+loadFb();
 </script>
-
 {% endblock %}

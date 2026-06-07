@@ -3,256 +3,380 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
-<style>
-    .sidebar-toggle { position:absolute; left:0; top:50%; transform:translateY(-50%); z-index:1001; background:var(--primary); color:white; border:none; width:28px; height:60px; border-radius:0 8px 8px 0; cursor:pointer; font-size:14px; display:none; }
-    .sidebar.collapsed { display:none; }
-    .sidebar.collapsed + .map-container { flex:0 0 100%; }
-    .webgis-container { position:relative; }
-    .sidebar-toggle.visible { display:block; }
-    .accordion-header { display:flex; justify-content:space-between; align-items:center; cursor:pointer; padding:12px 0 8px; user-select:none; }
-    .accordion-header h3 { margin:0; font-size:14px; }
-    .accordion-arrow { font-size:12px; transition:transform 0.2s; color:var(--gray-400); }
-    .accordion-arrow.open { transform:rotate(180deg); }
-    .accordion-body { display:none; }
-    .accordion-body.open { display:block; }
-    .stats-compact { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
-    .stat-mini { text-align:center; padding:10px 4px; border-radius:var(--radius-sm); background:var(--gray-50); border:1px solid var(--gray-200); }
-    .stat-mini-icon { font-size:16px; }
-    .stat-mini-num { font-size:20px; font-weight:600; margin:2px 0; }
-    .stat-mini-label { font-size:11px; color:var(--gray-600); }
-    .sidebar-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
-    .sidebar-head h2 { margin:0; }
-    .btn-collapse-sidebar { background:none; border:1px solid var(--gray-300); border-radius:var(--radius-sm); padding:4px 8px; cursor:pointer; font-size:13px; color:var(--gray-600); width:auto; margin:0; }
-    .btn-collapse-sidebar:hover { background:var(--gray-100); }
-    .sidebar-scroll { max-height:calc(100vh - 120px); overflow-y:auto; padding-right:4px; }
-    .sidebar-scroll::-webkit-scrollbar { width:4px; }
-    .sidebar-scroll::-webkit-scrollbar-thumb { background:var(--gray-300); border-radius:4px; }
-    .debit-info { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:8px 0; }
-    .debit-box { text-align:center; padding:10px; border-radius:var(--radius-sm); }
-    .debit-box-supply { background:#e8f6f3; }
-    .debit-box-demand { background:#fdebd0; }
-    .debit-box-num { font-size:18px; font-weight:600; }
-    .debit-box-label { font-size:11px; color:var(--gray-600); margin-top:2px; }
-    .status-bar { display:flex; align-items:center; gap:8px; padding:8px 12px; border-radius:var(--radius-sm); margin-top:8px; }
-    .status-dot { width:12px; height:12px; border-radius:50%; }
-    .map-info-bar { display:flex; justify-content:space-between; align-items:center; padding:8px 16px; background:var(--gray-900,#1a1a2e); color:#ccc; border-radius:0 0 var(--radius-md,10px) var(--radius-md,10px); font-size:12px; font-family:var(--font-body,'DM Sans',sans-serif); }
-    .map-info-item { display:flex; align-items:center; gap:4px; }
-    .map-info-label { font-weight:600; color:#999; }
-    .search-map-control { margin-top:10px; margin-left:10px; }
-    .print-map-control { margin-top:6px; margin-left:10px; }
-    .legend { max-height:300px; overflow-y:auto; }
-    .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; z-index:5000; }
-    .modal-box { background:white; border-radius:16px; width:100%; max-width:480px; max-height:90vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,0.3); }
-    .modal-header { display:flex; justify-content:space-between; align-items:center; padding:20px 24px 12px; border-bottom:1px solid #eee; }
-    .modal-header h3 { margin:0; font-size:18px; color:var(--primary-dark,#0e2f44); }
-    .modal-close { background:none; border:none; font-size:20px; cursor:pointer; color:#999; padding:4px; width:auto; }
-    .modal-close:hover { color:#333; }
-    .modal-body { padding:20px 24px 24px; }
-    .modal-body .auth-field { margin-bottom:14px; }
-    .modal-body .auth-field label { display:block; font-size:13px; font-weight:500; color:#333; margin-bottom:5px; }
-    .modal-body .auth-field input, .modal-body .auth-field select { width:100%; padding:10px 12px; border:1.5px solid #ddd; border-radius:6px; font-size:14px; font-family:inherit; }
-    .modal-body .auth-field input:focus, .modal-body .auth-field select:focus { outline:none; border-color:var(--primary,#1a5276); box-shadow:0 0 0 3px rgba(26,82,118,0.1); }
-    @media print { .navbar,.sidebar,.footer,.map-info-bar{display:none!important;} .map-container{flex:1!important;max-width:100%!important;} #map{height:100vh!important;} }
-    @keyframes slideIn { from{transform:translateX(120%);opacity:0;} to{transform:translateX(0);opacity:1;} }
-</style>
 {% endblock %}
 
 {% block content %}
+
 <div class="webgis-container">
-<button class="sidebar-toggle" id="btnShowSidebar" title="Tampilkan sidebar">▶</button>
-<aside class="sidebar" id="sidebar">
-    <div class="sidebar-scroll">
-    <div class="sidebar-head">
-        <h2>Fitur Peta</h2>
-        <button class="btn-collapse-sidebar" id="btnHideSidebar" title="Sembunyikan sidebar">✕</button>
-    </div>
 
-    <button class="menu-btn" id="btnLayer">Daftar Layer</button>
-    <div id="layerPanel" class="layer-panel">
-        <p style="font-weight:600;margin-bottom:5px;font-size:13px;">Batas & Wilayah</p>
-        <label><input type="checkbox" id="chkAdminGab"> Administrasi Desa</label><br>
-        <label><input type="checkbox" id="chkSubDAS"> Sungai Desa Wonotoro</label><br>
-        <label><input type="checkbox" id="chkCatchment"> Daerah Tangkapan Air Desa Wonotoro</label><br>
-        <label><input type="checkbox" id="chkRecharge"> Daerah Resapan Air Desa Wonotoro</label><br>
-        <hr style="margin:8px 0;">
-        <p style="font-weight:600;margin-bottom:5px;font-size:13px;">Infrastruktur Air</p>
-        <label><input type="checkbox" id="chkAir"> Sumber Air</label><br>
-        <label><input type="checkbox" id="chkReservoir"> Reservoir</label><br>
-        <label><input type="checkbox" id="chkPipa"> Jaringan Pipa</label><br>
-        <label><input type="checkbox" id="chkSungai"> Sungai</label><br>
-        <label><input type="checkbox" id="chkDebitPot"> Potensi Ketersediaan Air</label><br>
-        <hr style="margin:8px 0;">
-        <p style="font-weight:600;margin-bottom:5px;font-size:13px;">Fasilitas & Penduduk</p>
-        <label><input type="checkbox" id="chkHotel"> Hotel</label><br>
-        <label><input type="checkbox" id="chkMakan"> Tempat Makan</label><br>
-        <label><input type="checkbox" id="chkJasa"> Jasa</label><br>
-        <label><input type="checkbox" id="chkPermukiman"> Permukiman</label>
-    </div>
+    <!-- ── Sidebar toggle (tampil saat sidebar collapsed) ──────── -->
+    <button class="sidebar-toggle" id="btnShowSidebar" title="Tampilkan sidebar">▶</button>
 
-    <button class="menu-btn" id="btnInputToggle">Input Data</button>
-    <div id="inputChoicePanel" class="layer-panel">
-        <button class="menu-btn" id="btnInput" style="font-size:13px;padding:10px;margin:4px 0;">✏️ Input Manual (Klik Peta)</button>
-        <button class="menu-btn" id="btnUploadSHP" style="font-size:13px;padding:10px;margin:4px 0;background:#2c3e50;">📁 Upload Shapefile</button>
-    </div>
+    <!-- ── Sidebar ─────────────────────────────────────────────── -->
+    <aside class="sidebar" id="sidebar">
 
-    <button class="menu-btn" id="btnDebit">Informasi Ketersediaan Air</button>
-    <button class="menu-btn" id="btnDistance">Pengukuran Jarak</button>
-    <div id="distancePanel" class="layer-panel">
-        <label><input type="radio" name="mode" value="click" checked> Klik 2 Titik</label>
-        <label><input type="radio" name="mode" value="manual"> Manual</label>
-        <div id="manualInput" style="display:none;">
-            <input type="number" id="lat1" placeholder="Lat 1" step="any">
-            <input type="number" id="lng1" placeholder="Lng 1" step="any">
-            <input type="number" id="lat2" placeholder="Lat 2" step="any">
-            <input type="number" id="lng2" placeholder="Lng 2" step="any">
-            <button id="btnHitungManual">Hitung</button>
+        <div class="sidebar-head">
+            <h2>Fitur Peta</h2>
+            <button class="btn-collapse-sidebar" id="btnHideSidebar">✕</button>
         </div>
-        <p id="distanceResult"></p>
-    </div>
 
-    <a href="{% url 'data_list' %}"><button class="menu-btn">📊 Data Portal</button></a>
+        <div class="sidebar-scroll">
 
-    <div class="card polygon-stats-card" id="polygonStatsPanel" style="display:none;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-            <h3 style="margin:0;font-size:14px;" id="polygonStatsTitle">Info Wilayah</h3>
-            <button id="btnCloseStats" style="background:none;border:none;font-size:16px;cursor:pointer;color:#999;width:auto;margin:0;padding:4px;">✕</button>
-        </div>
-        <div id="polygonStatsContent"></div>
-    </div>
+            <!-- Daftar Layer -->
+            <button class="menu-btn" id="btnLayer">Daftar Layer</button>
+            <div id="layerPanel" class="layer-panel">
 
-    <div class="card" style="padding:12px;">
-        <div class="accordion-header" data-target="statsBody"><h3>Jumlah Data</h3><span class="accordion-arrow open">▼</span></div>
-        <div class="accordion-body" id="simBody">
-            <input type="number" id="simPenduduk" placeholder="Jumlah Penduduk (orang)" style="margin-top:8px;">
-            <input type="number" id="simHotel" placeholder="Jumlah Kamar Hotel/Homestay">
-            <input type="number" id="simResto" placeholder="Jumlah Kursi Restoran/Warung">
-            <input type="number" id="simPertanian" placeholder="Luas Pertanian (ha)" step="any">
-            <p style="font-size:11px;color:#999;margin:6px 0;">Standar: Penduduk 60 L/org/hari · Hotel 150 L/kamar/hari · Resto 100 L/kursi/hari · Pertanian 1 L/dtk/ha</p>
-            <button id="btnSimulasi">Hitung Simulasi</button>
-        </div>
-    </div>
+                <p>Batas & Wilayah</p>
+                <label><input type="checkbox" id="chkAdminGab"> Administrasi Desa</label>
+                <hr>
 
-    <div class="card" style="padding:12px;">
-        <div class="accordion-header" data-target="debitBody"><h3>Informasi Ketersediaan Air</h3><span class="accordion-arrow open">▼</span></div>
-        <div class="accordion-body open" id="debitBody">
-            <div class="debit-info">
-                <div class="debit-box debit-box-supply"><div class="debit-box-num" id="debitSupply">0</div><div class="debit-box-label">Ketersediaan (m³/hari)</div></div>
-                <div class="debit-box debit-box-demand"><div class="debit-box-num" id="debitDemand">0</div><div class="debit-box-label">Kebutuhan (m³/hari)</div></div>
+                <p>Infrastruktur Air</p>
+                <label><input type="checkbox" id="chkAir">          Sumber Air</label>
+                <label><input type="checkbox" id="chkReservoir">    Tandon Air</label>
+                <label><input type="checkbox" id="chkPipa">         Jaringan Pipa</label>
+                <label><input type="checkbox" id="chkSungaiVektor"> Daerah Aliran Sungai</label>
+                <hr>
+
+                <p>Analisis Hidrologi</p>
+                <label><input type="checkbox" id="chkPotensiAirTanah"> Daerah Potensi Air Tanah</label>
+                <label><input type="checkbox" id="chkDebitPuncak">     Debit Puncak Aliran</label>
+                <div id="debitBulanPanel" style="display:none; margin:4px 0 4px 6px;">
+                    <select id="selectDebitBulan" style="font-size:12px;">
+                        <option value="">-- Pilih Bulan --</option>
+                        <option value="Jan">Januari</option>
+                        <option value="Feb">Februari</option>
+                        <option value="Mar">Maret</option>
+                        <option value="Apr">April</option>
+                        <option value="Mei">Mei</option>
+                        <option value="Jun">Juni</option>
+                        <option value="Jul">Juli</option>
+                        <option value="Ags">Agustus</option>
+                        <option value="Sep">September</option>
+                        <option value="Okt">Oktober</option>
+                        <option value="Nov">November</option>
+                        <option value="Des">Desember</option>
+                    </select>
+                </div>
+                <hr>
+
+                <p>Fasilitas & Penduduk</p>
+                <label><input type="checkbox" id="chkHotel">      Hotel</label>
+                <label><input type="checkbox" id="chkMakan">      Tempat Makan</label>
+                <label><input type="checkbox" id="chkJasa">       Jasa</label>
+                <label><input type="checkbox" id="chkPermukiman"> Permukiman</label>
+
+            </div><!-- /layerPanel -->
+
+            <!-- Input Data -->
+            <button class="menu-btn" id="btnInputToggle">Input Data</button>
+            <div id="inputChoicePanel" class="layer-panel">
+                <button class="menu-btn" id="btnInput"     style="font-size:12px; padding:8px;">✏️ Input Manual</button>
+                <button class="menu-btn" id="btnUploadSHP" style="font-size:12px; padding:8px;">📁 Upload Shapefile</button>
             </div>
-            <div class="status-bar" id="statusBar" style="background:#e8f6f3;">
-                <div class="status-dot" id="statusDot" style="background:#f1c40f;"></div>
-                <div><span id="statusLabel" style="font-weight:600;font-size:14px;">-</span><span id="statusPersen" style="font-size:13px;color:var(--gray-600);margin-left:6px;">0%</span></div>
+
+            <!-- Pengukuran Jarak -->
+            <button class="menu-btn" id="btnDistance">Pengukuran Jarak</button>
+            <div id="distancePanel" class="layer-panel">
+                <label><input type="radio" name="mode" value="click"  checked> Klik 2 Titik</label>
+                <label><input type="radio" name="mode" value="manual">          Input Manual</label>
+                <div id="manualInput" style="display:none;">
+                    <input type="number" id="lat1" placeholder="Lat 1" step="any">
+                    <input type="number" id="lng1" placeholder="Lng 1" step="any">
+                    <input type="number" id="lat2" placeholder="Lat 2" step="any">
+                    <input type="number" id="lng2" placeholder="Lng 2" step="any">
+                    <button id="btnHitungManual">Hitung</button>
+                </div>
+                <p id="distanceResult" style="color:rgba(255,255,255,.6); font-size:12px; margin-top:6px;"></p>
+            </div>
+
+            <!-- Data Portal -->
+            <a href="{% url 'data_list' %}">
+                <button class="menu-btn">📊 Data Portal</button>
+            </a>
+
+            <!-- Info Wilayah (muncul saat polygon diklik) -->
+            <div class="card" id="polygonStatsPanel" style="display:none;">
+                <div class="polygon-stats-card">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                        <span style="font-size:12px; font-weight:500; color:rgba(255,255,255,.7);" id="polygonStatsTitle">Info Wilayah</span>
+                        <button id="btnCloseStats" style="background:none; border:none; font-size:14px; cursor:pointer; color:rgba(255,255,255,.3); width:auto; margin:0; padding:2px;">✕</button>
+                    </div>
+                    <div id="polygonStatsContent"></div>
+                </div>
+            </div>
+
+            <!-- Jumlah Data -->
+            <div class="card">
+                <div class="accordion-header" data-target="statsBody">
+                    <h3>Jumlah Data</h3>
+                    <span class="accordion-arrow open">▼</span>
+                </div>
+                <div class="accordion-body open" id="statsBody">
+                    <div class="stats-compact">
+                        <div class="stat-mini"><div class="stat-mini-icon">💧</div><div class="stat-mini-num" id="countAir">0</div><div class="stat-mini-label">Sumber Air</div></div>
+                        <div class="stat-mini"><div class="stat-mini-icon">🏨</div><div class="stat-mini-num" id="countHotel">0</div><div class="stat-mini-label">Hotel</div></div>
+                        <div class="stat-mini"><div class="stat-mini-icon">🍽</div><div class="stat-mini-num" id="countMakan">0</div><div class="stat-mini-label">Makan</div></div>
+                        <div class="stat-mini"><div class="stat-mini-icon">🛠</div><div class="stat-mini-num" id="countJasa">0</div><div class="stat-mini-label">Jasa</div></div>
+                        <div class="stat-mini"><div class="stat-mini-icon">👥</div><div class="stat-mini-num" id="totalPenduduk">0</div><div class="stat-mini-label">Penduduk</div></div>
+                        <div class="stat-mini"><div class="stat-mini-icon">🏗</div><div class="stat-mini-num" id="countReservoir">0</div><div class="stat-mini-label">Tandon</div></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ketersediaan Air -->
+            <div class="card">
+                <div class="accordion-header" data-target="debitBody">
+                    <h3>Ketersediaan Air</h3>
+                    <span class="accordion-arrow open">▼</span>
+                </div>
+                <div class="accordion-body open" id="debitBody">
+                    <div class="debit-info">
+                        <div class="debit-box debit-box-supply">
+                            <div class="debit-box-num" id="debitSupply">0</div>
+                            <div class="debit-box-label">Ketersediaan (m³/hari)</div>
+                        </div>
+                        <div class="debit-box debit-box-demand">
+                            <div class="debit-box-num" id="debitDemand">0</div>
+                            <div class="debit-box-label">Kebutuhan (m³/hari)</div>
+                        </div>
+                    </div>
+                    <div class="status-bar" id="statusBar" style="background:rgba(22,163,74,.12);">
+                        <div class="status-dot" id="statusDot" style="background:#F59E0B;"></div>
+                        <div>
+                            <span id="statusLabel"  style="font-weight:600; font-size:13px; color:rgba(255,255,255,.8);">-</span>
+                            <span id="statusPersen" style="font-size:11px; color:rgba(255,255,255,.3); margin-left:6px;">0%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Simulasi Skenario -->
+            <div class="card">
+                <div class="accordion-header" data-target="simBody">
+                    <h3>Simulasi Skenario</h3>
+                    <span class="accordion-arrow">▼</span>
+                </div>
+                <div class="accordion-body" id="simBody">
+                    <input type="number" id="simPenduduk"  placeholder="Jumlah Penduduk (orang)" style="margin-top:6px;">
+                    <input type="number" id="simHotel"     placeholder="Jumlah Kamar Hotel">
+                    <input type="number" id="simResto"     placeholder="Jumlah Kursi Restoran">
+                    <input type="number" id="simPertanian" placeholder="Luas Pertanian (ha)" step="any">
+                    <p style="font-size:10px; color:rgba(255,255,255,.25); margin:5px 0;">
+                        60 L/org · 150 L/kamar · 100 L/kursi · 1 L/dtk/ha
+                    </p>
+                    <button id="btnSimulasi">Hitung Simulasi</button>
+                </div>
+            </div>
+
+            <!-- Grafik Neraca Air -->
+            <div class="card">
+                <div class="accordion-header" data-target="chartBody">
+                    <h3>Grafik Neraca Air</h3>
+                    <span class="accordion-arrow">▼</span>
+                </div>
+                <div class="accordion-body" id="chartBody">
+                    <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:4px; margin:6px 0 4px;">
+                        <div class="stat-mini"><div class="stat-mini-label" style="color:rgba(255,255,255,.3);">Supply</div><div class="stat-mini-num" id="cardSupply"  style="font-size:13px;">—</div></div>
+                        <div class="stat-mini"><div class="stat-mini-label" style="color:rgba(255,255,255,.3);">Demand</div><div class="stat-mini-num" id="cardDemand"  style="font-size:13px;">—</div></div>
+                        <div class="stat-mini"><div class="stat-mini-label" style="color:rgba(255,255,255,.3);">Sisa</div>  <div class="stat-mini-num" id="cardSisa"    style="font-size:13px;">—</div></div>
+                    </div>
+                    <svg id="gaugeSVG" viewBox="0 0 260 160" width="100%" style="display:block; margin:auto;">
+                        <path   id="arcBg"       fill="none" stroke-linecap="round"/>
+                        <path   id="arcFill"     fill="none" stroke-linecap="round"/>
+                        <line   id="gaugeNeedle" x1="130" y1="130" x2="130" y2="130" stroke-width="3" stroke-linecap="round"/>
+                        <circle id="needleHub"   cx="130" cy="130" r="6"/>
+                        <text   id="pctText"     x="130" y="118" text-anchor="middle" font-size="32" font-weight="400" font-family="Inter,sans-serif"></text>
+                        <text   id="statusText"  x="130" y="136" text-anchor="middle" font-size="11"  fill="rgba(255,255,255,.4)" font-family="Inter,sans-serif"></text>
+                        <text x="18"  y="150" text-anchor="middle" font-size="10" fill="rgba(255,255,255,.2)" font-family="Inter,sans-serif">0%</text>
+                        <text x="242" y="150" text-anchor="middle" font-size="10" fill="rgba(255,255,255,.2)" font-family="Inter,sans-serif">100%</text>
+                    </svg>
+                </div>
+            </div>
+
+        </div><!-- /sidebar-scroll -->
+    </aside><!-- /sidebar -->
+
+    <!-- ── Peta ─────────────────────────────────────────────────── -->
+    <main class="map-container">
+
+        <div id="map"></div>
+
+        <!-- Kontrol kiri atas: search + export -->
+        <div class="map-ctrl-topleft" id="mapCtrlTop">
+            <input  type="text" id="mapSearchInput" placeholder="Cari lokasi...">
+            <button id="btnPrintMap">🖨️ Export</button>
+        </div>
+
+        <!-- Kontrol kanan bawah: zoom -->
+        <div class="map-ctrl-zoom">
+            <button id="btnZoomIn">+</button>
+            <button id="btnZoomOut">−</button>
+        </div>
+
+        <!-- Mata angin -->
+        <img
+            src="{% static 'images/arah_mata_angin.png' %}"
+            id="northArrow"
+            alt="Mata angin"
+            style="position:absolute; bottom:36px; left:320px; width:68px; z-index:600; pointer-events:none; opacity:.9; transition:left .25s ease;"
+        >
+
+        <!-- Info bar bawah -->
+        <div class="map-info-bar">
+            <div class="map-info-item">
+                <span class="map-info-label">Koordinat:</span>
+                <span id="coordDisplay">—</span>
+            </div>
+            <div class="map-info-item" style="justify-content:center;">
+                <span class="map-info-label">SRC:</span>
+                <span>WGS 84 / EPSG:4326</span>
+            </div>
+            <div class="map-info-item" style="justify-content:flex-end;">
+                <span class="map-info-label">Skala:</span>
+                <span id="scaleDisplay">—</span>
             </div>
         </div>
-    </div>
 
-    <div class="card" style="padding:12px;">
-        <div class="accordion-header" data-target="simBody"><h3>Simulasi Skenario</h3><span class="accordion-arrow">▼</span></div>
-        <div class="accordion-body" id="simBody">
-            <input type="number" id="simHotel" placeholder="Jumlah Kamar Hotel" style="margin-top:8px;">
-            <input type="number" id="simPenduduk" placeholder="Jumlah Penduduk">
-            <button id="btnSimulasi">Hitung Simulasi</button>
-        </div>
-    </div>
-
-    <div class="card" style="padding:12px;">
-        <div class="accordion-header" data-target="chartBody"><h3>Grafik Ketersediaan vs Kebutuhan</h3><span class="accordion-arrow">▼</span></div>
-        <div class="accordion-body" id="chartBody">
-            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:8px 0 4px;">
-                <div class="stat-mini"><div class="stat-mini-label">Ketersediaan</div><div class="stat-mini-num" id="cardSupply" style="font-size:15px;">—</div><div class="stat-mini-label">m³/hari</div></div>
-                <div class="stat-mini"><div class="stat-mini-label">Kebutuhan</div><div class="stat-mini-num" id="cardDemand" style="font-size:15px;">—</div><div class="stat-mini-label">m³/hari</div></div>
-                <div class="stat-mini"><div class="stat-mini-label">Sisa</div><div class="stat-mini-num" id="cardSisa" style="font-size:15px;">—</div><div class="stat-mini-label">m³/hari</div></div>
+        <!-- Loading overlay -->
+        <div id="mapLoading" style="
+            position:absolute; inset:0;
+            background:rgba(7,17,31,.85);
+            display:flex; align-items:center; justify-content:center;
+            z-index:999;">
+            <div style="text-align:center;">
+                <div style="
+                    width:36px; height:36px;
+                    border:3px solid rgba(255,255,255,.1);
+                    border-top:3px solid #3B82F6;
+                    border-radius:50%;
+                    animation:spin .7s linear infinite;
+                    margin:0 auto 12px;"></div>
+                <p style="font-size:12px; color:rgba(255,255,255,.35); font-family:'Inter',sans-serif;">Memuat peta...</p>
             </div>
-            <svg id="gaugeSVG" viewBox="0 0 260 160" width="100%" style="display:block;margin:auto;">
-                <path id="arcBg" fill="none" stroke-linecap="round"/>
-                <path id="arcFill" fill="none" stroke-linecap="round"/>
-                <line id="gaugeNeedle" x1="130" y1="130" x2="130" y2="130" stroke-width="3" stroke-linecap="round"/>
-                <circle id="needleHub" cx="130" cy="130" r="6"/>
-                <text id="pctText" x="130" y="118" text-anchor="middle" font-size="32" font-weight="500"></text>
-                <text id="statusText" x="130" y="136" text-anchor="middle" font-size="11" fill="#888"></text>
-                <text x="18" y="150" text-anchor="middle" font-size="10" fill="#aaa">0%</text>
-                <text x="242" y="150" text-anchor="middle" font-size="10" fill="#aaa">100%</text>
-            </svg>
         </div>
-    </div>
 
-    </div>
-</aside>
+    </main><!-- /map-container -->
 
-<main class="map-container">
-    <div id="map"><img src="{% static 'images/arah_mata_angin.png' %}" class="north-arrow"></div>
-    <div class="map-info-bar">
-        <div class="map-info-item"><span class="map-info-label">Koordinat:</span><span id="coordDisplay">-</span></div>
-        <div class="map-info-item"><span class="map-info-label">SRC:</span><span>WGS 84 / EPSG:4326</span></div>
-        <div class="map-info-item"><span class="map-info-label">Skala:</span><span id="scaleDisplay">-</span></div>
-    </div>
+</div><!-- /webgis-container -->
 
-    <div id="mapLoading" style="position:absolute;inset:0;background:rgba(255,255,255,0.85);display:flex;align-items:center;justify-content:center;z-index:999;">
-    <div style="text-align:center;">
-        <div style="width:40px;height:40px;border:4px solid #ddd;border-top:4px solid #1a5276;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 10px;"></div>
-        <p style="font-size:13px;color:#666;">Memuat peta...</p>
-    </div>
-</div>
-</main>
-</div>
 
+<!-- ================================================================
+     MODAL — Input Data Manual
+================================================================ -->
 <div class="modal-overlay" id="modalInput" style="display:none;">
     <div class="modal-box">
-        <div class="modal-header"><h3>Input Data Manual</h3><button class="modal-close" onclick="document.getElementById('modalInput').style.display='none'">✕</button></div>
+        <div class="modal-header">
+            <h3>Input Data Manual</h3>
+            <button class="modal-close" onclick="document.getElementById('modalInput').style.display='none'">✕</button>
+        </div>
         <div class="modal-body">
-            <div class="auth-field"><label>Jenis Data</label><select id="jenisData" style="width:100%;padding:10px;border:1.5px solid #ccc;border-radius:6px;font-size:14px;"><option value="">-- Pilih Jenis --</option><option value="air">Sumber Air</option><option value="hotel">Hotel</option><option value="makan">Tempat Makan</option><option value="jasa">Jasa</option><option value="penduduk">Permukiman / KK</option><option value="reservoir">Reservoir</option></select></div>
-            <div id="dynamicFields"></div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-                <div class="auth-field"><label>Latitude</label><input type="number" id="lat" placeholder="Klik peta" step="any"></div>
-                <div class="auth-field"><label>Longitude</label><input type="number" id="lng" placeholder="Klik peta" step="any"></div>
+
+            <div class="auth-field">
+                <label>Jenis Data</label>
+                <select id="jenisData">
+                    <option value="">-- Pilih Jenis --</option>
+                    <option value="air">Sumber Air</option>
+                    <option value="hotel">Hotel</option>
+                    <option value="makan">Tempat Makan</option>
+                    <option value="jasa">Jasa</option>
+                    <option value="penduduk">Permukiman / KK</option>
+                    <option value="reservoir">Reservoir</option>
+                </select>
             </div>
-            <p style="font-size:12px;color:#999;margin:4px 0 12px;">Klik pada peta untuk mengisi koordinat otomatis</p>
+
+            <div id="dynamicFields"></div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+                <div class="auth-field">
+                    <label>Latitude</label>
+                    <input type="number" id="lat" placeholder="Klik peta" step="any">
+                </div>
+                <div class="auth-field">
+                    <label>Longitude</label>
+                    <input type="number" id="lng" placeholder="Klik peta" step="any">
+                </div>
+            </div>
+
+            <p style="font-size:11px; color:rgba(255,255,255,.25); margin:3px 0 12px;">
+                Klik peta untuk mengisi koordinat otomatis
+            </p>
+
             <button id="btnSimpan" class="auth-submit">Simpan Data</button>
+
         </div>
     </div>
 </div>
 
+
+<!-- ================================================================
+     MODAL — Upload Shapefile
+================================================================ -->
 <div class="modal-overlay" id="modalSHP" style="display:none;">
     <div class="modal-box">
-        <div class="modal-header"><h3>Upload Shapefile</h3><button class="modal-close" onclick="document.getElementById('modalSHP').style.display='none'">✕</button></div>
+        <div class="modal-header">
+            <h3>Upload Shapefile</h3>
+            <button class="modal-close" onclick="document.getElementById('modalSHP').style.display='none'">✕</button>
+        </div>
         <div class="modal-body">
-            <div class="auth-field"><label>Target Dataset</label><select id="shpTarget" style="width:100%;padding:10px;border:1.5px solid #ccc;border-radius:6px;font-size:14px;"><option value="">-- Pilih Target --</option><option value="sumberair">Sumber Air</option><option value="fasilitas">Fasilitas Wisata</option><option value="permukiman">Permukiman</option><option value="reservoir">Reservoir</option><option value="pipa">Jaringan Pipa</option><option value="catchment">Catchment Area</option><option value="recharge">Recharge Area</option><option value="administrasi">Administrasi Desa</option></select></div>
+
+            <div class="auth-field">
+                <label>Target Dataset</label>
+                <select id="shpTarget">
+                    <option value="">-- Pilih Target --</option>
+                    <option value="sumberair">Sumber Air</option>
+                    <option value="fasilitas">Fasilitas Wisata</option>
+                    <option value="permukiman">Permukiman</option>
+                    <option value="reservoir">Tandon Air</option>
+                    <option value="pipa">Jaringan Pipa</option>
+                    <option value="catchment">Catchment Area</option>
+                    <option value="recharge">Recharge Area</option>
+                    <option value="administrasi">Administrasi Desa</option>
+                </select>
+            </div>
+
             <div class="auth-field"><label>.shp file</label><input type="file" id="fileShp" accept=".shp"></div>
             <div class="auth-field"><label>.shx file</label><input type="file" id="fileShx" accept=".shx"></div>
             <div class="auth-field"><label>.dbf file</label><input type="file" id="fileDbf" accept=".dbf"></div>
-            <div class="auth-field"><label>.prj file (opsional)</label><input type="file" id="filePrj" accept=".prj"></div>
-            <div id="shpUploadStatus" style="margin:8px 0;font-size:13px;"></div>
-            <button id="btnUploadSHPSubmit" class="auth-submit">Upload & Import</button>
+            <div class="auth-field"><label>.prj file <span style="opacity:.5;">(opsional)</span></label><input type="file" id="filePrj" accept=".prj"></div>
+
+            <div id="shpUploadStatus" style="margin:6px 0; font-size:12px;"></div>
+
+            <button id="btnUploadSHPSubmit" class="auth-submit">Upload &amp; Import</button>
+
         </div>
     </div>
 </div>
 
 {% endblock %}
+
 
 {% block extra_js %}
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://unpkg.com/georaster"></script>
+<script src="https://unpkg.com/georaster-layer-for-leaflet"></script>
 
+<!-- Kirim role admin ke script.js -->
 <script id="user-role" type="application/json">
     {{ is_admin|default_if_none:False|yesno:"true,false" }}
 </script>
+
 <script>
-var IS_ADMIN = JSON.parse(document.getElementById("user-role").textContent);
-document.getElementById("btnHideSidebar")?.addEventListener("click", function() {
-    document.getElementById("sidebar").classList.add("collapsed");
-    document.getElementById("btnShowSidebar").classList.add("visible");
-});
-document.getElementById("btnShowSidebar")?.addEventListener("click", function() {
-    document.getElementById("sidebar").classList.remove("collapsed");
-    this.classList.remove("visible");
-});
-document.querySelectorAll(".accordion-header").forEach(function(header) {
-    header.addEventListener("click", function() {
-        var body = document.getElementById(this.getAttribute("data-target"));
-        var arrow = this.querySelector(".accordion-arrow");
-        if (body) { body.classList.toggle("open"); if(arrow) arrow.classList.toggle("open"); }
+    // Role
+    var IS_ADMIN = JSON.parse(document.getElementById("user-role").textContent);
+
+    // Accordion
+    document.querySelectorAll(".accordion-header").forEach(function (h) {
+        h.addEventListener("click", function () {
+            var body  = document.getElementById(this.getAttribute("data-target"));
+            var arrow = this.querySelector(".accordion-arrow");
+            if (body) {
+                body.classList.toggle("open");
+                if (arrow) arrow.classList.toggle("open");
+            }
+        });
     });
-});
 </script>
+
 <script src="{% static 'js/script.js' %}"></script>
 {% endblock %}

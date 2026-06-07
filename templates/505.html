@@ -1,12 +1,13 @@
 {% extends "base.html" %}
-{% block title %}500 — Terjadi Kesalahan{% endblock %}
+{% load static %}
+{% block title %}Server Error — AQUAVISION{% endblock %}
 {% block content %}
-<section class="auth-section">
-    <div class="auth-card" style="max-width:500px;">
-        <h2 style="font-size:60px;color:#e74c3c;margin-bottom:10px;">500</h2>
-        <h3 style="margin-bottom:8px;">Terjadi Kesalahan</h3>
-        <p style="margin-bottom:24px;">Server mengalami masalah. Silakan coba lagi nanti.</p>
-        <a href="/" class="btn-primary-lg" style="text-decoration:none;">Kembali ke Beranda</a>
-    </div>
-</section>
+<div style="min-height:calc(100vh - 56px);display:flex;align-items:center;justify-content:center;background:#07111F;">
+  <div style="text-align:center;padding:48px 24px;">
+    <div style="font-family:'Fraunces',serif;font-size:96px;font-weight:200;color:rgba(220,38,38,.3);line-height:1;margin-bottom:16px;">500</div>
+    <h1 style="font-family:'Fraunces',serif;font-size:28px;font-weight:300;font-style:italic;color:rgba(255,255,255,.85);margin-bottom:10px;">Terjadi kesalahan server</h1>
+    <p style="font-size:14px;color:rgba(255,255,255,.35);font-weight:300;margin-bottom:36px;">Sistem mengalami gangguan sementara. Silakan coba kembali dalam beberapa saat.</p>
+    <a href="/" style="padding:11px 28px;border-radius:8px;background:#3B82F6;color:white;font-family:'Inter',sans-serif;font-size:14px;font-weight:500;text-decoration:none;">Kembali ke Beranda</a>
+  </div>
+</div>
 {% endblock %}
