@@ -1298,6 +1298,29 @@ a   { text-decoration: none; color: inherit; }
 }
 
 
+/* ── Tablet (769px – 1024px) ─────────────────────────────────── */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .sidebar { width: 260px; }
+    .map-ctrl-topleft { left: 294px; }
+    .dataset-grid { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+    .portal-section { padding: 28px 20px; }
+    .map-info-bar { font-size: 10px; }
+    .map-info-item { overflow: hidden; }
+    .map-info-item span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+}
+
+/* ── Info-bar text overflow on small screens ─────────────────── */
+@media (max-width: 480px) {
+    .map-info-bar { gap: 6px; font-size: 10px; }
+    .map-info-item:nth-child(2) { display: none; }
+    .map-info-item span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+}
+
+/* ── Modal safe-area on very small screens ───────────────────── */
+@media (max-width: 480px) {
+    .modal-box { margin: 0 8px; }
+}
+
 /* ================================================================
    16. ANIMATIONS
 ================================================================ */
