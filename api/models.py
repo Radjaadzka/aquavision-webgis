@@ -1,14 +1,10 @@
 """
-AQUAVISION — Models
-File: api/models.py
-
-Tambahan vs versi sebelumnya:
-  - Model Feedback (untuk fitur masukan di landing page)
-  - DAS model dipertahankan tapi ditandai (tidak di MODEL_MAP)
+AQUAVISION — Database Models
+Spatial and non-spatial models for water resource management.
 """
 
 from django.contrib.gis.db import models
-from django.utils           import timezone
+from django.utils import timezone
 
 
 class SumberAir(models.Model):

@@ -2,7 +2,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // ================================================================
     // 0. CSRF HELPER
-    // Diperlukan karena @csrf_exempt sudah dihapus dari views.py
     // ================================================================
 
     function getCsrfToken() {

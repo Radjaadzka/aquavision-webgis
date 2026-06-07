@@ -1309,15 +1309,11 @@ a   { text-decoration: none; color: inherit; }
     .map-info-item span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 }
 
-/* ── Info-bar text overflow on small screens ─────────────────── */
+/* ── Small screens (≤480px): info-bar + modal safe-area ─────── */
 @media (max-width: 480px) {
     .map-info-bar { gap: 6px; font-size: 10px; }
     .map-info-item:nth-child(2) { display: none; }
     .map-info-item span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-}
-
-/* ── Modal safe-area on very small screens ───────────────────── */
-@media (max-width: 480px) {
     .modal-box { margin: 0 8px; }
 }
 
