@@ -654,7 +654,7 @@ def dataset_detail(request, model_name):
     if not admin and model_name in ADMIN_ONLY_DATASETS:
         return redirect('data_list')
 
-    objects = model.objects.all()
+    objects = model.objects.all().order_by('pk')
 
     query = request.GET.get('q', '').strip()
     if query:
