@@ -3,8 +3,8 @@ Convert TIFF raster ke PNG overlay untuk Leaflet
 Jalankan: python convert_tiff.py
 """
 
-from osgeo import gdal, osr
-import numpy as np
+from osgeo import gdal, osr  # type: ignore[import-untyped]
+import numpy as np  # type: ignore[import-untyped]
 from PIL import Image
 
 gdal.UseExceptions()

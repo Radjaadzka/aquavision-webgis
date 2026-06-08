@@ -15,7 +15,7 @@ import zipfile
 
 # Third-party: shapefile (pyshp) — imported at module level with graceful fallback
 try:
-    import shapefile
+    import shapefile  # type: ignore[import-untyped]
 except ImportError:
     shapefile = None
 
