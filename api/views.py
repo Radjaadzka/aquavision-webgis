@@ -37,9 +37,11 @@ from rest_framework.permissions import BasePermission, SAFE_METHODS
 from .models import (
     AdministrasiDesa,
     CatchmentArea,
+    Conversation,
     Feedback,
     FasilitasWisata,
     JaringanPipa,
+    Message,
     Permukiman,
     RechargeArea,
     Reservoir,
@@ -932,5 +934,138 @@ def feedback_list(request):
             'tanggal': timezone.localtime(f['tanggal']).strftime('%d %b %Y') if f['tanggal'] else '-',
         }
         for f in feedbacks
+    ]
+    return JsonResponse(data, safe=False)
+
+
+# ================================================================
+# P2.1 — HUBUNGI ADMIN (Messaging)
+# ================================================================
+
+@login_required(login_url='/login/')
+def hubungi_view(request):
+    """Halaman Hubungi Admin — user melihat dan mengirim pesan."""
+    conv, _ = Conversation.objects.get_or_create(user=request.user)
+    return render(request, 'hubungi.html', {
+        'conversation': conv,
+        'is_admin':     is_admin_user(request.user),
+    })
+
+
+@login_required(login_url='/login/')
+def hubungi_send(request):
+    """User mengirim pesan baru."""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    try:
+        body = json.loads(request.body)
+    except (json.JSONDecodeError, Exception):
+        return JsonResponse({'error': 'Invalid JSON'}, status=400)
+
+    content = (body.get('content') or '').strip()
+    if not content:
+        return JsonResponse({'error': 'Pesan tidak boleh kosong.'}, status=400)
+    if len(content) > 2000:
+        return JsonResponse({'error': 'Pesan terlalu panjang (maks 2000 karakter).'}, status=400)
+
+    conv, _ = Conversation.objects.get_or_create(user=request.user)
+    msg = Message.objects.create(conversation=conv, sender=request.user, content=content)
+    conv.save()  # update updated_at
+    return JsonResponse({
+        'id':         msg.id,
+        'sender':     msg.sender.username,
+        'content':    msg.content,
+        'created_at': timezone.localtime(msg.created_at).strftime('%d %b %Y, %H:%M'),
+        'is_admin':   False,
+    })
+
+
+@login_required(login_url='/login/')
+def hubungi_messages(request):
+    """Polling: kembalikan pesan terbaru dalam percakapan user ini."""
+    conv, _ = Conversation.objects.get_or_create(user=request.user)
+    since_id = int(request.GET.get('since', 0))
+    msgs = conv.messages.filter(id__gt=since_id).select_related('sender')
+
+    # Tandai pesan admin sebagai sudah dibaca
+    msgs.filter(is_read=False).exclude(sender=request.user).update(is_read=True)
+
+    data = [
+        {
+            'id':         m.id,
+            'sender':     m.sender.username,
+            'content':    m.content,
+            'created_at': timezone.localtime(m.created_at).strftime('%d %b %Y, %H:%M'),
+            'is_admin':   m.sender != request.user,
+        }
+        for m in msgs
+    ]
+    return JsonResponse(data, safe=False)
+
+
+# ── Admin views ─────────────────────────────────────────────────
+
+@login_required(login_url='/login/')
+def hubungi_admin_list(request):
+    """Admin: daftar semua percakapan."""
+    if not is_admin_user(request.user):
+        return JsonResponse({'error': 'Forbidden'}, status=403)
+
+    convs = Conversation.objects.select_related('user').prefetch_related('messages')
+    data = [
+        {
+            'id':          c.id,
+            'user':        c.user.username,
+            'status':      c.status,
+            'updated_at':  timezone.localtime(c.updated_at).strftime('%d %b %Y, %H:%M'),
+            'unread':      c.messages.filter(is_read=False, sender=c.user).count(),
+            'last_msg':    c.messages.last().content[:80] if c.messages.exists() else '',
+        }
+        for c in convs
+    ]
+    return JsonResponse(data, safe=False)
+
+
+@login_required(login_url='/login/')
+def hubungi_admin_thread(request, conv_id):
+    """Admin: lihat dan balas percakapan tertentu."""
+    if not is_admin_user(request.user):
+        return JsonResponse({'error': 'Forbidden'}, status=403)
+    try:
+        conv = Conversation.objects.get(pk=conv_id)
+    except Conversation.DoesNotExist:
+        return JsonResponse({'error': 'Not found'}, status=404)
+
+    if request.method == 'POST':
+        try:
+            body = json.loads(request.body)
+        except (json.JSONDecodeError, Exception):
+            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+        content = (body.get('content') or '').strip()
+        if not content:
+            return JsonResponse({'error': 'Pesan tidak boleh kosong.'}, status=400)
+        msg = Message.objects.create(conversation=conv, sender=request.user, content=content, is_read=True)
+        conv.save()
+        return JsonResponse({
+            'id':         msg.id,
+            'sender':     msg.sender.username,
+            'content':    msg.content,
+            'created_at': timezone.localtime(msg.created_at).strftime('%d %b %Y, %H:%M'),
+            'is_admin':   True,
+        })
+
+    # GET — tandai pesan user sebagai sudah dibaca
+    since_id = int(request.GET.get('since', 0))
+    msgs = conv.messages.filter(id__gt=since_id).select_related('sender')
+    msgs.filter(is_read=False, sender=conv.user).update(is_read=True)
+    data = [
+        {
+            'id':         m.id,
+            'sender':     m.sender.username,
+            'content':    m.content,
+            'created_at': timezone.localtime(m.created_at).strftime('%d %b %Y, %H:%M'),
+            'is_admin':   m.sender != conv.user,
+        }
+        for m in msgs
     ]
     return JsonResponse(data, safe=False)

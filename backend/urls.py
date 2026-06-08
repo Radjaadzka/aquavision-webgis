@@ -91,6 +91,9 @@ urlpatterns = [
 
     # API JSON
     path('api/', include('api.urls_api')),
+
+    # Hubungi Admin (P2.1)
+    path('hubungi/', include('api.urls_hubungi')),
 ]
 
 # Media files — hanya saat DEBUG (di produksi Nginx yang serve)

@@ -4,6 +4,7 @@ Spatial and non-spatial models for water resource management.
 """
 
 from django.contrib.gis.db import models
+from django.contrib.auth.models import User
 from django.utils import timezone
 
 
@@ -162,3 +163,38 @@ class Feedback(models.Model):
 
     def __str__(self):
         return f'{self.nama} — {self.tanggal.strftime("%d %b %Y")}'
+
+
+# ── P2.1: Hubungi Admin ──────────────────────────────────────────
+
+class Conversation(models.Model):
+    STATUS_CHOICES = [('open', 'Open'), ('closed', 'Closed')]
+
+    user       = models.OneToOneField(User, on_delete=models.CASCADE, related_name='conversation')
+    subject    = models.CharField(max_length=200, blank=True, default='')
+    status     = models.CharField(max_length=20, choices=STATUS_CHOICES, default='open')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-updated_at']
+
+    def __str__(self):
+        return f'Conversation — {self.user.username}'
+
+    def unread_count_for_admin(self):
+        return self.messages.filter(is_read=False, sender=self.user).count()
+
+
+class Message(models.Model):
+    conversation = models.ForeignKey(Conversation, on_delete=models.CASCADE, related_name='messages')
+    sender       = models.ForeignKey(User, on_delete=models.CASCADE)
+    content      = models.TextField()
+    created_at   = models.DateTimeField(auto_now_add=True)
+    is_read      = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ['created_at']
+
+    def __str__(self):
+        return f'{self.sender.username}: {self.content[:40]}'
