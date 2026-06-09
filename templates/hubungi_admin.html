@@ -130,7 +130,10 @@
     <div class="conv-list" id="convList">
         {% if conversations %}
             {% for c in conversations %}
-            <div class="conv-item" onclick="openThread({{ c.id }}, '{{ c.user }}')">
+            <div class="conv-item" 
+                data-id="{{ c.id }}" 
+                data-user="{{ c.user|escapejs }}"
+                onclick="openThread(this)">
                 <div class="conv-avatar">{{ c.user|make_list|first|upper }}</div>
                 <div class="conv-info">
                     <div class="conv-top">

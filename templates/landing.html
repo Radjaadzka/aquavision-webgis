@@ -233,10 +233,10 @@ body { background: #07111F; }
 .prob-n {
   font-family: 'Fraunces', serif;
   font-size: 52px; font-weight: 200; line-height: 1;
-  color: rgba(59,130,246,.08); margin-bottom: 20px;
+  color: rgba(59,130,246,.22); margin-bottom: 20px;
   transition: color .3s;
 }
-.prob-cell:hover .prob-n { color: rgba(59,130,246,.14); }
+.prob-cell:hover .prob-n { color: rgba(59,130,246,.38); }
 .prob-cell h3 { font-size: 16px; font-weight: 600; color: #0F172A; margin-bottom: 10px; }
 .prob-cell p  { font-size: 14px; font-weight: 300; color: #64748B; line-height: 1.8; }
 
@@ -555,9 +555,9 @@ body { background: #07111F; }
 <!-- FITUR -->
 <section class="sec sec-white">
   <span class="lbl rv">Sistem</span>
-  <div style="display:flex;align-items:baseline;gap:24px;flex-wrap:wrap;margin-bottom:32px;">
-    <h2 class="sec-h rv d1" style="margin-bottom:0;">Platform terintegrasi <em>untuk pengelolaan air</em></h2>
-    <p class="rv d2" style="font-size:14px;font-weight:300;color:#64748B;line-height:1.7;margin:0;">Semua informasi sumber daya air tersedia dalam satu platform yang dapat diakses dari browser, tanpa perlu perangkat lunak tambahan.</p>
+  <div style="margin-bottom:32px;">
+    <h2 class="sec-h rv d1">Platform terintegrasi <em>untuk pengelolaan air</em></h2>
+    <p class="rv d2" style="font-size:14px;font-weight:300;color:#64748B;line-height:1.7;margin:8px 0 0;">Semua informasi sumber daya air tersedia dalam satu platform yang dapat diakses dari browser, tanpa perlu perangkat lunak tambahan.</p>
   </div>
   <div class="feat-layout">
     <div class="fc span2 rv d1"><div class="fc-icon">🗺️</div><h3>Peta interaktif multi-layer</h3><p>Aktifkan dan kombinasikan lapisan peta sesuai kebutuhan: data debit puncak aliran per bulan, zonasi potensi air tanah, jaringan sungai, jalur pipa distribusi, lokasi sumber air, tandon, hingga fasilitas wisata. Nilai piksel ditampilkan real-time saat kursor bergerak.</p></div>
@@ -606,7 +606,7 @@ body { background: #07111F; }
   <span class="lbl lbl-lt rv">Preview</span>
   <h2 class="sec-h sec-h-lt rv d1">Tampilan sistem</h2>
   <div class="prev-wrap rv d2">
-    <img src="{% static 'images/webgis_preview.png' %}" alt="Preview WebGIS AQUAVISION">
+    <img src="{% static 'images/webgis_preview.png' %}" alt="Preview Dashboard AQUAVISION" onerror="this.style.display='none'">
     <div class="prev-bar">
       <div>
         <h4>📍 Desa Wonotoro, Kec. Sukapura, Kab. Probolinggo</h4>
@@ -626,7 +626,7 @@ body { background: #07111F; }
     <p class="sec-p rv d2" style="text-align:center;margin:0 auto 40px;">Satu platform untuk semua informasi sumber daya air — dapat diakses kapan saja dari perangkat apapun.</p>
     <div class="cta-btns rv d3">
       {% if user.is_authenticated %}
-        <a href="/map/" class="btn-cta-fill">Buka WebGIS</a>
+        <a href="/map/" class="btn-cta-fill">Buka Dashboard</a>
         <a href="/data/" class="btn-cta-out">Lihat Data Portal</a>
       {% else %}
         <a href="/login/" class="btn-cta-fill">Masuk ke Sistem</a>
@@ -670,7 +670,7 @@ body { background: #07111F; }
         <p class="tc-name">Najwa Maharani</p>
         <p class="tc-nim">15122103</p>
         <div class="tc-links">
-          <a href="mailto:najwamaharani34@gmail.com" class="tc-link tc-link-email" title="Email">✉ Email</a>
+          <a href="mailto:najwamaharani34@gmail.com" target="_blank" rel="noopener" class="tc-link tc-link-email" title="Email">✉ Email</a>
           <a href="https://linkedin.com/in/najwamhrn/" target="_blank" rel="noopener" class="tc-link tc-link-linkedin" title="LinkedIn">in LinkedIn</a>
         </div>
       </div>
@@ -681,7 +681,7 @@ body { background: #07111F; }
         <p class="tc-name">Rayhan Fadhil M.</p>
         <p class="tc-nim">15122106</p>
         <div class="tc-links">
-          <a href="mailto:rayhanfm.business@gmail.com" class="tc-link tc-link-email" title="Email">✉ Email</a>
+          <a href="mailto:rayhanfm.business@gmail.com" target="_blank" rel="noopener" class="tc-link tc-link-email" title="Email">✉ Email</a>
           <a href="https://linkedin.com/in/rrayhanfadhil/" target="_blank" rel="noopener" class="tc-link tc-link-linkedin" title="LinkedIn">in LinkedIn</a>
         </div>
       </div>
@@ -692,7 +692,7 @@ body { background: #07111F; }
         <p class="tc-name">Muhammad Radja Adzka</p>
         <p class="tc-nim">15122115</p>
         <div class="tc-links">
-          <a href="mailto:radjaadzka18@gmail.com" class="tc-link tc-link-email" title="Email">✉ Email</a>
+          <a href="mailto:radjaadzka18@gmail.com" target="_blank" rel="noopener" class="tc-link tc-link-email" title="Email">✉ Email</a>
           <a href="https://linkedin.com/in/radjaadzka/" target="_blank" rel="noopener" class="tc-link tc-link-linkedin" title="LinkedIn">in LinkedIn</a>
         </div>
       </div>
@@ -741,7 +741,7 @@ body { background: #07111F; }
 {% block extra_js %}
 <script>
 function cnt(el,t,d){if(!el)return;var t0=null;(function tick(ts){if(!t0)t0=ts;var p=Math.min((ts-t0)/d,1),e=1-Math.pow(1-p,4);el.textContent=Math.floor(e*t);if(p<1)requestAnimationFrame(tick);else el.textContent=t;})(performance.now());}
-[['Air','/api/sumber-air-geojson/'],['Fasilitas','/api/fasilitas-geojson/'],['Permukiman','/api/permukiman-geojson/']].forEach(function(k,i){var el=document.getElementById('stat'+k[0]);fetch(k[1]).then(r=>r.json()).then(d=>cnt(el,d.features?d.features.length:(+el.dataset.t||0),1200+i*200)).catch(()=>cnt(el,+el.dataset.t||0,1200+i*200));});
+['Air','Fasilitas','Permukiman'].forEach(function(k,i){var el=document.getElementById('stat'+k);if(el)cnt(el,+el.dataset.t||0,1200+i*200);});
 cnt(document.getElementById('statSungai'),28,1800);
 var obs=new IntersectionObserver(function(e){e.forEach(function(x){if(x.isIntersecting){x.target.classList.add('on');obs.unobserve(x.target);}});},{threshold:.1,rootMargin:'0px 0px -20px 0px'});
 document.querySelectorAll('.rv').forEach(function(el){obs.observe(el);});

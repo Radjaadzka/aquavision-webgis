@@ -158,7 +158,7 @@
 
 <script>
 (function () {
-    var convId   = {{ conversation.id }};
+    var convId   = "{{ conversation.id }}";
     var myName   = "{{ request.user.username|escapejs }}";
     var lastId   = 0;
     var pollTimer = null;

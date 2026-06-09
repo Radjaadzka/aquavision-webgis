@@ -534,6 +534,7 @@ def upload_shp(request):
 # INFORMASI DEBIT — aggregate query, bukan loop Python
 # ================================================================
 
+@login_required(login_url='/login/')
 def informasi_debit(request):
     total_debit = SumberAir.objects.aggregate(total=Sum('debit'))['total'] or 0
     supply_m3   = total_debit * 86.4

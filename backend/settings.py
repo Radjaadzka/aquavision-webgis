@@ -135,7 +135,7 @@ DATABASES = {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
         'NAME':     os.environ.get('DB_NAME',     'webgis_ta'),
         'USER':     os.environ.get('DB_USER',     'postgres'),
-        'PASSWORD': os.environ.get('DB_PASSWORD', 'Ratuadzkia17'),
+        'PASSWORD': os.environ.get('DB_PASSWORD', ''),
         'HOST':     os.environ.get('DB_HOST',     'localhost'),
         'PORT':     os.environ.get('DB_PORT',     '5432'),
     }

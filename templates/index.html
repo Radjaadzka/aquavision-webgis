@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% block title %}Dashboard — AQUAVISION{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
@@ -153,7 +154,7 @@
 
             <!-- Simulasi Skenario -->
             <div class="card">
-                <div class="accordion-header" data-target="simBody">
+                <div class="accordion-header" id="simHeader" data-target="simBody">
                     <h3>Simulasi Skenario</h3>
                     <span class="accordion-arrow">▼</span>
                 </div>
@@ -171,7 +172,7 @@
 
             <!-- Grafik Neraca Air -->
             <div class="card">
-                <div class="accordion-header" data-target="chartBody">
+                <div class="accordion-header" id="chartHeader" data-target="chartBody">
                     <h3>Grafik Neraca Air</h3>
                     <span class="accordion-arrow">▼</span>
                 </div>
@@ -355,7 +356,6 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script src="https://unpkg.com/georaster@1.6.0"></script>
-<script src="https://unpkg.com/georaster-layer-for-leaflet@3.10.0"></script>
 
 <!-- Kirim role admin ke script.js -->
 <script id="user-role" type="application/json">
