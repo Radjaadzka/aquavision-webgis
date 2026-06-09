@@ -20,7 +20,7 @@ DEBUG = os.environ.get('DJANGO_DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = os.environ.get(
     'ALLOWED_HOSTS',
-    'localhost,127.0.0.1'
+    'localhost,127.0.0.1,158.69.60.54,158.69.60.54:8000'
 ).split(',')
 
 # ================================================================
@@ -74,7 +74,7 @@ MIDDLEWARE = [
 CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOWED_ORIGINS = os.environ.get(
     'CORS_ALLOWED_ORIGINS',
-    'http://localhost:8000'
+    'http://localhost:8000,http://158.69.60.54,http://158.69.60.54:8000'
 ).split(',')
 
 # ================================================================
@@ -83,7 +83,7 @@ CORS_ALLOWED_ORIGINS = os.environ.get(
 
 CSRF_TRUSTED_ORIGINS = os.environ.get(
     'CSRF_TRUSTED_ORIGINS',
-    'http://localhost:8000'
+    'http://localhost:8000,http://158.69.60.54,http://158.69.60.54:8000'
 ).split(',')
 
 # ================================================================
@@ -97,9 +97,9 @@ if not DEBUG:
     X_FRAME_OPTIONS                = 'DENY'
     SECURE_HSTS_SECONDS            = 31536000
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-    SECURE_HSTS_PRELOAD            = True
-    SESSION_COOKIE_SECURE          = True
-    CSRF_COOKIE_SECURE             = True
+
+    SESSION_COOKIE_SECURE       = False
+    CSRF_COOKIE_SECURE          = False
 
 # ================================================================
 # URL & TEMPLATES
@@ -119,8 +119,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'social_django.context_processors.backends',
-                'social_django.context_processors.login_redirect',
-            ],
+                'social_django.context_processors.login_redirect',            ],
         },
     },
 ]
@@ -136,7 +135,7 @@ DATABASES = {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
         'NAME':     os.environ.get('DB_NAME',     'webgis_ta'),
         'USER':     os.environ.get('DB_USER',     'postgres'),
-        'PASSWORD': os.environ.get('DB_PASSWORD', ''),
+        'PASSWORD': os.environ.get('DB_PASSWORD', 'Ratuadzkia17'),
         'HOST':     os.environ.get('DB_HOST',     'localhost'),
         'PORT':     os.environ.get('DB_PORT',     '5432'),
     }
