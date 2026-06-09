@@ -349,13 +349,13 @@ document.addEventListener("DOMContentLoaded", function () {
                     style: function (f) {
                         var kelas = f.properties.DN || f.properties.dn || f.properties.VALUE || 1;
                         return {
-                            color: "transparent",
-                            weight: 0,
-                            fillColor: getDebitColor(kelas),
-                            fillOpacity: 0.75
+                            color:       "#1a7fad",
+                            weight:      0.3,
+                            fillColor:   getDebitColor(kelas),
+                            fillOpacity: 0.72,
+                            opacity:     1
                         };
                     },
-                    // P0.4: tap/click on GeoJSON area shows debit class popup (mobile-friendly)
                     onEachFeature: function (f, l) {
                         l.on("click", function (ev) {
                             var kelas = f.properties.DN || f.properties.dn || f.properties.VALUE || 1;
@@ -374,6 +374,10 @@ document.addEventListener("DOMContentLoaded", function () {
                         });
                     }
                 });
+                // Add immediately if this month is still the active one
+                if (activeDebitBulan === kode) {
+                    map.addLayer(debitGeoJSONLayers[kode]);
+                }
                 console.log("Debit GeoJSON loaded:", kode);
             })
             .catch(function (err) { console.log("Debit GeoJSON error:", kode, err); });
@@ -414,19 +418,9 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
-        // Belum dimuat — muat sekarang
+        // Belum dimuat — muat sekarang; layer akan ditambah ke map di dalam callback
         showNotif("Memuat", "Memuat data " + BULAN_LABEL[BULAN.indexOf(kode)] + "...", "warning");
         loadDebitBulan(kode);
-
-        var tries = 0;
-        var wait = setInterval(function () {
-            tries++;
-            if (debitGeoJSONLayers[kode]) {
-                clearInterval(wait);
-                if (activeDebitBulan === kode) map.addLayer(debitGeoJSONLayers[kode]);
-            }
-            if (tries > 30) clearInterval(wait);
-        }, 200);
     }
 
 
@@ -1304,12 +1298,12 @@ document.addEventListener("DOMContentLoaded", function () {
     loadGeoJSON();
     loadDebit();
 
-    // P0.5: safe loading overlay removal
     setTimeout(function () {
         try {
             var el = document.getElementById("mapLoading");
             if (el) el.style.display = "none";
         } catch (e) { /* ignore */ }
+        window.dispatchEvent(new CustomEvent('aquavision:mapReady'));
     }, 2000);
 
     // P0.5: global JS error guard — catch uncaught errors from CDN scripts
