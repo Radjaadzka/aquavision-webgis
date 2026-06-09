@@ -6,6 +6,9 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,200;0,9..144,300;0,9..144,400;1,9..144,200;1,9..144,300;1,9..144,400&family=Inter:wght@300;400;500;600&display=swap');
 
+/* P0.2: prevent horizontal scroll on all pages */
+html { overflow-x: hidden; }
+
 
 /* ================================================================
    1. CSS VARIABLES
@@ -1298,6 +1301,25 @@ a   { text-decoration: none; color: inherit; }
 }
 
 
+/* ── Tablet (769px – 1024px) ─────────────────────────────────── */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .sidebar { width: 260px; }
+    .map-ctrl-topleft { left: 294px; }
+    .dataset-grid { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+    .portal-section { padding: 28px 20px; }
+    .map-info-bar { font-size: 10px; }
+    .map-info-item { overflow: hidden; }
+    .map-info-item span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+}
+
+/* ── Small screens (≤480px): info-bar + modal safe-area ─────── */
+@media (max-width: 480px) {
+    .map-info-bar { gap: 6px; font-size: 10px; }
+    .map-info-item:nth-child(2) { display: none; }
+    .map-info-item span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .modal-box { margin: 0 8px; }
+}
+
 /* ================================================================
    16. ANIMATIONS
 ================================================================ */
@@ -1309,4 +1331,157 @@ a   { text-decoration: none; color: inherit; }
 @media print {
     .navbar, .sidebar, .footer, .map-info-bar { display: none !important; }
     #map { height: 100vh !important; }
+}
+
+
+/* ================================================================
+   P0.3 — Mobile Hamburger Drawer
+================================================================ */
+
+.nav-drawer-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,.5);
+    z-index: 1098;
+    opacity: 0;
+    transition: opacity .25s;
+    -webkit-backdrop-filter: blur(2px);
+    backdrop-filter: blur(2px);
+}
+.nav-drawer-overlay.open { display: block; opacity: 1; }
+
+.nav-drawer {
+    position: fixed;
+    top: 0; right: 0;
+    width: min(320px, 88vw);
+    height: 100dvh;
+    background: #07111F;
+    z-index: 1099;
+    transform: translateX(100%);
+    transition: transform .28s cubic-bezier(.4,0,.2,1);
+    display: flex; flex-direction: column;
+    overflow-y: auto;
+    border-left: 1px solid rgba(255,255,255,.08);
+}
+.nav-drawer.open { transform: translateX(0); }
+
+.nav-drawer-head {
+    display: flex; align-items: center; gap: 10px;
+    padding: 0 16px;
+    border-bottom: 1px solid rgba(255,255,255,.08);
+    min-height: 56px; flex-shrink: 0;
+}
+.nav-drawer-close {
+    margin-left: auto;
+    background: none; border: none; color: rgba(255,255,255,.4);
+    font-size: 20px; cursor: pointer;
+    width: 40px; height: 40px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 8px; transition: all .15s; padding: 0;
+}
+.nav-drawer-close:hover { background: rgba(255,255,255,.07); color: white; }
+
+.nav-drawer-links { padding: 8px 0; flex: 1; }
+.nav-drawer-link {
+    display: flex; align-items: center; gap: 13px;
+    padding: 14px 20px;
+    color: rgba(255,255,255,.65);
+    text-decoration: none;
+    font-size: 15px; font-weight: 400;
+    font-family: 'Inter', sans-serif;
+    transition: all .15s;
+    border-left: 3px solid transparent;
+}
+.nav-drawer-link:hover, .nav-drawer-link.active {
+    background: rgba(59,130,246,.08);
+    border-left-color: #3B82F6;
+    color: white;
+}
+.nav-drawer-link-icon { font-size: 17px; width: 22px; text-align: center; flex-shrink: 0; }
+
+.nav-drawer-divider {
+    height: 1px;
+    background: rgba(255,255,255,.06);
+    margin: 6px 20px;
+}
+
+.nav-drawer-auth {
+    padding: 14px 20px 20px;
+    border-top: 1px solid rgba(255,255,255,.08);
+    display: flex; flex-direction: column; gap: 8px; flex-shrink: 0;
+}
+.nav-drawer-user {
+    font-size: 13px; color: rgba(255,255,255,.4);
+    padding-bottom: 4px;
+    display: flex; align-items: center; gap: 8px;
+}
+.nav-drawer-avatar {
+    width: 28px; height: 28px; border-radius: 8px;
+    background: linear-gradient(135deg,#1a5276,#2e86c1);
+    color: white; font-size: 12px; font-weight: 600;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+}
+.nav-drawer-btn-logout {
+    width: 100%; padding: 11px 16px;
+    background: rgba(239,68,68,.1);
+    border: 1px solid rgba(239,68,68,.25);
+    color: #EF4444; border-radius: 8px;
+    font-size: 14px; cursor: pointer; font-family: 'Inter', sans-serif;
+    transition: all .15s; text-align: center;
+}
+.nav-drawer-btn-logout:hover { background: rgba(239,68,68,.15); }
+.nav-drawer-btn-login {
+    display: block; padding: 11px 16px;
+    background: #3B82F6; color: white;
+    border: none; border-radius: 8px;
+    font-size: 14px; text-align: center; text-decoration: none;
+    font-family: 'Inter', sans-serif; transition: all .2s;
+}
+.nav-drawer-btn-login:hover { background: #2563EB; }
+.nav-drawer-btn-register {
+    display: block; padding: 11px 16px;
+    background: transparent; color: rgba(255,255,255,.6);
+    border: 1px solid rgba(255,255,255,.15); border-radius: 8px;
+    font-size: 14px; text-align: center; text-decoration: none;
+    font-family: 'Inter', sans-serif; transition: all .2s;
+}
+.nav-drawer-btn-register:hover { color: white; border-color: rgba(255,255,255,.3); }
+
+
+/* ================================================================
+   P0.6 — WebGIS Mobile Layout
+================================================================ */
+
+@media (max-width: 768px) {
+    /* Search & export: reposition to bottom of map, above info bar */
+    .map-ctrl-topleft {
+        top: auto !important;
+        bottom: 52px;
+        left: 8px !important;
+        right: 8px;
+        width: auto;
+        display: flex; gap: 6px;
+    }
+    .map-ctrl-topleft input[type="text"] {
+        flex: 1; min-width: 0;
+        font-size: 14px;
+    }
+    .map-ctrl-topleft #btnPrintMap {
+        white-space: nowrap; flex-shrink: 0;
+    }
+    /* Hide north arrow on mobile */
+    #northArrow { display: none !important; }
+}
+
+/* ── Footer mobile (P1.2) ─────────────────────────────────────── */
+@media (max-width: 540px) {
+    .footer-inner {
+        flex-direction: column;
+        gap: 16px;
+        text-align: center;
+        align-items: center;
+    }
+    .footer-left { flex-direction: column; align-items: center; text-align: center; }
+    .footer-right { border-top: 1px solid rgba(255,255,255,.07); padding-top: 14px; width: 100%; text-align: center; }
 }

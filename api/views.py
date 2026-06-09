@@ -1,58 +1,51 @@
 """
 AQUAVISION — Views
-File: api/views.py
-
-Perbaikan yang telah diterapkan:
-  - Hapus @csrf_exempt pada semua endpoint write
-  - Whitelist field pada edit_data (cegah mass assignment)
-  - Optimasi N+1 query pada informasi_debit (pakai aggregate)
-  - Validasi ukuran + ekstensi file pada upload_shp
-  - Tempfile context manager (auto cleanup pada upload & download SHP)
-  - KML output di-escape (cegah XSS)
-  - Validasi parameter simulasi (cegah ValueError 500)
-  - UTF-8 BOM pada download_csv (Excel compatibility)
-  - Feedback tanggal dalam WIB (timezone.localtime)
-  - dataset_detail 403/404 redirect ke data_list (bukan JSON error)
-  - GIS imports dipindah ke top-level (tidak lagi inline per-fungsi)
-  - Hapus dead code: landing_page, map_view, login_api, logout_api
+API endpoints, data portal, GeoJSON export, and shapefile upload/download.
 """
 
-# ================================================================
-# IMPORTS
-# ================================================================
-
+# Standard library
+import csv
 import html
 import json
-import csv
 import math
 import os
 import re
 import tempfile
 import zipfile
 
-from django.shortcuts   import render, redirect
-from django.http        import JsonResponse, HttpResponse
-from django.core.serializers import serialize
-from django.db.models   import Sum, Q, F, ExpressionWrapper, FloatField
-from django.core.paginator import Paginator
-from django.contrib.auth.decorators import login_required
-from django.utils       import timezone
+# Third-party: shapefile (pyshp) — imported at module level with graceful fallback
+try:
+    import shapefile  # type: ignore[import-untyped]
+except ImportError:
+    shapefile = None
 
-from django.contrib.gis.geos import GEOSGeometry, MultiPolygon, MultiLineString, Point
-from django.contrib.gis.gdal import DataSource
+# Django
+from django.contrib.auth.decorators  import login_required
+from django.contrib.gis.gdal         import DataSource
+from django.contrib.gis.geos         import GEOSGeometry, MultiLineString, MultiPolygon, Point
+from django.core.paginator           import Paginator
+from django.core.serializers         import serialize
+from django.db.models                import ExpressionWrapper, F, FloatField, Q, Sum
+from django.http                     import HttpResponse, JsonResponse
+from django.shortcuts                import redirect, render
+from django.utils                    import timezone
 
+# Django REST Framework
 from rest_framework.permissions import BasePermission, SAFE_METHODS
 
+# Local
 from .models import (
-    SumberAir,
+    AdministrasiDesa,
+    CatchmentArea,
+    Conversation,
+    Feedback,
     FasilitasWisata,
+    JaringanPipa,
+    Message,
     Permukiman,
     RechargeArea,
-    CatchmentArea,
-    JaringanPipa,
     Reservoir,
-    AdministrasiDesa,
-    Feedback,
+    SumberAir,
 )
 
 # ================================================================
@@ -237,8 +230,7 @@ def reservoir_geojson(request):
 
 
 # ================================================================
-# CREATE DATA (admin only) — @csrf_exempt DIHAPUS
-# Gunakan X-CSRFToken header dari JS (lihat script.js)
+# CREATE DATA (admin only)
 # ================================================================
 
 @login_required
@@ -654,7 +646,7 @@ def dataset_detail(request, model_name):
     if not admin and model_name in ADMIN_ONLY_DATASETS:
         return redirect('data_list')
 
-    objects = model.objects.all()
+    objects = model.objects.all().order_by('pk')
 
     query = request.GET.get('q', '').strip()
     if query:
@@ -817,9 +809,7 @@ def download_shp(request, model_name):
     if not geo_field:
         return JsonResponse({'error': 'No geometry field'}, status=400)
 
-    try:
-        import shapefile
-    except ImportError:
+    if shapefile is None:
         return JsonResponse({'error': 'pyshp belum terinstall. Jalankan: pip install pyshp'}, status=500)
 
     attr_fields = [
@@ -944,5 +934,138 @@ def feedback_list(request):
             'tanggal': timezone.localtime(f['tanggal']).strftime('%d %b %Y') if f['tanggal'] else '-',
         }
         for f in feedbacks
+    ]
+    return JsonResponse(data, safe=False)
+
+
+# ================================================================
+# P2.1 — HUBUNGI ADMIN (Messaging)
+# ================================================================
+
+@login_required(login_url='/login/')
+def hubungi_view(request):
+    """Halaman Hubungi Admin — user melihat dan mengirim pesan."""
+    conv, _ = Conversation.objects.get_or_create(user=request.user)
+    return render(request, 'hubungi.html', {
+        'conversation': conv,
+        'is_admin':     is_admin_user(request.user),
+    })
+
+
+@login_required(login_url='/login/')
+def hubungi_send(request):
+    """User mengirim pesan baru."""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    try:
+        body = json.loads(request.body)
+    except (json.JSONDecodeError, Exception):
+        return JsonResponse({'error': 'Invalid JSON'}, status=400)
+
+    content = (body.get('content') or '').strip()
+    if not content:
+        return JsonResponse({'error': 'Pesan tidak boleh kosong.'}, status=400)
+    if len(content) > 2000:
+        return JsonResponse({'error': 'Pesan terlalu panjang (maks 2000 karakter).'}, status=400)
+
+    conv, _ = Conversation.objects.get_or_create(user=request.user)
+    msg = Message.objects.create(conversation=conv, sender=request.user, content=content)
+    conv.save()  # update updated_at
+    return JsonResponse({
+        'id':         msg.id,
+        'sender':     msg.sender.username,
+        'content':    msg.content,
+        'created_at': timezone.localtime(msg.created_at).strftime('%d %b %Y, %H:%M'),
+        'is_admin':   False,
+    })
+
+
+@login_required(login_url='/login/')
+def hubungi_messages(request):
+    """Polling: kembalikan pesan terbaru dalam percakapan user ini."""
+    conv, _ = Conversation.objects.get_or_create(user=request.user)
+    since_id = int(request.GET.get('since', 0))
+    msgs = conv.messages.filter(id__gt=since_id).select_related('sender')
+
+    # Tandai pesan admin sebagai sudah dibaca
+    msgs.filter(is_read=False).exclude(sender=request.user).update(is_read=True)
+
+    data = [
+        {
+            'id':         m.id,
+            'sender':     m.sender.username,
+            'content':    m.content,
+            'created_at': timezone.localtime(m.created_at).strftime('%d %b %Y, %H:%M'),
+            'is_admin':   m.sender != request.user,
+        }
+        for m in msgs
+    ]
+    return JsonResponse(data, safe=False)
+
+
+# ── Admin views ─────────────────────────────────────────────────
+
+@login_required(login_url='/login/')
+def hubungi_admin_list(request):
+    """Admin: daftar semua percakapan."""
+    if not is_admin_user(request.user):
+        return JsonResponse({'error': 'Forbidden'}, status=403)
+
+    convs = Conversation.objects.select_related('user').prefetch_related('messages')
+    data = [
+        {
+            'id':          c.id,
+            'user':        c.user.username,
+            'status':      c.status,
+            'updated_at':  timezone.localtime(c.updated_at).strftime('%d %b %Y, %H:%M'),
+            'unread':      c.messages.filter(is_read=False, sender=c.user).count(),
+            'last_msg':    c.messages.last().content[:80] if c.messages.exists() else '',
+        }
+        for c in convs
+    ]
+    return JsonResponse(data, safe=False)
+
+
+@login_required(login_url='/login/')
+def hubungi_admin_thread(request, conv_id):
+    """Admin: lihat dan balas percakapan tertentu."""
+    if not is_admin_user(request.user):
+        return JsonResponse({'error': 'Forbidden'}, status=403)
+    try:
+        conv = Conversation.objects.get(pk=conv_id)
+    except Conversation.DoesNotExist:
+        return JsonResponse({'error': 'Not found'}, status=404)
+
+    if request.method == 'POST':
+        try:
+            body = json.loads(request.body)
+        except (json.JSONDecodeError, Exception):
+            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+        content = (body.get('content') or '').strip()
+        if not content:
+            return JsonResponse({'error': 'Pesan tidak boleh kosong.'}, status=400)
+        msg = Message.objects.create(conversation=conv, sender=request.user, content=content, is_read=True)
+        conv.save()
+        return JsonResponse({
+            'id':         msg.id,
+            'sender':     msg.sender.username,
+            'content':    msg.content,
+            'created_at': timezone.localtime(msg.created_at).strftime('%d %b %Y, %H:%M'),
+            'is_admin':   True,
+        })
+
+    # GET — tandai pesan user sebagai sudah dibaca
+    since_id = int(request.GET.get('since', 0))
+    msgs = conv.messages.filter(id__gt=since_id).select_related('sender')
+    msgs.filter(is_read=False, sender=conv.user).update(is_read=True)
+    data = [
+        {
+            'id':         m.id,
+            'sender':     m.sender.username,
+            'content':    m.content,
+            'created_at': timezone.localtime(m.created_at).strftime('%d %b %Y, %H:%M'),
+            'is_admin':   m.sender != conv.user,
+        }
+        for m in msgs
     ]
     return JsonResponse(data, safe=False)

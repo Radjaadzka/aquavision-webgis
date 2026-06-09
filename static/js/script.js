@@ -2,7 +2,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // ================================================================
     // 0. CSRF HELPER
-    // Diperlukan karena @csrf_exempt sudah dihapus dari views.py
     // ================================================================
 
     function getCsrfToken() {
@@ -177,24 +176,16 @@ document.addEventListener("DOMContentLoaded", function () {
     // 7. TOOLTIP DEBIT (dari GeoRaster TIFF)
     // ================================================================
 
-    function updateTooltipDebit(eLat, eLng, eX, eY, offsetY) {
-        if (!activeDebitBulan || !debitGeoRasters[activeDebitBulan]) {
-            tooltipDebit.style.display = "none";
-            return;
-        }
-
+    // P0.4: extract raster lookup into reusable helper
+    function getDebitRasterValue(lat, lng) {
+        if (!activeDebitBulan || !debitGeoRasters[activeDebitBulan]) return null;
         var gr    = debitGeoRasters[activeDebitBulan];
         var west  = gr.xmin, east = gr.xmax, south = gr.ymin, north = gr.ymax;
+        if (lat < south || lat > north || lng < west || lng > east) return null;
 
-        if (eLat < south || eLat > north || eLng < west || eLng > east) {
-            tooltipDebit.style.display = "none";
-            return;
-        }
+        var col = Math.max(0, Math.min(Math.floor((lng - west)  / (east - west)   * gr.width),  gr.width  - 1));
+        var row = Math.max(0, Math.min(Math.floor((north - lat) / (north - south) * gr.height), gr.height - 1));
 
-        var col = Math.max(0, Math.min(Math.floor((eLng - west)  / (east - west)   * gr.width),  gr.width  - 1));
-        var row = Math.max(0, Math.min(Math.floor((north - eLat) / (north - south) * gr.height), gr.height - 1));
-
-        var foundVal = null;
         outer:
         for (var dr = -3; dr <= 3; dr++) {
             for (var dc = -3; dc <= 3; dc++) {
@@ -202,11 +193,15 @@ document.addEventListener("DOMContentLoaded", function () {
                 var r2 = Math.max(0, Math.min(row + dr, gr.height - 1));
                 var v  = gr.values[0][r2][c2];
                 if (v !== null && !isNaN(v) && v !== gr.noDataValue && Math.abs(v) > 0.0001 && v !== -9999) {
-                    foundVal = v;
-                    break outer;
+                    return v;
                 }
             }
         }
+        return null;
+    }
+
+    function updateTooltipDebit(eLat, eLng, eX, eY, offsetY) {
+        var foundVal = getDebitRasterValue(eLat, eLng);
 
         if (foundVal !== null) {
             var bulanLabel = BULAN_LABEL[BULAN.indexOf(activeDebitBulan)];
@@ -359,6 +354,24 @@ document.addEventListener("DOMContentLoaded", function () {
                             fillColor: getDebitColor(kelas),
                             fillOpacity: 0.75
                         };
+                    },
+                    // P0.4: tap/click on GeoJSON area shows debit class popup (mobile-friendly)
+                    onEachFeature: function (f, l) {
+                        l.on("click", function (ev) {
+                            var kelas = f.properties.DN || f.properties.dn || f.properties.VALUE || 1;
+                            var warna = getDebitColor(kelas);
+                            var bulanLabel = BULAN_LABEL[BULAN.indexOf(kode)];
+                            var ranges = ["0–5", "5–10", "10–15", "15–21", "21–26", "26–31", "31–36", ">36"];
+                            var rangeStr = ranges[Math.max(0, Math.min(7, Math.round(kelas) - 1))];
+                            L.popup().setLatLng(ev.latlng).setContent(
+                                '<div style="font-size:13px;min-width:180px;">' +
+                                    '<div style="font-weight:600;color:' + warna + ';border-bottom:1px solid #eee;padding-bottom:4px;margin-bottom:6px;">🌊 Debit Puncak — ' + bulanLabel + "</div>" +
+                                    '<div>Kelas: <b>' + kelas + "</b></div>" +
+                                    '<div>Debit: <b style="color:' + warna + ';">' + rangeStr + " m³/s</b></div>" +
+                                "</div>"
+                            ).openOn(map);
+                            L.DomEvent.stopPropagation(ev);
+                        });
                     }
                 });
                 console.log("Debit GeoJSON loaded:", kode);
@@ -1097,6 +1110,23 @@ document.addEventListener("DOMContentLoaded", function () {
         var northing = k0 * (M + N * Math.tan(latR) * (A * A / 2 + (5 - T + 9 * C + 4 * C * C) * A * A * A * A / 24));
         if (lat < 0) northing += 10000000;
 
+        // P0.4: include debit raster value in click popup (works on desktop + mobile)
+        var debitHtml = "";
+        var debitVal  = getDebitRasterValue(lat, lng);
+        if (debitVal !== null && activeDebitBulan) {
+            var dLabel = BULAN_LABEL[BULAN.indexOf(activeDebitBulan)];
+            var dKelas =
+                debitVal <= 5  ? 1 : debitVal <= 10 ? 2 : debitVal <= 15 ? 3 :
+                debitVal <= 21 ? 4 : debitVal <= 26 ? 5 : debitVal <= 31 ? 6 :
+                debitVal <= 36 ? 7 : 8;
+            var dWarna = getDebitColor(dKelas);
+            debitHtml =
+                '<div style="margin-top:6px;padding-top:6px;border-top:1px solid #eee;">' +
+                    '<div style="font-weight:600;color:' + dWarna + ';font-size:11px;margin-bottom:4px;">🌊 Debit Puncak — ' + dLabel + "</div>" +
+                    '<div><b>Nilai:</b> <span style="color:' + dWarna + ';font-weight:600;">' + debitVal.toFixed(2) + " m³/s</span></div>" +
+                "</div>";
+        }
+
         L.popup().setLatLng(e.latlng).setContent(
             '<div style="font-size:13px;line-height:1.8;min-width:200px;">' +
                 '<div style="font-weight:600;color:#1a5276;margin-bottom:6px;border-bottom:1px solid #eee;padding-bottom:4px;">📍 Koordinat Titik</div>' +
@@ -1107,6 +1137,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     "<div><b>E:</b> " + easting.toFixed(2)  + " m</div>" +
                     "<div><b>N:</b> " + northing.toFixed(2) + " m</div>" +
                 "</div>" +
+                debitHtml +
             "</div>"
         ).openOn(map);
 
@@ -1235,19 +1266,25 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("btnHideSidebar")?.addEventListener("click", function () {
         document.getElementById("sidebar").classList.add("collapsed");
         document.getElementById("btnShowSidebar").classList.add("visible");
-        var ctrl  = document.querySelector(".map-ctrl-topleft");
-        var arrow = document.getElementById("northArrow");
-        if (ctrl)  ctrl.style.left  = "14px";
-        if (arrow) arrow.style.left = "14px";
+        // On desktop only: sidebar collapses horizontally so controls need to shift left
+        // On mobile: sidebar collapses vertically; CSS handles control positioning
+        if (window.innerWidth > 768) {
+            var ctrl  = document.querySelector(".map-ctrl-topleft");
+            var arrow = document.getElementById("northArrow");
+            if (ctrl)  ctrl.style.left  = "14px";
+            if (arrow) arrow.style.left = "14px";
+        }
     });
 
     document.getElementById("btnShowSidebar")?.addEventListener("click", function () {
         document.getElementById("sidebar").classList.remove("collapsed");
         this.classList.remove("visible");
-        var ctrl  = document.querySelector(".map-ctrl-topleft");
-        var arrow = document.getElementById("northArrow");
-        if (ctrl)  ctrl.style.left  = "320px";
-        if (arrow) arrow.style.left = "320px";
+        if (window.innerWidth > 768) {
+            var ctrl  = document.querySelector(".map-ctrl-topleft");
+            var arrow = document.getElementById("northArrow");
+            if (ctrl)  ctrl.style.left  = "320px";
+            if (arrow) arrow.style.left = "320px";
+        }
     });
 
 
@@ -1267,9 +1304,25 @@ document.addEventListener("DOMContentLoaded", function () {
     loadGeoJSON();
     loadDebit();
 
+    // P0.5: safe loading overlay removal
     setTimeout(function () {
-        var el = document.getElementById("mapLoading");
-        if (el) el.style.display = "none";
+        try {
+            var el = document.getElementById("mapLoading");
+            if (el) el.style.display = "none";
+        } catch (e) { /* ignore */ }
     }, 2000);
+
+    // P0.5: global JS error guard — catch uncaught errors from CDN scripts
+    window.addEventListener("error", function (e) {
+        // Suppress CDN-related errors silently so they don't break the app
+        if (e && e.filename && (
+            e.filename.indexOf("georaster") !== -1 ||
+            e.filename.indexOf("driver")    !== -1 ||
+            e.filename.indexOf("html2canvas") !== -1
+        )) {
+            console.warn("CDN script error suppressed:", e.message);
+            e.preventDefault();
+        }
+    });
 
 });

@@ -4,6 +4,8 @@ __pycache__/
 *.pyc
 db.sqlite3
 *.tif
+!static/data/*.tif
+static/data/DebitResapan.tif.tif
 media/
 .env
 staticfiles/

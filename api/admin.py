@@ -1,31 +1,85 @@
+"""
+AQUAVISION — Django Admin Registration
+"""
+
 from django.contrib import admin
+
 from .models import (
-    SumberAir,
-    FasilitasWisata,
-    Permukiman,
-    DAS,
-    JaringanPipa,
-    Reservoir,
-    RechargeArea,
-    CatchmentArea,
     AdministrasiDesa,
+    CatchmentArea,
+    DAS,
     Feedback,
+    FasilitasWisata,
+    JaringanPipa,
+    Permukiman,
+    RechargeArea,
+    Reservoir,
+    SumberAir,
 )
 
-admin.site.register(SumberAir)
-admin.site.register(FasilitasWisata)
-admin.site.register(Permukiman)
-admin.site.register(DAS)
-admin.site.register(JaringanPipa)
-admin.site.register(Reservoir)
-admin.site.register(RechargeArea)
-admin.site.register(CatchmentArea)
-admin.site.register(AdministrasiDesa)
+
+@admin.register(SumberAir)
+class SumberAirAdmin(admin.ModelAdmin):
+    list_display  = ['nama', 'jenis_sumber', 'kondisi', 'debit', 'tahun_pendataan']
+    search_fields = ['nama', 'jenis_sumber', 'kondisi']
+    list_filter   = ['jenis_sumber', 'kondisi']
+
+
+@admin.register(FasilitasWisata)
+class FasilitasWisataAdmin(admin.ModelAdmin):
+    list_display  = ['nama', 'jenis', 'kamar', 'kapasitas']
+    search_fields = ['nama']
+    list_filter   = ['jenis']
+
+
+@admin.register(Permukiman)
+class PermukimanAdmin(admin.ModelAdmin):
+    list_display  = ['nama_dusun', 'jumlah_kk', 'jumlah_penduduk', 'kategori_pelanggan']
+    search_fields = ['nama_dusun']
+    list_filter   = ['kategori_pelanggan']
+
+
+@admin.register(RechargeArea)
+class RechargeAreaAdmin(admin.ModelAdmin):
+    list_display  = ['nama', 'kelas_potensi', 'luas_ha']
+    search_fields = ['nama']
+
+
+@admin.register(CatchmentArea)
+class CatchmentAreaAdmin(admin.ModelAdmin):
+    list_display  = ['nama', 'luas_ha']
+    search_fields = ['nama']
+
+
+@admin.register(JaringanPipa)
+class JaringanPipaAdmin(admin.ModelAdmin):
+    list_display  = ['nama', 'diameter_mm', 'kondisi', 'tahun_pasang']
+    search_fields = ['nama']
+    list_filter   = ['kondisi']
+
+
+@admin.register(Reservoir)
+class ReservoirAdmin(admin.ModelAdmin):
+    list_display  = ['nama', 'kapasitas_m3', 'elevasi']
+    search_fields = ['nama']
+
+
+@admin.register(DAS)
+class DASAdmin(admin.ModelAdmin):
+    list_display  = ['nama']
+    search_fields = ['nama']
+
+
+@admin.register(AdministrasiDesa)
+class AdministrasiDesaAdmin(admin.ModelAdmin):
+    list_display  = ['wadmkd', 'wadmkc', 'wadmkk', 'wadmpr']
+    search_fields = ['wadmkd', 'wadmkc', 'wadmkk']
+    list_filter   = ['wadmkc', 'wadmkk']
 
 
 @admin.register(Feedback)
 class FeedbackAdmin(admin.ModelAdmin):
-    list_display  = ['nama', 'pesan', 'tanggal']
-    list_filter   = ['tanggal']
-    search_fields = ['nama', 'pesan']
+    list_display    = ['nama', 'pesan', 'tanggal']
+    list_filter     = ['tanggal']
+    search_fields   = ['nama', 'pesan']
     readonly_fields = ['tanggal']

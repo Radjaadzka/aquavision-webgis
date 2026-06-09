@@ -8,7 +8,6 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet">
 
     <link rel="icon" type="image/png" href="{% static 'images/logo_webgis.png' %}">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
@@ -48,6 +47,9 @@ document.querySelectorAll('a[href^="#"]').forEach(function(a) {
             <a href="/" class="nav-link {% if request.resolver_match.url_name == 'landing' %}active{% endif %}">Beranda</a>
             <a href="/map/" class="nav-link {% if request.resolver_match.url_name == 'map' %}active{% endif %}">WebGIS</a>
             <a href="/data/" class="nav-link {% if request.resolver_match.url_name == 'data_list' or request.resolver_match.url_name == 'dataset_detail' %}active{% endif %}">Data Portal</a>
+            {% if user.is_authenticated %}
+            <a href="/hubungi/" class="nav-link {% if request.resolver_match.url_name == 'hubungi' %}active{% endif %}">Hubungi Admin</a>
+            {% endif %}
         </div>
 
         <!-- RIGHT: Auth -->
@@ -76,6 +78,51 @@ document.querySelectorAll('a[href^="#"]').forEach(function(a) {
     </div>
 </nav>
 
+<!-- ================= MOBILE DRAWER ================= -->
+<div class="nav-drawer-overlay" id="navDrawerOverlay"></div>
+<div class="nav-drawer" id="navDrawer" role="dialog" aria-modal="true" aria-label="Menu navigasi">
+    <div class="nav-drawer-head">
+        <img src="{% static 'images/logo_webgis.png' %}" alt="Logo" class="nav-logo-img">
+        <span class="nav-logo-text" style="color:white; font-size:14px; font-weight:600;">AQUAVISION</span>
+        <button class="nav-drawer-close" id="navDrawerClose" aria-label="Tutup menu">✕</button>
+    </div>
+
+    <nav class="nav-drawer-links">
+        <a href="/" class="nav-drawer-link {% if request.resolver_match.url_name == 'landing' %}active{% endif %}">
+            <span class="nav-drawer-link-icon">🏠</span> Beranda
+        </a>
+        <a href="/#tim" class="nav-drawer-link" id="navLinkTim">
+            <span class="nav-drawer-link-icon">👥</span> Tentang Kami
+        </a>
+        <a href="/map/" class="nav-drawer-link {% if request.resolver_match.url_name == 'map' %}active{% endif %}">
+            <span class="nav-drawer-link-icon">🗺️</span> WebGIS
+        </a>
+        <a href="/data/" class="nav-drawer-link {% if request.resolver_match.url_name == 'data_list' or request.resolver_match.url_name == 'dataset_detail' %}active{% endif %}">
+            <span class="nav-drawer-link-icon">📊</span> Data Portal
+        </a>
+        <div class="nav-drawer-divider"></div>
+        <a href="/hubungi/" class="nav-drawer-link">
+            <span class="nav-drawer-link-icon">✉️</span> Hubungi Admin
+        </a>
+    </nav>
+
+    <div class="nav-drawer-auth">
+        {% if user.is_authenticated %}
+            <div class="nav-drawer-user">
+                <div class="nav-drawer-avatar">{{ user.username|make_list|first|upper }}</div>
+                <span>{{ user.username }}</span>
+            </div>
+            <form method="post" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button type="submit" class="nav-drawer-btn-logout">Logout</button>
+            </form>
+        {% else %}
+            <a href="{% url 'login' %}" class="nav-drawer-btn-login">Login</a>
+            <a href="{% url 'register' %}" class="nav-drawer-btn-register">Daftar Akun</a>
+        {% endif %}
+    </div>
+</div>
+
 <!-- ================= MAIN CONTENT ================= -->
 <div class="main-content">
     {% block content %}{% endblock %}
@@ -101,11 +148,41 @@ document.querySelectorAll('a[href^="#"]').forEach(function(a) {
 {% block extra_js %}{% endblock %}
 
 <script>
-document.getElementById('navToggle')?.addEventListener('click', function() {
-    document.querySelector('.nav-links').classList.toggle('nav-open');
-    document.querySelector('.nav-auth').classList.toggle('nav-open');
-    this.classList.toggle('active');
-});
+(function () {
+    var toggle  = document.getElementById('navToggle');
+    var drawer  = document.getElementById('navDrawer');
+    var overlay = document.getElementById('navDrawerOverlay');
+    var close   = document.getElementById('navDrawerClose');
+
+    function openDrawer() {
+        if (!drawer) return;
+        drawer.classList.add('open');
+        overlay.classList.add('open');
+        document.body.style.overflow = 'hidden';
+    }
+    function closeDrawer() {
+        if (!drawer) return;
+        drawer.classList.remove('open');
+        overlay.classList.remove('open');
+        document.body.style.overflow = '';
+    }
+
+    if (toggle)  toggle.addEventListener('click', openDrawer);
+    if (close)   close.addEventListener('click', closeDrawer);
+    if (overlay) overlay.addEventListener('click', closeDrawer);
+
+    // Close on nav link click (instant nav, smooth UX)
+    if (drawer) {
+        drawer.querySelectorAll('a').forEach(function (link) {
+            link.addEventListener('click', closeDrawer);
+        });
+    }
+
+    // Close on Escape key
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') closeDrawer();
+    });
+})();
 </script>
 
 </body>

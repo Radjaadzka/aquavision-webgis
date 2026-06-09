@@ -366,19 +366,79 @@ body { background: #07111F; }
 .fb-btn:disabled { opacity: .4; cursor: not-allowed; }
 
 /* ── TIM ──────────────────────────────────────────────── */
-.team-row { display: flex; justify-content: center; gap: 28px; flex-wrap: wrap; margin-bottom: 32px; }
-.tc { text-align: center; }
-.tav {
-  width: 56px; height: 56px; border-radius: 13px;
+/* P1.1: Profile cards */
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-bottom: 36px;
+}
+.team-card {
+  background: white;
+  border: 1px solid #E2E8F0;
+  border-radius: 16px;
+  padding: 28px 20px 22px;
+  text-align: center;
+  transition: all .25s;
+  position: relative; overflow: hidden;
+}
+.team-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #1a5276, #3B82F6);
+  opacity: 0;
+  transition: opacity .25s;
+}
+.team-card:hover {
+  border-color: rgba(59,130,246,.25);
+  box-shadow: 0 12px 40px rgba(59,130,246,.08);
+  transform: translateY(-3px);
+}
+.team-card:hover::before { opacity: 1; }
+.tc-avatar {
+  width: 64px; height: 64px; border-radius: 16px;
   background: linear-gradient(135deg, #1a5276, #2e86c1);
   color: white; font-family: 'Fraunces', serif;
-  font-size: 17px; font-weight: 300; font-style: italic;
+  font-size: 22px; font-weight: 300; font-style: italic;
   display: flex; align-items: center; justify-content: center;
-  margin: 0 auto 11px; transition: transform .25s;
+  margin: 0 auto 14px;
+  transition: transform .25s;
 }
-.tc:hover .tav { transform: rotate(-4deg) scale(1.06); }
-.tn { font-size: 14px; font-weight: 500; color: #0F172A; }
-.tnim { font-size: 11px; color: #94A3B8; margin-top: 2px; }
+.team-card.supervisor .tc-avatar {
+  background: linear-gradient(135deg, #15803D, #16A34A);
+}
+.team-card:hover .tc-avatar { transform: rotate(-4deg) scale(1.07); }
+.tc-badge {
+  display: inline-block;
+  font-size: 10px; font-weight: 600; letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 3px 10px; border-radius: 20px;
+  margin-bottom: 10px;
+}
+.tc-badge-student  { background: rgba(59,130,246,.08); color: #2563EB; }
+.tc-badge-supervisor { background: rgba(22,163,74,.08); color: #15803D; }
+.tc-name {
+  font-size: 14px; font-weight: 600; color: #0F172A;
+  margin-bottom: 2px; line-height: 1.3;
+}
+.tc-nim { font-size: 11px; color: #94A3B8; margin-bottom: 12px; }
+.tc-links {
+  display: flex; justify-content: center; gap: 6px; flex-wrap: wrap;
+}
+.tc-link {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 11px; font-weight: 500;
+  padding: 5px 9px; border-radius: 6px;
+  text-decoration: none; transition: all .15s;
+}
+.tc-link-email    { background: #FEF2F2; color: #DC2626; border: 1px solid rgba(220,38,38,.15); }
+.tc-link-email:hover { background: #FEE2E2; }
+.tc-link-linkedin { background: rgba(10,102,194,.07); color: #0A66C2; border: 1px solid rgba(10,102,194,.15); }
+.tc-link-linkedin:hover { background: rgba(10,102,194,.12); }
+.tc-link-profile  { background: #F0FDF4; color: #15803D; border: 1px solid rgba(22,163,74,.15); }
+.tc-link-profile:hover { background: #DCFCE7; }
+
 .pmb {
   background: white; border: 1px solid #E2E8F0;
   border-radius: 12px; padding: 22px 36px;
@@ -401,12 +461,30 @@ body { background: #07111F; }
   .lokasi-wrap { grid-template-columns: 1fr; gap: 36px; }
   .sec { padding: 64px 6%; }
   .lnd-foot { flex-direction: column; text-align: center; }
+  .team-grid { grid-template-columns: repeat(2, 1fr); }
 }
 @media (max-width: 540px) {
   .hero-btns, .cta-btns { flex-direction: column; }
   .hero-bottom { grid-template-columns: repeat(2,1fr); }
   .hb-item { padding: 14px 20px; }
   .lp-wrap { gap: 8px; }
+  .team-grid { grid-template-columns: 1fr; max-width: 360px; margin: 0 auto 36px; }
+  .pmb { padding: 18px 20px; }
+}
+
+/* ── P0.2: Mobile overflow fix (320–414px) ────────────────────── */
+@media (max-width: 480px) {
+  .hero-body { padding: 72px 5% 36px; gap: 24px; }
+  .hb-item { padding: 12px 14px; }
+  .hb-val { font-size: 12px; }
+  .sec { padding: 52px 5%; }
+  .prob-cell { padding: 28px 20px; }
+  .feat-layout .fc { padding: 20px 16px; }
+  .lokasi-wrap { gap: 24px; }
+  .lp { padding: 7px 12px; }
+  .lp span { font-size: 12px; }
+  .prev-bar { flex-direction: column; }
+  .pmb { padding: 18px 20px; }
 }
 </style>
 {% endblock %}
@@ -462,7 +540,7 @@ body { background: #07111F; }
 <section class="sec">
   <span class="lbl rv">Konteks</span>
   <div style="display:flex;align-items:baseline;gap:24px;flex-wrap:wrap;margin-bottom:32px;">
-    <h2 class="sec-h rv d1" style="margin-bottom:0;white-space:nowrap;">Tantangan pengelolaan air <em>di Desa Wonotoro</em></h2>
+    <h2 class="sec-h rv d1" style="margin-bottom:0;">Tantangan pengelolaan air <em>di Desa Wonotoro</em></h2>
     <p class="rv d2" style="font-size:14px;font-weight:300;color:#64748B;line-height:1.7;margin:0;">Setiap permasalahan di bawah ini terdokumentasi, terukur, dan berdampak langsung pada kehidupan warga serta keberlanjutan sektor wisata.</p>
   </div>
   <div class="prob-layout">
@@ -477,7 +555,7 @@ body { background: #07111F; }
 <section class="sec sec-white">
   <span class="lbl rv">Sistem</span>
   <div style="display:flex;align-items:baseline;gap:24px;flex-wrap:wrap;margin-bottom:32px;">
-    <h2 class="sec-h rv d1" style="margin-bottom:0;white-space:nowrap;">Platform terintegrasi <em>untuk pengelolaan air</em></h2>
+    <h2 class="sec-h rv d1" style="margin-bottom:0;">Platform terintegrasi <em>untuk pengelolaan air</em></h2>
     <p class="rv d2" style="font-size:14px;font-weight:300;color:#64748B;line-height:1.7;margin:0;">Semua informasi sumber daya air tersedia dalam satu platform yang dapat diakses dari browser, tanpa perlu perangkat lunak tambahan.</p>
   </div>
   <div class="feat-layout">
@@ -576,19 +654,84 @@ body { background: #07111F; }
 </section>
 
 <!-- TIM -->
-<section class="sec sec-white">
+<section class="sec sec-white" id="tim">
   <div style="text-align:center;">
     <span class="lbl rv" style="display:inline-flex;">Tim</span>
     <h2 class="sec-h rv d1">Capstone Design Project<br><em>2026</em></h2>
     <p class="sec-p rv d2" style="text-align:center;margin:0 auto 44px;">Program Studi Teknik Geodesi dan Geomatika<br>Fakultas Ilmu dan Teknologi Kebumian, Institut Teknologi Bandung</p>
-    <div class="team-row">
-      <div class="tc rv d1"><div class="tav">NM</div><p class="tn">Najwa Maharani</p><p class="tnim">15122103</p></div>
-      <div class="tc rv d2"><div class="tav">RF</div><p class="tn">Rayhan Fadhil M.</p><p class="tnim">15122106</p></div>
-      <div class="tc rv d3"><div class="tav">MR</div><p class="tn">M. Radja Adzka</p><p class="tnim">15122115</p></div>
+
+    <!-- Mahasiswa -->
+    <div class="team-grid rv d3" style="max-width:900px; margin:0 auto 40px;">
+
+      <div class="team-card">
+        <div class="tc-avatar">NM</div>
+        <span class="tc-badge tc-badge-student">Mahasiswa</span>
+        <p class="tc-name">Najwa Maharani</p>
+        <p class="tc-nim">15122103</p>
+        <div class="tc-links">
+          <a href="mailto:najwamaharani34@gmail.com" class="tc-link tc-link-email" title="Email">✉ Email</a>
+          <a href="https://linkedin.com/in/najwamhrn/" target="_blank" rel="noopener" class="tc-link tc-link-linkedin" title="LinkedIn">in LinkedIn</a>
+        </div>
+      </div>
+
+      <div class="team-card">
+        <div class="tc-avatar">RF</div>
+        <span class="tc-badge tc-badge-student">Mahasiswa</span>
+        <p class="tc-name">Rayhan Fadhil M.</p>
+        <p class="tc-nim">15122106</p>
+        <div class="tc-links">
+          <a href="mailto:rayhanfm.business@gmail.com" class="tc-link tc-link-email" title="Email">✉ Email</a>
+          <a href="https://linkedin.com/in/rrayhanfadhil/" target="_blank" rel="noopener" class="tc-link tc-link-linkedin" title="LinkedIn">in LinkedIn</a>
+        </div>
+      </div>
+
+      <div class="team-card">
+        <div class="tc-avatar">MR</div>
+        <span class="tc-badge tc-badge-student">Mahasiswa</span>
+        <p class="tc-name">Muhammad Radja Adzka</p>
+        <p class="tc-nim">15122115</p>
+        <div class="tc-links">
+          <a href="mailto:radjaadzka18@gmail.com" class="tc-link tc-link-email" title="Email">✉ Email</a>
+          <a href="https://linkedin.com/in/radjaadzka/" target="_blank" rel="noopener" class="tc-link tc-link-linkedin" title="LinkedIn">in LinkedIn</a>
+        </div>
+      </div>
+
     </div>
-    <div class="pmb rv d4">
-      <p>Koordinator Pembimbing: <strong>Dr. Ratri Widyastuti, S.T., M.T.</strong></p>
-      <p>Dosen Pembimbing: <strong>Dr., Ir., Bambang Setyadji, M.Si</strong> dan <strong>Miga Magentika Julian, S.T., M.T.</strong></p>
+
+    <!-- Dosen Pembimbing -->
+    <p style="font-size:10px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:#94A3B8;margin-bottom:20px;" class="rv d4">Dosen Pembimbing</p>
+    <div class="team-grid rv d5" style="max-width:900px; margin:0 auto 12px; grid-template-columns: repeat(3,1fr);">
+
+      <div class="team-card supervisor">
+        <div class="tc-avatar">RW</div>
+        <span class="tc-badge tc-badge-supervisor">Koordinator</span>
+        <p class="tc-name">Dr. Ratri Widyastuti, S.T., M.T.</p>
+        <p class="tc-nim">&nbsp;</p>
+        <div class="tc-links">
+          <a href="https://itb.ac.id/staf/profil/5705/ratri-widyastuti" target="_blank" rel="noopener" class="tc-link tc-link-profile" title="Profil ITB">🏛 Profil ITB</a>
+        </div>
+      </div>
+
+      <div class="team-card supervisor">
+        <div class="tc-avatar">MM</div>
+        <span class="tc-badge tc-badge-supervisor">Pembimbing</span>
+        <p class="tc-name">Miga Magenika Julian, S.T., M.T.</p>
+        <p class="tc-nim">&nbsp;</p>
+        <div class="tc-links">
+          <a href="https://itb.ac.id/staf/profil/miga-magenika-julian" target="_blank" rel="noopener" class="tc-link tc-link-profile" title="Profil ITB">🏛 Profil ITB</a>
+        </div>
+      </div>
+
+      <div class="team-card supervisor">
+        <div class="tc-avatar">AB</div>
+        <span class="tc-badge tc-badge-supervisor">Pembimbing</span>
+        <p class="tc-name">Agustinus Bambang Setyadji</p>
+        <p class="tc-nim">&nbsp;</p>
+        <div class="tc-links">
+          <a href="https://itb.ac.id/staf/profil/agustinus-bambang-setyadji" target="_blank" rel="noopener" class="tc-link tc-link-profile" title="Profil ITB">🏛 Profil ITB</a>
+        </div>
+      </div>
+
     </div>
   </div>
 </section>

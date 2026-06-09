@@ -1,5 +1,6 @@
 """
 AQUAVISION — Root URL Configuration
+Inline view functions for simple pages; GIS and data portal routed to api/.
 """
 
 from django.contrib import admin
@@ -54,7 +55,7 @@ def register(request):
     return render(request, 'register.html', {'form': form})
 
 
-def custom_404(request, exception=None):
+def custom_404(request, _exception=None):
     return render(request, '404.html', status=404)
 
 
@@ -90,6 +91,9 @@ urlpatterns = [
 
     # API JSON
     path('api/', include('api.urls_api')),
+
+    # Hubungi Admin (P2.1)
+    path('hubungi/', include('api.urls_hubungi')),
 ]
 
 # Media files — hanya saat DEBUG (di produksi Nginx yang serve)
