@@ -79,6 +79,10 @@ class RechargeArea(models.Model):
     USER_FIELDS  = ['nama', 'kelas_potensi']
     ADMIN_FIELDS = ['nama', 'kelas_potensi', 'luas_ha']
 
+    class Meta:
+        verbose_name        = 'Daerah Potensi Air Tanah'
+        verbose_name_plural = 'Daerah Potensi Air Tanah'
+
     def __str__(self):
         return self.nama
 
@@ -99,6 +103,10 @@ class CatchmentArea(models.Model):
 
     USER_FIELDS  = ['nama']
     ADMIN_FIELDS = ['nama', 'luas_ha']
+
+    class Meta:
+        verbose_name        = 'Debit Puncak Aliran'
+        verbose_name_plural = 'Debit Puncak Aliran'
 
     def __str__(self):
         return self.nama
@@ -126,6 +134,10 @@ class Reservoir(models.Model):
 
     USER_FIELDS  = ['nama', 'kapasitas_m3', 'lat', 'lon']
     ADMIN_FIELDS = ['nama', 'kapasitas_m3', 'elevasi', 'lat', 'lon', 'easting', 'northing']
+
+    class Meta:
+        verbose_name        = 'Tandon Air'
+        verbose_name_plural = 'Tandon Air'
 
     def __str__(self):
         return self.nama

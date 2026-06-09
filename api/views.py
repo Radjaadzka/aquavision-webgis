@@ -309,7 +309,7 @@ def create_reservoir(request):
             elevasi      = float(data['elevasi']) if data.get('elevasi') else None,
             lokasi       = point,
         )
-        return JsonResponse({'message': 'Reservoir berhasil disimpan'}, status=201)
+        return JsonResponse({'message': 'Tandon air berhasil disimpan'}, status=201)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=400)
 
@@ -600,13 +600,13 @@ def data_list(request):
          'description': 'Data lokasi permukiman dan jumlah penduduk'},
         {'name': 'Fasilitas Wisata',             'slug': 'fasilitas',    'model': FasilitasWisata,
          'description': 'Data hotel, restoran, dan jasa'},
-        {'name': 'Recharge Area Desa Wonotoro',  'slug': 'recharge',     'model': RechargeArea,
+        {'name': 'Daerah Potensi Air Tanah Desa Wonotoro', 'slug': 'recharge',  'model': RechargeArea,
          'description': 'Zona daerah resapan air tanah'},
-        {'name': 'Catchment Area Desa Wonotoro', 'slug': 'catchment',    'model': CatchmentArea,
+        {'name': 'Debit Puncak Aliran Desa Wonotoro',    'slug': 'catchment', 'model': CatchmentArea,
          'description': 'Wilayah daerah tangkapan air'},
-        {'name': 'Jaringan Pipa',                'slug': 'pipa',         'model': JaringanPipa,
+        {'name': 'Jaringan Pipa',                        'slug': 'pipa',      'model': JaringanPipa,
          'description': 'Data jaringan pipa distribusi air'},
-        {'name': 'Reservoir',                    'slug': 'reservoir',    'model': Reservoir,
+        {'name': 'Tandon Air',                           'slug': 'reservoir', 'model': Reservoir,
          'description': 'Data lokasi dan kapasitas tandon air'},
         {'name': 'Administrasi Desa',            'slug': 'administrasi', 'model': AdministrasiDesa,
          'description': 'Batas administrasi desa sekitar Wonotoro'},
@@ -1004,6 +1004,27 @@ def hubungi_messages(request):
 
 
 # ── Admin views ─────────────────────────────────────────────────
+
+@login_required(login_url='/login/')
+def hubungi_admin_page(request):
+    """Admin: halaman HTML daftar semua percakapan."""
+    if not is_admin_user(request.user):
+        from django.http import HttpResponseForbidden
+        return HttpResponseForbidden("Akses ditolak.")
+    convs = Conversation.objects.select_related('user').prefetch_related('messages').order_by('-updated_at')
+    conv_data = []
+    for c in convs:
+        last = c.messages.last()
+        conv_data.append({
+            'id':         c.id,
+            'user':       c.user.username,
+            'status':     c.status,
+            'updated_at': timezone.localtime(c.updated_at).strftime('%d %b %Y, %H:%M'),
+            'unread':     c.messages.filter(is_read=False, sender=c.user).count(),
+            'last_msg':   last.content[:100] if last else '',
+        })
+    return render(request, 'hubungi_admin.html', {'conversations': conv_data})
+
 
 @login_required(login_url='/login/')
 def hubungi_admin_list(request):
