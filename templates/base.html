@@ -50,6 +50,7 @@ document.querySelectorAll('a[href^="#"]').forEach(function(a) {
             {% if user.is_authenticated %}
             <a href="/hubungi/" class="nav-link {% if request.resolver_match.url_name == 'hubungi' %}active{% endif %}">Hubungi Admin</a>
             {% endif %}
+            <a href="/bantuan/" class="nav-link {% if request.resolver_match.url_name == 'bantuan' %}active{% endif %}">Pusat Bantuan</a>
         </div>
 
         <!-- RIGHT: Auth -->
@@ -100,10 +101,15 @@ document.querySelectorAll('a[href^="#"]').forEach(function(a) {
         <a href="/data/" class="nav-drawer-link {% if request.resolver_match.url_name == 'data_list' or request.resolver_match.url_name == 'dataset_detail' %}active{% endif %}">
             <span class="nav-drawer-link-icon">📊</span> Data Portal
         </a>
+        <a href="/bantuan/" class="nav-drawer-link {% if request.resolver_match.url_name == 'bantuan' %}active{% endif %}">
+            <span class="nav-drawer-link-icon">❓</span> Pusat Bantuan
+        </a>
         <div class="nav-drawer-divider"></div>
-        <a href="/hubungi/" class="nav-drawer-link">
+        {% if user.is_authenticated %}
+        <a href="/hubungi/" class="nav-drawer-link {% if request.resolver_match.url_name == 'hubungi' %}active{% endif %}">
             <span class="nav-drawer-link-icon">✉️</span> Hubungi Admin
         </a>
+        {% endif %}
     </nav>
 
     <div class="nav-drawer-auth">

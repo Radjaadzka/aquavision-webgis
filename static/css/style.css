@@ -1485,3 +1485,93 @@ a   { text-decoration: none; color: inherit; }
     .footer-left { flex-direction: column; align-items: center; text-align: center; }
     .footer-right { border-top: 1px solid rgba(255,255,255,.07); padding-top: 14px; width: 100%; text-align: center; }
 }
+
+
+/* ================================================================
+   17. MOBILE TOUCH UX (Android Chrome + iPhone Safari)
+   Touch target minimum: 44 × 44 px (Apple HIG / WCAG 2.5.5)
+================================================================ */
+
+@media (max-width: 768px) {
+    /* ── Sidebar accordion headers ─────────────────────────── */
+    .accordion-header {
+        min-height: 44px;
+        padding: 10px 9px;
+    }
+
+    /* ── Sidebar layer checkboxes ──────────────────────────── */
+    .layer-panel label {
+        min-height: 36px;
+        display: flex;
+        align-items: center;
+        padding: 4px 0;
+    }
+
+    /* ── Sidebar menu buttons ──────────────────────────────── */
+    .menu-btn {
+        min-height: 44px;
+        padding: 10px 12px;
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+    }
+
+    /* ── Nav drawer links ──────────────────────────────────── */
+    .nav-drawer-link {
+        min-height: 48px;
+    }
+
+    /* ── Portal search input — prevent iOS auto-zoom ───────── */
+    .search-input,
+    .portal-toolbar input[type="text"],
+    .portal-toolbar input[type="search"] {
+        font-size: 16px;
+    }
+
+    /* ── Portal pagination — bigger tap targets ────────────── */
+    .pagination a,
+    .pagination button,
+    .page-link {
+        min-height: 44px;
+        min-width: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* ── Data table — don't shrink text below readable ─────── */
+    .data-table th,
+    .data-table td {
+        font-size: 12px;
+        padding: 8px 10px;
+    }
+
+    /* ── Sidebar form inputs — prevent iOS auto-zoom ───────── */
+    .sidebar input[type="number"],
+    .sidebar input[type="text"],
+    .sidebar select {
+        font-size: 16px !important;
+        min-height: 40px;
+    }
+
+    /* ── Sidebar scroll — ensure visible on touch ─────────── */
+    .sidebar-scroll {
+        -webkit-overflow-scrolling: touch;
+    }
+}
+
+/* ── Download buttons — full-width stacked on small screens ─ */
+@media (max-width: 480px) {
+    .download-buttons {
+        flex-direction: column;
+    }
+    .download-buttons a,
+    .download-buttons button {
+        width: 100%;
+        text-align: center;
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+}

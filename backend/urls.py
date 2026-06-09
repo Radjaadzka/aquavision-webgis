@@ -55,6 +55,12 @@ def register(request):
     return render(request, 'register.html', {'form': form})
 
 
+@login_required(login_url='/login/')
+def bantuan_view(request):
+    """Pusat Bantuan AQUAVISION — halaman FAQ dan panduan penggunaan."""
+    return render(request, 'bantuan.html')
+
+
 def custom_404(request, _exception=None):
     return render(request, '404.html', status=404)
 
@@ -69,9 +75,10 @@ def custom_500(request):
 
 urlpatterns = [
     # Halaman utama
-    path('',          landing,   name='landing'),
-    path('map/',      map_view,  name='map'),
-    path('register/', register,  name='register'),
+    path('',          landing,      name='landing'),
+    path('map/',      map_view,     name='map'),
+    path('bantuan/',  bantuan_view, name='bantuan'),
+    path('register/', register,     name='register'),
 
     # Auth
     path('login/',  auth_views.LoginView.as_view(

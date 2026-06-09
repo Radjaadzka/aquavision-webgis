@@ -9,8 +9,11 @@ django.setup()
 
 from django.contrib.gis.gdal import DataSource
 from django.contrib.gis.geos import GEOSGeometry, MultiLineString
-from api.models import Sungai
+# NOTE: Sungai model dihapus di migration 0009 (data dipindah ke static GeoJSON)
+# Script ini sudah tidak berlaku. Gunakan static/data/Sungai.geojson.
 import re
+
+raise SystemExit("Script ini sudah tidak berlaku. Sungai model telah dihapus. Gunakan static/data/Sungai.geojson.")
 
 ds = DataSource('static/data/SUNGAI.shp')
 layer = ds[0]

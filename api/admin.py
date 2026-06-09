@@ -7,10 +7,12 @@ from django.contrib import admin
 from .models import (
     AdministrasiDesa,
     CatchmentArea,
+    Conversation,
     DAS,
     Feedback,
     FasilitasWisata,
     JaringanPipa,
+    Message,
     Permukiman,
     RechargeArea,
     Reservoir,
@@ -83,3 +85,19 @@ class FeedbackAdmin(admin.ModelAdmin):
     list_filter     = ['tanggal']
     search_fields   = ['nama', 'pesan']
     readonly_fields = ['tanggal']
+
+
+@admin.register(Conversation)
+class ConversationAdmin(admin.ModelAdmin):
+    list_display  = ['user', 'status', 'created_at', 'updated_at']
+    list_filter   = ['status']
+    search_fields = ['user__username']
+    readonly_fields = ['created_at', 'updated_at']
+
+
+@admin.register(Message)
+class MessageAdmin(admin.ModelAdmin):
+    list_display  = ['sender', 'conversation', 'created_at', 'is_read']
+    list_filter   = ['is_read']
+    search_fields = ['sender__username', 'content']
+    readonly_fields = ['created_at']

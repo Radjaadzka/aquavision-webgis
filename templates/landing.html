@@ -233,10 +233,10 @@ body { background: #07111F; }
 .prob-n {
   font-family: 'Fraunces', serif;
   font-size: 52px; font-weight: 200; line-height: 1;
-  color: rgba(59,130,246,.22); margin-bottom: 20px;
+  color: rgba(59,130,246,.55); margin-bottom: 20px;
   transition: color .3s;
 }
-.prob-cell:hover .prob-n { color: rgba(59,130,246,.38); }
+.prob-cell:hover .prob-n { color: rgba(59,130,246,.85); }
 .prob-cell h3 { font-size: 16px; font-weight: 600; color: #0F172A; margin-bottom: 10px; }
 .prob-cell p  { font-size: 14px; font-weight: 300; color: #64748B; line-height: 1.8; }
 
@@ -302,8 +302,9 @@ body { background: #07111F; }
   border-radius: 16px; overflow: hidden;
   border: 1px solid rgba(255,255,255,.08);
   box-shadow: 0 40px 100px rgba(0,0,0,.5);
+  background: #0D2236;
 }
-.prev-wrap img { width: 100%; display: block; max-height: 460px; object-fit: cover; }
+.prev-wrap img { width: 100%; display: block; min-height: 200px; max-height: 460px; object-fit: cover; }
 .prev-bar {
   background: #0D2236; padding: 18px 24px;
   display: flex; justify-content: space-between; align-items: center;
@@ -606,7 +607,7 @@ body { background: #07111F; }
   <span class="lbl lbl-lt rv">Preview</span>
   <h2 class="sec-h sec-h-lt rv d1">Tampilan sistem</h2>
   <div class="prev-wrap rv d2">
-    <img src="{% static 'images/webgis_preview.png' %}" alt="Preview Dashboard AQUAVISION" onerror="this.style.display='none'">
+    <img src="{% static 'images/webgis_preview.png' %}" alt="Preview Dashboard AQUAVISION">
     <div class="prev-bar">
       <div>
         <h4>📍 Desa Wonotoro, Kec. Sukapura, Kab. Probolinggo</h4>
@@ -726,7 +727,7 @@ body { background: #07111F; }
       <div class="team-card supervisor">
         <div class="tc-avatar">AB</div>
         <span class="tc-badge tc-badge-supervisor">Pembimbing</span>
-        <p class="tc-name">Agustinus Bambang Setyadji</p>
+        <p class="tc-name">Ir. Agustinus Bambang Setyadji, M.Si., D.Sc.</p>
         <p class="tc-nim">&nbsp;</p>
         <div class="tc-links">
           <a href="https://itb.ac.id/staf/profil/agustinus-bambang-setyadji" target="_blank" rel="noopener" class="tc-link tc-link-profile" title="Profil ITB">🏛 Profil ITB</a>

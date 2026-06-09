@@ -40,8 +40,8 @@
                 <hr>
 
                 <p>Analisis Hidrologi</p>
-                <label><input type="checkbox" id="chkPotensiAirTanah"> Daerah Potensi Air Tanah</label>
-                <label><input type="checkbox" id="chkDebitPuncak">     Debit Puncak Aliran</label>
+                <label><input type="checkbox" id="chkPotensiAirTanah"> Daerah Potensi Air Tanah <small style="color:rgba(255,255,255,.25);font-size:10px;">10m×10m</small></label>
+                <label><input type="checkbox" id="chkDebitPuncak">     Debit Puncak Aliran <small style="color:rgba(255,255,255,.25);font-size:10px;">30m×30m</small></label>
                 <div id="debitBulanPanel" style="display:none; margin:4px 0 4px 6px;">
                     <select id="selectDebitBulan" style="font-size:12px;">
                         <option value="">-- Pilih Bulan --</option>
@@ -94,6 +94,16 @@
             <!-- Data Portal -->
             <a href="{% url 'data_list' %}">
                 <button class="menu-btn">📊 Data Portal</button>
+            </a>
+
+            <!-- Hubungi Admin -->
+            <a href="/hubungi/">
+                <button class="menu-btn">✉️ Hubungi Admin</button>
+            </a>
+
+            <!-- Pusat Bantuan -->
+            <a href="/bantuan/">
+                <button class="menu-btn">❓ Pusat Bantuan</button>
             </a>
 
             <!-- Info Wilayah (muncul saat polygon diklik) -->

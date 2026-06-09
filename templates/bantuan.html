@@ -1,0 +1,575 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Pusat Bantuan — AQUAVISION{% endblock %}
+
+{% block extra_css %}
+<style>
+.bantuan-wrap {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 88px 5% 72px;
+    min-height: calc(100vh - 56px);
+}
+
+/* Header */
+.bantuan-head {
+    text-align: center;
+    margin-bottom: 40px;
+}
+.bantuan-head h1 {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(30px, 5vw, 48px);
+    font-weight: 200;
+    letter-spacing: -2px;
+    color: #0F172A;
+    margin-bottom: 10px;
+    line-height: 1.1;
+}
+.bantuan-head h1 em { font-style: italic; color: #3B82F6; }
+.bantuan-head p {
+    font-size: 15px;
+    font-weight: 300;
+    color: #64748B;
+    max-width: 520px;
+    margin: 0 auto 28px;
+    line-height: 1.7;
+}
+
+/* Search */
+.bantuan-search {
+    position: relative;
+    max-width: 480px;
+    margin: 0 auto;
+}
+.bantuan-search input {
+    width: 100%;
+    padding: 13px 18px 13px 44px;
+    border: 1.5px solid #E2E8F0;
+    border-radius: 12px;
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    color: #0F172A;
+    background: white;
+    transition: all .15s;
+    box-shadow: 0 2px 8px rgba(0,0,0,.04);
+}
+.bantuan-search input:focus {
+    outline: none;
+    border-color: #3B82F6;
+    box-shadow: 0 0 0 3px rgba(59,130,246,.08);
+}
+.bantuan-search-icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94A3B8;
+    font-size: 16px;
+    pointer-events: none;
+}
+
+/* Category tabs */
+.bantuan-cats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 32px;
+    justify-content: center;
+}
+.bcat-btn {
+    padding: 7px 16px;
+    border-radius: 20px;
+    border: 1.5px solid #E2E8F0;
+    background: white;
+    color: #64748B;
+    font-size: 13px;
+    font-weight: 500;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    transition: all .15s;
+}
+.bcat-btn:hover { border-color: #3B82F6; color: #3B82F6; }
+.bcat-btn.active {
+    background: #3B82F6;
+    border-color: #3B82F6;
+    color: white;
+}
+
+/* No results */
+.bantuan-empty {
+    text-align: center;
+    padding: 48px 20px;
+    color: #94A3B8;
+    font-size: 14px;
+    font-weight: 300;
+    display: none;
+}
+.bantuan-empty.show { display: block; }
+
+/* Section title */
+.bsec-title {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #94A3B8;
+    margin: 32px 0 12px;
+    padding: 0 4px;
+}
+.bsec-title:first-child { margin-top: 0; }
+
+/* FAQ accordion */
+.bant-item {
+    border: 1px solid #E2E8F0;
+    border-radius: 12px;
+    overflow: hidden;
+    background: white;
+    margin-bottom: 8px;
+    transition: box-shadow .15s;
+}
+.bant-item:hover { box-shadow: 0 4px 16px rgba(0,0,0,.06); }
+.bant-item.hidden { display: none; }
+
+.bant-q {
+    padding: 16px 20px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #0F172A;
+    user-select: none;
+    -webkit-user-select: none;
+}
+.bant-q:hover { background: #F8FAFC; }
+.bant-q::after {
+    content: '+';
+    font-size: 20px;
+    font-weight: 300;
+    color: #94A3B8;
+    flex-shrink: 0;
+    transition: transform .2s;
+}
+.bant-item.open .bant-q::after {
+    transform: rotate(45deg);
+    color: #3B82F6;
+}
+.bant-item.open .bant-q { color: #3B82F6; background: #F0F7FF; }
+
+.bant-a {
+    display: none;
+    padding: 0 20px 18px;
+    font-size: 14px;
+    font-weight: 300;
+    color: #475569;
+    line-height: 1.8;
+    border-top: 1px solid #F1F5F9;
+}
+.bant-item.open .bant-a { display: block; }
+
+.bant-a ul, .bant-a ol {
+    padding-left: 20px;
+    margin: 8px 0;
+}
+.bant-a li { margin-bottom: 4px; }
+.bant-a strong { color: #0F172A; font-weight: 600; }
+.bant-a a { color: #3B82F6; text-decoration: underline; }
+
+/* CTA hubungi */
+.bantuan-cta {
+    background: linear-gradient(135deg, #EFF6FF, #F0FDF4);
+    border: 1px solid rgba(59,130,246,.15);
+    border-radius: 16px;
+    padding: 28px 32px;
+    text-align: center;
+    margin-top: 48px;
+}
+.bantuan-cta h3 {
+    font-family: 'Fraunces', serif;
+    font-size: 20px;
+    font-weight: 300;
+    font-style: italic;
+    color: #0F172A;
+    margin-bottom: 8px;
+}
+.bantuan-cta p {
+    font-size: 13px;
+    font-weight: 300;
+    color: #64748B;
+    margin-bottom: 20px;
+}
+.bantuan-cta-btn {
+    display: inline-block;
+    padding: 11px 28px;
+    background: #3B82F6;
+    color: white;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    font-family: 'Inter', sans-serif;
+    text-decoration: none;
+    transition: background .15s;
+}
+.bantuan-cta-btn:hover { background: #2563EB; }
+
+@media (max-width: 640px) {
+    .bantuan-wrap { padding: 76px 4% 56px; }
+    .bantuan-head h1 { font-size: 28px; }
+    .bantuan-cats { gap: 6px; }
+    .bcat-btn { font-size: 12px; padding: 6px 12px; }
+    .bant-q { font-size: 13px; padding: 14px 16px; }
+    .bant-a { padding: 0 16px 16px; font-size: 13px; }
+    .bantuan-cta { padding: 22px 20px; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="bantuan-wrap">
+
+    <!-- Header + Search -->
+    <div class="bantuan-head">
+        <h1>Pusat <em>Bantuan</em></h1>
+        <p>Temukan panduan penggunaan, penjelasan fitur, dan jawaban dari pertanyaan yang sering ditanyakan seputar AQUAVISION.</p>
+        <div class="bantuan-search">
+            <span class="bantuan-search-icon">🔍</span>
+            <input type="text" id="faqSearch" placeholder="Cari pertanyaan atau topik...">
+        </div>
+    </div>
+
+    <!-- Kategori -->
+    <div class="bantuan-cats" id="bantCats">
+        <button class="bcat-btn active" data-cat="all">Semua</button>
+        <button class="bcat-btn" data-cat="umum">Tentang AQUAVISION</button>
+        <button class="bcat-btn" data-cat="dashboard">Dashboard</button>
+        <button class="bcat-btn" data-cat="data">Data &amp; Layer</button>
+        <button class="bcat-btn" data-cat="neraca">Neraca Air</button>
+        <button class="bcat-btn" data-cat="akun">Akun &amp; Akses</button>
+        <button class="bcat-btn" data-cat="teknis">Teknis</button>
+    </div>
+
+    <!-- FAQ List -->
+    <div id="bantList">
+
+        <!-- ── TENTANG AQUAVISION ─────────────────── -->
+        <p class="bsec-title" data-cat="umum">Tentang AQUAVISION</p>
+
+        <div class="bant-item" data-cat="umum">
+            <div class="bant-q">Apa itu AQUAVISION?</div>
+            <div class="bant-a">
+                AQUAVISION adalah platform WebGIS (Web Geographic Information System) berbasis Django dan Leaflet.js yang dirancang khusus untuk pemantauan dan pengelolaan sumber daya air di <strong>Desa Wonotoro, Kecamatan Sukapura, Kabupaten Probolinggo</strong>.<br><br>
+                Platform ini dikembangkan sebagai Capstone Design Project 2026 oleh mahasiswa Teknik Geodesi dan Geomatika ITB untuk mendukung pengelolaan air yang lebih terstruktur di kawasan penyangga Bromo Tengger Semeru.
+            </div>
+        </div>
+
+        <div class="bant-item" data-cat="umum">
+            <div class="bant-q">Apa tujuan utama AQUAVISION?</div>
+            <div class="bant-a">
+                AQUAVISION memiliki tiga tujuan utama:
+                <ul>
+                    <li><strong>Pemetaan aset air</strong> — Mendokumentasikan lokasi sumber air, jaringan pipa, tandon, dan fasilitas wisata secara digital dan spasial.</li>
+                    <li><strong>Analisis hidrologi</strong> — Memvisualisasikan debit puncak aliran (12 bulan), daerah potensi air tanah, dan menghitung neraca ketersediaan air.</li>
+                    <li><strong>Pengelolaan data terbuka</strong> — Menyediakan dataset dalam format CSV, GeoJSON, KML, dan Shapefile untuk digunakan dalam analisis lanjutan.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="bant-item" data-cat="umum">
+            <div class="bant-q">Siapa yang bisa menggunakan AQUAVISION?</div>
+            <div class="bant-a">
+                AQUAVISION dirancang untuk empat jenis pengguna:
+                <ul>
+                    <li><strong>Super Admin</strong> — Akses penuh termasuk Django Admin dan kelola pengguna.</li>
+                    <li><strong>Admin Pemda</strong> — Dapat upload, edit, dan mengelola data spasial.</li>
+                    <li><strong>User</strong> — Dapat mengakses Dashboard, Data Portal (baca saja), dan Hubungi Admin.</li>
+                    <li><strong>Guest</strong> — Dapat melihat Landing Page tanpa login.</li>
+                </ul>
+                Daftar akun baru untuk mendapatkan akses sebagai User.
+            </div>
+        </div>
+
+        <!-- ── DASHBOARD ─────────────────────────── -->
+        <p class="bsec-title" data-cat="dashboard">Cara Menggunakan Dashboard</p>
+
+        <div class="bant-item" data-cat="dashboard">
+            <div class="bant-q">Bagaimana cara membuka Dashboard peta?</div>
+            <div class="bant-a">
+                Klik <strong>Dashboard</strong> di menu navigasi atas, atau gunakan tombol <strong>"Buka Dashboard"</strong> di halaman beranda setelah login. Dashboard akan memuat peta interaktif Desa Wonotoro secara otomatis.
+            </div>
+        </div>
+
+        <div class="bant-item" data-cat="dashboard">
+            <div class="bant-q">Bagaimana cara mengaktifkan layer pada peta?</div>
+            <div class="bant-a">
+                Klik tombol <strong>"Daftar Layer"</strong> di sidebar kiri untuk membuka panel layer. Centang layer yang ingin ditampilkan, misalnya:
+                <ul>
+                    <li><strong>Daerah Potensi Air Tanah</strong> — Zonasi resapan air tanah (resolusi 10m × 10m)</li>
+                    <li><strong>Debit Puncak Aliran</strong> — Pilih bulan (Januari–Desember) untuk melihat debit per bulan (resolusi 30m × 30m)</li>
+                    <li><strong>Sumber Air, Tandon, Pipa, Fasilitas</strong> — Data infrastruktur air</li>
+                </ul>
+                Beberapa layer dapat diaktifkan bersamaan untuk analisis kombinasi.
+            </div>
+        </div>
+
+        <div class="bant-item" data-cat="dashboard">
+            <div class="bant-q">Bagaimana cara membaca nilai piksel pada peta?</div>
+            <div class="bant-a">
+                Saat layer <strong>Debit Puncak Aliran</strong> atau <strong>Daerah Potensi Air Tanah</strong> aktif, arahkan kursor ke area peta atau klik titik yang diinginkan. Nilai piksel (m³/s untuk debit, atau kelas potensi untuk resapan) akan muncul sebagai tooltip atau popup di atas peta.
+            </div>
+        </div>
+
+        <div class="bant-item" data-cat="dashboard">
+            <div class="bant-q">Bagaimana cara menggunakan fitur Pengukuran Jarak?</div>
+            <div class="bant-a">
+                Klik tombol <strong>"Pengukuran Jarak"</strong> di sidebar. Tersedia dua mode:
+                <ul>
+                    <li><strong>Klik 2 Titik</strong> — Aktifkan mode, lalu klik dua titik pada peta. Jarak akan dihitung otomatis dalam meter.</li>
+                    <li><strong>Input Manual</strong> — Masukkan koordinat latitude dan longitude dua titik secara manual, lalu klik "Hitung".</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="bant-item" data-cat="dashboard">
+            <div class="bant-q">Bagaimana cara mengekspor peta sebagai gambar?</div>
+            <div class="bant-a">
+                Klik tombol <strong>"🖨️ Export"</strong> di pojok kiri atas peta. Peta akan diunduh sebagai file PNG dengan tampilan layer yang sedang aktif. Pastikan semua layer yang diinginkan sudah tercentang sebelum mengekspor.
+            </div>
+        </div>
+
+        <div class="bant-item" data-cat="dashboard">
+            <div class="bant-q">Apa itu Simulasi Skenario?</div>
+            <div class="bant-a">
+                Fitur Simulasi Skenario (di sidebar bawah) memungkinkan Anda menghitung kebutuhan air hipotetis dengan memasukkan parameter:
+                <ul>
+                    <li>Jumlah penduduk (60 L/orang/hari)</li>
+                    <li>Jumlah kamar hotel (150 L/kamar/hari)</li>
+                    <li>Jumlah kursi restoran (100 L/kursi/hari)</li>
+                    <li>Luas pertanian dalam hektar (1 L/detik/ha)</li>
+                </ul>
+                Hasil simulasi akan langsung ditampilkan di panel Grafik Neraca Air.
+            </div>
+        </div>
+
+        <!-- ── DATA & LAYER ────────────────────────── -->
+        <p class="bsec-title" data-cat="data">Data &amp; Layer</p>
+
+        <div class="bant-item" data-cat="data">
+            <div class="bant-q">Apa itu Daerah Potensi Air Tanah?</div>
+            <div class="bant-a">
+                <strong>Daerah Potensi Air Tanah</strong> adalah hasil analisis zonasi resapan air tanah menggunakan metode AHP (Analytical Hierarchy Process) berbasis data tutupan lahan, kemiringan lereng, jenis tanah, dan curah hujan.<br><br>
+                Data ini memiliki resolusi spasial <strong>10m × 10m</strong> dan menunjukkan tingkat potensi dari rendah hingga sangat tinggi, berguna untuk menentukan lokasi sumber air baru yang potensial.
+            </div>
+        </div>
+
+        <div class="bant-item" data-cat="data">
+            <div class="bant-q">Apa itu Debit Puncak Aliran?</div>
+            <div class="bant-a">
+                <strong>Debit Puncak Aliran</strong> adalah estimasi volume air limpasan permukaan maksimum (m³/s) yang dihitung menggunakan metode Rasional dari data curah hujan dan karakteristik DAS.<br><br>
+                Data tersedia untuk <strong>12 bulan</strong> (Januari–Desember) dengan resolusi spasial <strong>30m × 30m</strong>. Visualisasi menggunakan GeoJSON dengan gradasi warna; nilai piksel tepat dapat dilihat dengan mengklik area peta.
+            </div>
+        </div>
+
+        <div class="bant-item" data-cat="data">
+            <div class="bant-q">Bagaimana cara mengunduh data?</div>
+            <div class="bant-a">
+                Buka <strong>Data Portal</strong> di menu navigasi. Pilih dataset yang diinginkan, lalu klik tombol format ekspor:
+                <ul>
+                    <li><strong>CSV</strong> — Format tabel untuk Excel/spreadsheet</li>
+                    <li><strong>GeoJSON</strong> — Format spasial untuk GIS web</li>
+                    <li><strong>KML</strong> — Format untuk Google Earth</li>
+                    <li><strong>SHP</strong> — Format Shapefile untuk QGIS/ArcGIS (dalam ZIP)</li>
+                </ul>
+                Beberapa dataset dibatasi hanya untuk Admin.
+            </div>
+        </div>
+
+        <div class="bant-item" data-cat="data">
+            <div class="bant-q">Bagaimana cara upload data Shapefile baru?</div>
+            <div class="bant-a">
+                Fitur ini hanya tersedia untuk <strong>Admin</strong>. Buka Dashboard, klik tombol <strong>"Input Data"</strong> di sidebar, lalu pilih <strong>"Upload Shapefile"</strong>. Upload file .shp, .shx, .dbf (wajib) dan .prj (opsional). Ukuran maksimum per file adalah 50 MB.
+            </div>
+        </div>
+
+        <!-- ── NERACA AIR ──────────────────────────── -->
+        <p class="bsec-title" data-cat="neraca">Neraca Air</p>
+
+        <div class="bant-item" data-cat="neraca">
+            <div class="bant-q">Bagaimana cara membaca status Neraca Air?</div>
+            <div class="bant-a">
+                Panel <strong>Ketersediaan Air</strong> di sidebar menampilkan tiga status:
+                <ul>
+                    <li>🟢 <strong>AMAN</strong> — Kebutuhan air &lt; 50% dari ketersediaan. Surplus aman.</li>
+                    <li>🟡 <strong>WASPADA</strong> — Kebutuhan air 50–80% dari ketersediaan. Mendekati batas.</li>
+                    <li>🔴 <strong>KRITIS</strong> — Kebutuhan air &gt; 80% dari ketersediaan. Defisit mengancam.</li>
+                </ul>
+                Data ketersediaan dihitung dari total debit sumber air. Data kebutuhan dihitung dari data permukiman, hotel, dan restoran yang tersimpan di sistem.
+            </div>
+        </div>
+
+        <div class="bant-item" data-cat="neraca">
+            <div class="bant-q">Mengapa angka Neraca Air berbeda dari kondisi lapangan?</div>
+            <div class="bant-a">
+                Neraca Air dihitung berdasarkan data yang tersimpan di database AQUAVISION. Jika data debit sumber air atau jumlah konsumen belum diperbarui, angka yang ditampilkan mungkin tidak mencerminkan kondisi aktual. Admin dapat memperbarui data melalui fitur Input Data atau Upload Shapefile.
+            </div>
+        </div>
+
+        <!-- ── AKUN & AKSES ───────────────────────── -->
+        <p class="bsec-title" data-cat="akun">Akun &amp; Akses</p>
+
+        <div class="bant-item" data-cat="akun">
+            <div class="bant-q">Bagaimana cara membuat akun?</div>
+            <div class="bant-a">
+                Klik tombol <strong>"Daftar Akun"</strong> di halaman utama atau menu navigasi. Isi username dan password, lalu klik "Daftar". Akun baru otomatis mendapatkan role <strong>User</strong> dengan akses Dashboard dan Data Portal (baca saja).
+            </div>
+        </div>
+
+        <div class="bant-item" data-cat="akun">
+            <div class="bant-q">Saya lupa password. Bagaimana cara reset?</div>
+            <div class="bant-a">
+                Fitur reset password mandiri belum tersedia. Hubungi Admin melalui halaman <a href="/hubungi/">Hubungi Admin</a> atau minta Admin untuk mereset password Anda melalui Django Admin.
+            </div>
+        </div>
+
+        <div class="bant-item" data-cat="akun">
+            <div class="bant-q">Apakah saya bisa login dengan akun Google?</div>
+            <div class="bant-a">
+                Ya, AQUAVISION mendukung login dengan akun Google melalui OAuth2. Klik tombol <strong>"Masuk dengan Google"</strong> di halaman login. Fitur ini tersedia jika Admin telah mengkonfigurasi Google OAuth credentials di server.
+            </div>
+        </div>
+
+        <div class="bant-item" data-cat="akun">
+            <div class="bant-q">Mengapa saya tidak bisa mengakses Data Portal tertentu?</div>
+            <div class="bant-a">
+                Beberapa dataset (Daerah Potensi Air Tanah, Debit Puncak Aliran, Jaringan Pipa) dibatasi untuk Admin saja di Data Portal. Jika Anda membutuhkan akses, hubungi Admin untuk upgrade role akun Anda.
+            </div>
+        </div>
+
+        <!-- ── TEKNIS ─────────────────────────────── -->
+        <p class="bsec-title" data-cat="teknis">Teknis</p>
+
+        <div class="bant-item" data-cat="teknis">
+            <div class="bant-q">Sistem koordinat apa yang digunakan?</div>
+            <div class="bant-a">
+                AQUAVISION menggunakan sistem koordinat <strong>WGS 84 / EPSG:4326</strong> (latitude/longitude) sebagai standar utama. Konversi ke <strong>UTM Zone 49S (EPSG:32749)</strong> tersedia untuk data easting/northing di Data Portal.
+            </div>
+        </div>
+
+        <div class="bant-item" data-cat="teknis">
+            <div class="bant-q">Browser apa yang direkomendasikan?</div>
+            <div class="bant-a">
+                AQUAVISION bekerja optimal di:
+                <ul>
+                    <li><strong>Chrome</strong> versi 90 ke atas (direkomendasikan)</li>
+                    <li><strong>Firefox</strong> versi 88 ke atas</li>
+                    <li><strong>Safari</strong> versi 14 ke atas (iPhone/Mac)</li>
+                    <li><strong>Edge</strong> versi 90 ke atas</li>
+                </ul>
+                Hindari menggunakan Internet Explorer atau browser lama yang tidak mendukung ES6+.
+            </div>
+        </div>
+
+        <div class="bant-item" data-cat="teknis">
+            <div class="bant-q">Peta tidak muncul atau blank. Apa yang harus dilakukan?</div>
+            <div class="bant-a">
+                Coba langkah berikut:
+                <ol>
+                    <li>Refresh halaman (Ctrl+F5 / Cmd+Shift+R)</li>
+                    <li>Pastikan koneksi internet stabil (peta membutuhkan tile dari OpenStreetMap)</li>
+                    <li>Bersihkan cache browser</li>
+                    <li>Coba gunakan browser lain</li>
+                    <li>Jika masalah berlanjut, hubungi Admin</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="bant-item" data-cat="teknis">
+            <div class="bant-q">Mengapa loading data terasa lambat?</div>
+            <div class="bant-a">
+                Beberapa layer seperti Debit Puncak Aliran memuat file GeoJSON berukuran besar (~7 MB per bulan). Waktu loading bergantung pada kecepatan koneksi internet. Setelah layer pertama kali dimuat, layer yang sama akan lebih cepat saat diaktifkan ulang karena tersimpan di cache browser.
+            </div>
+        </div>
+
+    </div><!-- /bantList -->
+
+    <!-- No results -->
+    <div class="bantuan-empty" id="bantEmpty">
+        Tidak ditemukan hasil untuk pencarian Anda.<br>
+        Coba kata kunci yang berbeda atau pilih kategori lain.
+    </div>
+
+    <!-- CTA -->
+    <div class="bantuan-cta">
+        <h3>Pertanyaan tidak terjawab?</h3>
+        <p>Sampaikan pertanyaan Anda langsung kepada tim AQUAVISION. Admin akan merespons secepatnya.</p>
+        <a href="/hubungi/" class="bantuan-cta-btn">✉️ Hubungi Admin</a>
+    </div>
+
+</div>
+
+<script>
+(function () {
+    var items   = document.querySelectorAll('.bant-item');
+    var secTitles = document.querySelectorAll('.bsec-title');
+    var searchEl = document.getElementById('faqSearch');
+    var emptyEl  = document.getElementById('bantEmpty');
+    var catBtns  = document.querySelectorAll('.bcat-btn');
+    var activeCat = 'all';
+
+    // Accordion
+    items.forEach(function (item) {
+        var q = item.querySelector('.bant-q');
+        if (q) {
+            q.addEventListener('click', function () {
+                var wasOpen = item.classList.contains('open');
+                items.forEach(function (i) { i.classList.remove('open'); });
+                if (!wasOpen) item.classList.add('open');
+            });
+        }
+    });
+
+    // Category filter
+    catBtns.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            catBtns.forEach(function (b) { b.classList.remove('active'); });
+            btn.classList.add('active');
+            activeCat = btn.getAttribute('data-cat');
+            applyFilters();
+        });
+    });
+
+    // Search
+    searchEl.addEventListener('input', applyFilters);
+
+    function applyFilters() {
+        var q = searchEl.value.trim().toLowerCase();
+        var anyVisible = false;
+
+        items.forEach(function (item) {
+            var cat  = item.getAttribute('data-cat');
+            var text = (item.querySelector('.bant-q').textContent + ' ' + item.querySelector('.bant-a').textContent).toLowerCase();
+            var catOk  = (activeCat === 'all' || cat === activeCat);
+            var textOk = (!q || text.indexOf(q) !== -1);
+            var show   = catOk && textOk;
+            item.classList.toggle('hidden', !show);
+            if (show) anyVisible = true;
+        });
+
+        // Show/hide section titles
+        secTitles.forEach(function (title) {
+            var cat = title.getAttribute('data-cat');
+            var hasVisible = false;
+            items.forEach(function (item) {
+                if (item.getAttribute('data-cat') === cat && !item.classList.contains('hidden')) {
+                    hasVisible = true;
+                }
+            });
+            title.style.display = (activeCat === 'all' || activeCat === cat) && hasVisible ? '' : 'none';
+        });
+
+        emptyEl.classList.toggle('show', !anyVisible);
+    }
+})();
+</script>
+{% endblock %}

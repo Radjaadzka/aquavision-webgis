@@ -120,9 +120,19 @@
     vertical-align: middle;
 }
 
+@media (max-width: 768px) {
+    .chat-messages { height: 300px; }
+    .chat-input-area {
+        padding-bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+        position: sticky;
+        bottom: 0;
+    }
+    .chat-input-area textarea { font-size: 16px; }
+    .chat-send-btn { min-width: 60px; }
+}
 @media (max-width: 480px) {
     .hubungi-wrap { padding: 70px 4% 40px; }
-    .chat-messages { height: 320px; }
+    .chat-messages { height: 260px; }
     .chat-send-btn { padding: 10px 14px; font-size: 13px; }
 }
 </style>
@@ -158,7 +168,6 @@
 
 <script>
 (function () {
-    var convId   = "{{ conversation.id }}";
     var myName   = "{{ request.user.username|escapejs }}";
     var lastId   = 0;
     var pollTimer = null;
@@ -176,8 +185,6 @@
         var empty = document.getElementById('chatEmpty');
         if (empty) empty.remove();
 
-        var isMe = (m.sender === myName && !m.is_admin) || (m.is_admin && m.sender === myName);
-        // Simpler: if sender === myName → "me" side
         var side = (m.sender === myName) ? 'me' : 'other';
         var avClass = m.is_admin ? 'admin-av' : 'user-av';
         var initial = (m.sender || '?')[0].toUpperCase();

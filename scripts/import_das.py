@@ -1,4 +1,10 @@
 import json
+import os
+import django
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
+django.setup()
+
 from django.contrib.gis.geos import GEOSGeometry, MultiPolygon
 from api.models import DAS
 
