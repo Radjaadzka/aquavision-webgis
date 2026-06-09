@@ -92,7 +92,7 @@ CSRF_TRUSTED_ORIGINS = os.environ.get(
 
 if not DEBUG:
     SECURE_PROXY_SSL_HEADER        = ('HTTP_X_FORWARDED_PROTO', 'https')
-    SECURE_SSL_REDIRECT            = True
+    SECURE_SSL_REDIRECT            = False
     SECURE_CONTENT_TYPE_NOSNIFF    = True
     X_FRAME_OPTIONS                = 'DENY'
     SECURE_HSTS_SECONDS            = 31536000
