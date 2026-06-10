@@ -180,7 +180,11 @@ class Feedback(models.Model):
 # ── P2.1: Hubungi Admin ──────────────────────────────────────────
 
 class Conversation(models.Model):
-    STATUS_CHOICES = [('open', 'Open'), ('closed', 'Closed')]
+    STATUS_CHOICES = [
+        ('open',              'Open'),
+        ('WAITING_FOR_ADMIN', 'Waiting for Admin'),
+        ('closed',            'Closed'),
+    ]
 
     user       = models.OneToOneField(User, on_delete=models.CASCADE, related_name='conversation')
     subject    = models.CharField(max_length=200, blank=True, default='')
@@ -199,14 +203,77 @@ class Conversation(models.Model):
 
 
 class Message(models.Model):
-    conversation = models.ForeignKey(Conversation, on_delete=models.CASCADE, related_name='messages')
-    sender       = models.ForeignKey(User, on_delete=models.CASCADE)
-    content      = models.TextField()
-    created_at   = models.DateTimeField(auto_now_add=True)
-    is_read      = models.BooleanField(default=False)
+    conversation    = models.ForeignKey(Conversation, on_delete=models.CASCADE, related_name='messages')
+    sender          = models.ForeignKey(User, on_delete=models.CASCADE)
+    content         = models.TextField()
+    created_at      = models.DateTimeField(auto_now_add=True)
+    is_read         = models.BooleanField(default=False)
+    is_ai_response  = models.BooleanField(default=False)
 
     class Meta:
         ordering = ['created_at']
 
     def __str__(self):
         return f'{self.sender.username}: {self.content[:40]}'
+
+
+# ── P2.2: Download Log ───────────────────────────────────────────
+
+class DownloadLog(models.Model):
+    FORMAT_CHOICES = [
+        ('csv',     'CSV'),
+        ('geojson', 'GeoJSON'),
+        ('kml',     'KML'),
+        ('shp',     'Shapefile'),
+    ]
+    user       = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    dataset    = models.CharField(max_length=50)
+    format     = models.CharField(max_length=10, choices=FORMAT_CHOICES)
+    waktu      = models.DateTimeField(auto_now_add=True)
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+
+    class Meta:
+        ordering = ['-waktu']
+
+    def __str__(self):
+        return f'{self.user} — {self.dataset}.{self.format}'
+
+
+# ── P2.3: Audit Log ──────────────────────────────────────────────
+
+class AuditLog(models.Model):
+    ACTION_CHOICES = [
+        ('LOGIN',    'Login'),
+        ('LOGOUT',   'Logout'),
+        ('DOWNLOAD', 'Download'),
+        ('UPLOAD',   'Upload'),
+        ('EDIT',     'Edit'),
+        ('DELETE',   'Delete'),
+        ('CHAT',     'Chat'),
+    ]
+    user       = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    action     = models.CharField(max_length=20, choices=ACTION_CHOICES)
+    detail     = models.CharField(max_length=200, blank=True, default='')
+    waktu      = models.DateTimeField(auto_now_add=True)
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+
+    class Meta:
+        ordering = ['-waktu']
+
+    def __str__(self):
+        return f'{self.user} — {self.action}'
+
+
+# ── P2.4: Notification ───────────────────────────────────────────
+
+class Notification(models.Model):
+    user       = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')
+    message    = models.CharField(max_length=300)
+    is_read    = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f'{self.user.username}: {self.message[:50]}'

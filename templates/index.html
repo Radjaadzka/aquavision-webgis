@@ -5,6 +5,100 @@
 {% block extra_css %}
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@0.9.8/dist/driver.min.css">
+<style>
+/* Layer info button */
+.lyr-info {
+    display:inline-flex; align-items:center; justify-content:center;
+    width:16px; height:16px; border-radius:50%;
+    background:rgba(59,130,246,.2); color:rgba(99,179,237,.8);
+    font-size:10px; font-weight:700; cursor:pointer; margin-left:4px;
+    border:1px solid rgba(59,130,246,.25); flex-shrink:0;
+    transition:background .15s; vertical-align:middle;
+}
+.lyr-info:hover { background:rgba(59,130,246,.4); }
+
+/* Legend items */
+.legend-item {
+    display:flex; align-items:center; gap:8px;
+    font-size:12px; color:rgba(255,255,255,.6);
+}
+.legend-swatch {
+    width:14px; height:14px; border-radius:3px; flex-shrink:0;
+}
+.legend-swatch.circle { border-radius:50%; }
+.legend-swatch.line { height:3px; border-radius:2px; margin:5px 0; }
+
+/* Health status */
+.health-row { display:flex; align-items:center; gap:8px; font-size:12px; }
+.health-dot {
+    width:8px; height:8px; border-radius:50%; flex-shrink:0;
+    background:#F59E0B;
+}
+.health-dot.ok     { background:#22C55E; }
+.health-dot.error  { background:#EF4444; }
+.health-dot.empty  { background:#F59E0B; }
+.health-label { color:rgba(255,255,255,.5); flex:1; }
+.health-val   { color:rgba(255,255,255,.3); font-size:11px; }
+
+/* Story mode overlay */
+#storyOverlay {
+    position:fixed; inset:0; z-index:2000;
+    background:rgba(7,17,31,.95);
+    display:none; flex-direction:column;
+    align-items:center; justify-content:center;
+    padding:20px;
+}
+#storyOverlay.active { display:flex; }
+.story-card {
+    max-width:560px; width:100%;
+    background:rgba(255,255,255,.04);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:20px; padding:36px 40px;
+    text-align:left;
+}
+.story-stage-num {
+    font-size:11px; font-weight:600; letter-spacing:2px;
+    color:rgba(99,179,237,.7); text-transform:uppercase; margin-bottom:12px;
+}
+.story-title {
+    font-family:'Fraunces',serif; font-size:clamp(22px,4vw,30px);
+    font-weight:300; color:white; line-height:1.3; margin-bottom:16px;
+}
+.story-content {
+    font-size:14px; color:rgba(255,255,255,.6); line-height:1.75; margin-bottom:28px;
+}
+.story-progress {
+    display:flex; gap:6px; margin-bottom:24px;
+}
+.story-prog-dot {
+    height:3px; flex:1; border-radius:2px; background:rgba(255,255,255,.1);
+    transition:background .3s;
+}
+.story-prog-dot.done { background:rgba(99,179,237,.7); }
+.story-nav {
+    display:flex; gap:12px; justify-content:space-between; align-items:center;
+}
+.story-btn {
+    padding:10px 24px; border-radius:10px; font-size:13px; font-weight:500;
+    cursor:pointer; transition:all .15s; border:none;
+}
+.story-btn-next { background:#3B82F6; color:white; }
+.story-btn-next:hover { background:#2563EB; }
+.story-btn-prev { background:rgba(255,255,255,.07); color:rgba(255,255,255,.6); border:1px solid rgba(255,255,255,.1); }
+.story-btn-prev:hover { background:rgba(255,255,255,.12); }
+.story-close {
+    position:absolute; top:20px; right:20px;
+    background:none; border:none; color:rgba(255,255,255,.3);
+    font-size:22px; cursor:pointer; padding:8px;
+}
+.story-close:hover { color:rgba(255,255,255,.7); }
+
+/* Layer info modal */
+#modalLayerInfo .modal-box { max-width:520px; }
+.lyrinfo-row { display:flex; gap:8px; margin-bottom:10px; font-size:13px; }
+.lyrinfo-label { color:#64748B; min-width:100px; font-weight:500; flex-shrink:0; }
+.lyrinfo-val { color:#334155; line-height:1.5; }
+</style>
 {% endblock %}
 
 {% block content %}
@@ -29,19 +123,19 @@
             <div id="layerPanel" class="layer-panel">
 
                 <p>Batas & Wilayah</p>
-                <label><input type="checkbox" id="chkAdminGab"> Administrasi Desa</label>
+                <label><input type="checkbox" id="chkAdminGab"> Administrasi Desa <span class="lyr-info" onclick="showLayerInfo('administrasi')">ℹ</span></label>
                 <hr>
 
                 <p>Infrastruktur Air</p>
-                <label><input type="checkbox" id="chkAir">          Sumber Air</label>
-                <label><input type="checkbox" id="chkReservoir">    Tandon Air</label>
-                <label><input type="checkbox" id="chkPipa">         Jaringan Pipa</label>
-                <label><input type="checkbox" id="chkSungaiVektor"> Daerah Aliran Sungai</label>
+                <label><input type="checkbox" id="chkAir">          Sumber Air <span class="lyr-info" onclick="showLayerInfo('sumber_air')">ℹ</span></label>
+                <label><input type="checkbox" id="chkReservoir">    Tandon Air <span class="lyr-info" onclick="showLayerInfo('reservoir')">ℹ</span></label>
+                <label><input type="checkbox" id="chkPipa">         Jaringan Pipa <span class="lyr-info" onclick="showLayerInfo('pipa')">ℹ</span></label>
+                <label><input type="checkbox" id="chkSungaiVektor"> Daerah Aliran Sungai <span class="lyr-info" onclick="showLayerInfo('sungai')">ℹ</span></label>
                 <hr>
 
                 <p>Analisis Hidrologi</p>
-                <label><input type="checkbox" id="chkPotensiAirTanah"> Daerah Potensi Air Tanah <small style="color:rgba(255,255,255,.25);font-size:10px;">10m×10m</small></label>
-                <label><input type="checkbox" id="chkDebitPuncak">     Debit Puncak Aliran <small style="color:rgba(255,255,255,.25);font-size:10px;">30m×30m</small></label>
+                <label><input type="checkbox" id="chkPotensiAirTanah"> Daerah Potensi Air Tanah <small style="color:rgba(255,255,255,.25);font-size:10px;">10m×10m</small> <span class="lyr-info" onclick="showLayerInfo('potensi')">ℹ</span></label>
+                <label><input type="checkbox" id="chkDebitPuncak">     Debit Puncak Aliran <small style="color:rgba(255,255,255,.25);font-size:10px;">30m×30m</small> <span class="lyr-info" onclick="showLayerInfo('debit')">ℹ</span></label>
                 <div id="debitBulanPanel" style="display:none; margin:4px 0 4px 6px;">
                     <select id="selectDebitBulan" style="font-size:12px;">
                         <option value="">-- Pilih Bulan --</option>
@@ -62,19 +156,32 @@
                 <hr>
 
                 <p>Fasilitas & Penduduk</p>
-                <label><input type="checkbox" id="chkHotel">      Hotel</label>
+                <label><input type="checkbox" id="chkHotel">      Hotel <span class="lyr-info" onclick="showLayerInfo('fasilitas')">ℹ</span></label>
                 <label><input type="checkbox" id="chkMakan">      Tempat Makan</label>
                 <label><input type="checkbox" id="chkJasa">       Jasa</label>
-                <label><input type="checkbox" id="chkPermukiman"> Permukiman</label>
+                <label><input type="checkbox" id="chkPermukiman"> Permukiman <span class="lyr-info" onclick="showLayerInfo('permukiman')">ℹ</span></label>
 
             </div><!-- /layerPanel -->
 
-            <!-- Input Data -->
+            <!-- Legenda Peta -->
+            <div class="card" id="legendCard" style="display:none;">
+                <div class="accordion-header" data-target="legendBody">
+                    <h3>Legenda Peta</h3>
+                    <span class="accordion-arrow open">▼</span>
+                </div>
+                <div class="accordion-body open" id="legendBody">
+                    <div id="legendItems" style="display:flex; flex-direction:column; gap:5px;"></div>
+                </div>
+            </div>
+
+            <!-- Input Data (hanya untuk user yang login) -->
+            {% if user.is_authenticated %}
             <button class="menu-btn" id="btnInputToggle">Input Data</button>
             <div id="inputChoicePanel" class="layer-panel">
                 <button class="menu-btn" id="btnInput"     style="font-size:12px; padding:8px;">✏️ Input Manual</button>
                 <button class="menu-btn" id="btnUploadSHP" style="font-size:12px; padding:8px;">📁 Upload Shapefile</button>
             </div>
+            {% endif %}
 
             <!-- Pengukuran Jarak -->
             <button class="menu-btn" id="btnDistance">Pengukuran Jarak</button>
@@ -96,15 +203,33 @@
                 <button class="menu-btn">📊 Data Portal</button>
             </a>
 
-            <!-- Hubungi Admin -->
-            <a href="/hubungi/">
-                <button class="menu-btn">✉️ Hubungi Admin</button>
+            <!-- Hubungi Admin (hanya untuk user yang login) -->
+            {% if user.is_authenticated %}
+            <a href="/hubungi/" style="position:relative; display:block;">
+                <button class="menu-btn" style="position:relative;">
+                    ✉️ Hubungi Admin
+                    <span id="notifBadge" style="display:none; position:absolute; top:6px; right:10px; background:#EF4444; color:white; font-size:10px; font-weight:700; min-width:18px; height:18px; border-radius:9px; line-height:18px; text-align:center; padding:0 4px;">0</span>
+                </button>
             </a>
+            {% endif %}
 
             <!-- Pusat Bantuan -->
             <a href="/bantuan/">
                 <button class="menu-btn">❓ Pusat Bantuan</button>
             </a>
+
+            <!-- Login prompt untuk guest -->
+            {% if not user.is_authenticated %}
+            <a href="/login/?next=/map/">
+                <button class="menu-btn" style="border-color:rgba(59,130,246,.3); color:rgba(59,130,246,.8);">🔑 Masuk / Daftar</button>
+            </a>
+            {% endif %}
+
+            <!-- Story Mode -->
+            <button class="menu-btn" id="btnStoryMode" style="border-color:rgba(139,92,246,.3); color:rgba(167,139,250,.8);">📖 Story Mode</button>
+
+            <!-- Mulai Tour -->
+            <button class="menu-btn" id="btnStartTour" onclick="if(window.aquavisionStartTour) window.aquavisionStartTour();" style="border-color:rgba(245,158,11,.3); color:rgba(245,158,11,.7);">🗺️ Mulai Tour</button>
 
             <!-- Info Wilayah (muncul saat polygon diklik) -->
             <div class="card" id="polygonStatsPanel" style="display:none;">
@@ -117,22 +242,30 @@
                 </div>
             </div>
 
-            <!-- Jumlah Data -->
+            <!-- Dashboard Summary -->
             <div class="card">
                 <div class="accordion-header" data-target="statsBody">
-                    <h3>Jumlah Data</h3>
+                    <h3>Ringkasan Data</h3>
                     <span class="accordion-arrow open">▼</span>
                 </div>
                 <div class="accordion-body open" id="statsBody">
                     <div class="stats-compact">
-                        <div class="stat-mini"><div class="stat-mini-icon">💧</div><div class="stat-mini-num" id="countAir">0</div><div class="stat-mini-label">Sumber Air</div></div>
-                        <div class="stat-mini"><div class="stat-mini-icon">🏨</div><div class="stat-mini-num" id="countHotel">0</div><div class="stat-mini-label">Hotel</div></div>
-                        <div class="stat-mini"><div class="stat-mini-icon">🍽</div><div class="stat-mini-num" id="countMakan">0</div><div class="stat-mini-label">Makan</div></div>
-                        <div class="stat-mini"><div class="stat-mini-icon">🛠</div><div class="stat-mini-num" id="countJasa">0</div><div class="stat-mini-label">Jasa</div></div>
-                        <div class="stat-mini"><div class="stat-mini-icon">👥</div><div class="stat-mini-num" id="totalPenduduk">0</div><div class="stat-mini-label">Penduduk</div></div>
-                        <div class="stat-mini"><div class="stat-mini-icon">🏗</div><div class="stat-mini-num" id="countReservoir">0</div><div class="stat-mini-label">Tandon</div></div>
+                        <div class="stat-mini"><div class="stat-mini-icon">🗂️</div><div class="stat-mini-num" id="statLayer">9</div><div class="stat-mini-label">Layer GIS</div></div>
+                        <div class="stat-mini"><div class="stat-mini-icon">📦</div><div class="stat-mini-num" id="statDataset">8</div><div class="stat-mini-label">Dataset</div></div>
+                        <div class="stat-mini"><div class="stat-mini-icon">💧</div><div class="stat-mini-num" id="countAir">—</div><div class="stat-mini-label">Sumber Air</div></div>
+                        <div class="stat-mini"><div class="stat-mini-icon">🏗</div><div class="stat-mini-num" id="countReservoir">—</div><div class="stat-mini-label">Tandon Air</div></div>
+                        <div class="stat-mini"><div class="stat-mini-icon">✉️</div><div class="stat-mini-num" id="statConv">—</div><div class="stat-mini-label">Percakapan</div></div>
+                        <div class="stat-mini"><div class="stat-mini-icon">📥</div><div class="stat-mini-num" id="statDl">—</div><div class="stat-mini-label">Download</div></div>
                     </div>
                 </div>
+            </div>
+
+            <!-- Hidden stat elements kept for script.js GeoJSON callbacks -->
+            <div style="display:none;">
+                <span id="countHotel">0</span>
+                <span id="countMakan">0</span>
+                <span id="countJasa">0</span>
+                <span id="totalPenduduk">0</span>
             </div>
 
             <!-- Ketersediaan Air -->
@@ -169,14 +302,27 @@
                     <span class="accordion-arrow">▼</span>
                 </div>
                 <div class="accordion-body" id="simBody">
-                    <input type="number" id="simPenduduk"  placeholder="Jumlah Penduduk (orang)" style="margin-top:6px;">
-                    <input type="number" id="simHotel"     placeholder="Jumlah Kamar Hotel">
-                    <input type="number" id="simResto"     placeholder="Jumlah Kursi Restoran">
-                    <input type="number" id="simPertanian" placeholder="Luas Pertanian (ha)" step="any">
-                    <p style="font-size:10px; color:rgba(255,255,255,.25); margin:5px 0;">
-                        60 L/org · 150 L/kamar · 100 L/kursi · 1 L/dtk/ha
+                    <p style="font-size:11px; color:rgba(255,255,255,.35); margin:4px 0 8px;">Proyeksikan kebutuhan air berdasarkan skenario pengembangan wisata:</p>
+                    <input type="number" id="simPenduduk"  placeholder="Jumlah Penduduk (orang)" style="margin-top:4px;" min="0">
+                    <input type="number" id="simHotel"     placeholder="Jumlah Kamar Hotel" min="0">
+                    <input type="number" id="simResto"     placeholder="Jumlah Kursi Restoran" min="0">
+                    <input type="number" id="simPertanian" placeholder="Luas Pertanian (ha)" step="0.1" min="0">
+                    <p style="font-size:10px; color:rgba(255,255,255,.2); margin:4px 0 8px; line-height:1.6;">
+                        Asumsi: 120 L/org/hari · 250 L/kamar/hari · 25 L/kursi/hari · 86.4 m³/ha/hari
                     </p>
-                    <button id="btnSimulasi">Hitung Simulasi</button>
+                    <button id="btnSimulasi">⚡ Hitung Simulasi</button>
+                    <div id="simResult" style="display:none; margin-top:10px; padding:10px 12px; border-radius:8px; border:1px solid rgba(255,255,255,.08); background:rgba(255,255,255,.03);">
+                        <div style="font-size:11px; color:rgba(255,255,255,.4); margin-bottom:6px;">Hasil Proyeksi Simulasi</div>
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:8px;">
+                            <div style="font-size:11px; color:rgba(255,255,255,.35);">Kebutuhan</div>
+                            <div style="font-size:13px; font-weight:600; color:rgba(255,255,255,.85);" id="simDemandVal">—</div>
+                            <div style="font-size:11px; color:rgba(255,255,255,.35);">Ketersediaan</div>
+                            <div style="font-size:13px; font-weight:600; color:rgba(255,255,255,.85);" id="simSupplyVal">—</div>
+                            <div style="font-size:11px; color:rgba(255,255,255,.35);">Selisih</div>
+                            <div style="font-size:13px; font-weight:600;" id="simSisaVal">—</div>
+                        </div>
+                        <div id="simStatusBadge" style="display:inline-block; font-size:11px; font-weight:700; padding:3px 10px; border-radius:20px; letter-spacing:.8px;"></div>
+                    </div>
                 </div>
             </div>
 
@@ -202,6 +348,22 @@
                         <text x="18"  y="150" text-anchor="middle" font-size="10" fill="rgba(255,255,255,.2)" font-family="Inter,sans-serif">0%</text>
                         <text x="242" y="150" text-anchor="middle" font-size="10" fill="rgba(255,255,255,.2)" font-family="Inter,sans-serif">100%</text>
                     </svg>
+                </div>
+            </div>
+
+            <!-- Health Status -->
+            <div class="card">
+                <div class="accordion-header" data-target="healthBody">
+                    <h3>Status Sistem</h3>
+                    <span class="accordion-arrow">▼</span>
+                </div>
+                <div class="accordion-body" id="healthBody">
+                    <div style="display:flex; flex-direction:column; gap:6px; margin-top:4px;">
+                        <div class="health-row"><span class="health-dot" id="hDot-database"></span><span class="health-label">Database</span><span class="health-val" id="hVal-database">...</span></div>
+                        <div class="health-row"><span class="health-dot" id="hDot-api"></span><span class="health-label">API</span><span class="health-val" id="hVal-api">...</span></div>
+                        <div class="health-row"><span class="health-dot" id="hDot-layers"></span><span class="health-label">Layer GIS</span><span class="health-val" id="hVal-layers">...</span></div>
+                        <div class="health-row"><span class="health-dot" id="hDot-storage"></span><span class="health-label">Storage</span><span class="health-val" id="hVal-storage">...</span></div>
+                    </div>
                 </div>
             </div>
 
@@ -359,6 +521,38 @@
     </div>
 </div>
 
+
+<!-- ================================================================
+     MODAL — Informasi Layer
+================================================================ -->
+<div class="modal-overlay" id="modalLayerInfo" style="display:none;">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3 id="liTitle">Informasi Layer</h3>
+            <button class="modal-close" onclick="document.getElementById('modalLayerInfo').style.display='none'">✕</button>
+        </div>
+        <div class="modal-body" id="liBody"></div>
+    </div>
+</div>
+
+
+<!-- ================================================================
+     STORY MODE OVERLAY
+================================================================ -->
+<div id="storyOverlay" role="dialog" aria-modal="true">
+    <button class="story-close" onclick="closeStory()">✕</button>
+    <div class="story-card">
+        <div class="story-stage-num" id="storyStageNum">Tahap 1 / 6</div>
+        <div class="story-progress" id="storyProgress"></div>
+        <div class="story-title"    id="storyTitle"></div>
+        <div class="story-content"  id="storyContent"></div>
+        <div class="story-nav">
+            <button class="story-btn story-btn-prev" id="storyPrev" onclick="storyNav(-1)">← Sebelumnya</button>
+            <button class="story-btn story-btn-next" id="storyNext" onclick="storyNav(1)">Selanjutnya →</button>
+        </div>
+    </div>
+</div>
+
 {% endblock %}
 
 
@@ -392,4 +586,193 @@
 <script src="{% static 'js/script.js' %}"></script>
 <script src="https://cdn.jsdelivr.net/npm/driver.js@0.9.8/dist/driver.min.js"></script>
 <script src="{% static 'js/tour.js' %}"></script>
+
+<script>
+// ── Dashboard Stats from real DB ──────────────────────────────
+(function loadStats() {
+    fetch('/api/stats/')
+        .then(function(r) { return r.json(); })
+        .then(function(d) {
+            function set(id, val) {
+                var el = document.getElementById(id);
+                if (el) el.textContent = val;
+            }
+            set('statLayer',     d.layer_count   || 9);
+            set('statDataset',   d.dataset_count || 8);
+            set('countAir',      d.sumber_air);
+            set('countReservoir', d.reservoir);
+            set('statConv',      d.conversation_count);
+            set('statDl',        d.download_count);
+            // hidden legacy elements kept for script.js GeoJSON callbacks
+            set('countHotel',    d.hotel);
+            set('countMakan',    d.makan);
+            set('countJasa',     d.jasa);
+            set('totalPenduduk', d.penduduk);
+        })
+        .catch(function() {});
+})();
+
+// ── Health Status Panel ────────────────────────────────────────
+(function checkHealth() {
+    fetch('/api/health/')
+        .then(function(r) { return r.json(); })
+        .then(function(d) {
+            var map = { database:'Database', api:'API', layers:'Layer GIS', storage:'Storage' };
+            Object.keys(map).forEach(function(k) {
+                var val = d.components[k] || 'error';
+                var dot = document.getElementById('hDot-' + k);
+                var lbl = document.getElementById('hVal-' + k);
+                if (dot) { dot.className = 'health-dot ' + val; }
+                if (lbl) { lbl.textContent = val === 'ok' ? 'Online' : val === 'empty' ? 'Kosong' : 'Offline'; }
+            });
+        })
+        .catch(function() {
+            ['database','api','layers','storage'].forEach(function(k) {
+                var dot = document.getElementById('hDot-' + k);
+                var lbl = document.getElementById('hVal-' + k);
+                if (dot) dot.className = 'health-dot error';
+                if (lbl) lbl.textContent = 'Offline';
+            });
+        });
+})();
+
+// ── Notification Badge (authenticated users only) ──────────────
+(function pollNotif() {
+    if (!document.getElementById('notifBadge')) return; // guest: badge absent
+    function check() {
+        fetch('/api/notifications/')
+            .then(function(r) { return r.json(); })
+            .then(function(d) {
+                var badge = document.getElementById('notifBadge');
+                if (!badge) return;
+                if (d.count > 0) {
+                    badge.textContent = d.count;
+                    badge.style.display = 'inline-block';
+                } else {
+                    badge.style.display = 'none';
+                }
+            })
+            .catch(function() {});
+    }
+    check();
+    setInterval(check, 30000);
+})();
+
+// ── Legend Dinamis ─────────────────────────────────────────────
+var LEGEND_DEFS = [
+    { id:'chkAdminGab',       color:'rgba(148,163,184,.6)',  type:'line',   label:'Administrasi Desa' },
+    { id:'chkAir',            color:'#3B82F6',               type:'circle', label:'Sumber Air' },
+    { id:'chkReservoir',      color:'#06B6D4',               type:'circle', label:'Tandon Air' },
+    { id:'chkPipa',           color:'#F59E0B',               type:'line',   label:'Jaringan Pipa' },
+    { id:'chkSungaiVektor',   color:'#60A5FA',               type:'line',   label:'Daerah Aliran Sungai' },
+    { id:'chkPotensiAirTanah',color:'linear-gradient(90deg,#166534,#4ADE80)', type:'gradient', label:'Potensi Air Tanah' },
+    { id:'chkDebitPuncak',    color:'linear-gradient(90deg,#1E3A5F,#60A5FA)', type:'gradient', label:'Debit Puncak Aliran' },
+    { id:'chkHotel',          color:'#F97316',               type:'circle', label:'Hotel' },
+    { id:'chkMakan',          color:'#EAB308',               type:'circle', label:'Tempat Makan' },
+    { id:'chkJasa',           color:'#8B5CF6',               type:'circle', label:'Jasa' },
+    { id:'chkPermukiman',     color:'#A78BFA',               type:'circle', label:'Permukiman' },
+];
+
+function updateLegend() {
+    var active = LEGEND_DEFS.filter(function(d) {
+        var el = document.getElementById(d.id);
+        return el && el.checked;
+    });
+    var card = document.getElementById('legendCard');
+    var container = document.getElementById('legendItems');
+    if (!card || !container) return;
+    if (active.length === 0) { card.style.display = 'none'; return; }
+    card.style.display = '';
+    container.innerHTML = active.map(function(d) {
+        var swatchStyle;
+        if (d.type === 'gradient') {
+            swatchStyle = 'background:' + d.color + '; width:28px; height:10px; border-radius:3px;';
+        } else if (d.type === 'line') {
+            swatchStyle = 'background:' + d.color + '; width:20px; height:3px; border-radius:2px; margin:5px 0;';
+        } else {
+            swatchStyle = 'background:' + d.color + '; width:12px; height:12px; border-radius:50%;';
+        }
+        return '<div class="legend-item"><span style="' + swatchStyle + ' flex-shrink:0;"></span><span>' + d.label + '</span></div>';
+    }).join('');
+}
+
+LEGEND_DEFS.forEach(function(d) {
+    var el = document.getElementById(d.id);
+    if (el) el.addEventListener('change', updateLegend);
+});
+
+// ── Layer Info Modal ───────────────────────────────────────────
+var LAYER_META = {
+    administrasi: { nama:'Administrasi Desa', deskripsi:'Batas administrasi desa-desa di sekitar Desa Wonotoro, Kecamatan Sukapura.', metode:'Digitasi dari peta RBI skala 1:50.000', resolusi:'Poligon vektor', tahun:'2024', sumber:'BIG (Badan Informasi Geospasial)', format:'GeoJSON / Shapefile' },
+    sumber_air:   { nama:'Sumber Air', deskripsi:'Titik sumber mata air di Desa Wonotoro beserta debit dan kondisi fisik.', metode:'Survey lapangan GPS RTK', resolusi:'Titik (Point)', tahun:'2024', sumber:'Survey Primer Tim AQUAVISION', format:'GeoJSON / CSV / Shapefile' },
+    reservoir:    { nama:'Tandon Air', deskripsi:'Lokasi dan kapasitas tandon distribusi air di Desa Wonotoro.', metode:'Survey lapangan GPS', resolusi:'Titik (Point)', tahun:'2024', sumber:'Survey Primer Tim AQUAVISION', format:'GeoJSON / CSV / Shapefile' },
+    pipa:         { nama:'Jaringan Pipa', deskripsi:'Jaringan pipa distribusi air dari sumber ke permukiman dan fasilitas wisata.', metode:'Digitasi dari survey lapangan', resolusi:'Garis (LineString)', tahun:'2024', sumber:'Survey Primer Tim AQUAVISION', format:'GeoJSON / Shapefile' },
+    sungai:       { nama:'Daerah Aliran Sungai', deskripsi:'Jaringan sungai dan aliran permukaan di wilayah studi Desa Wonotoro.', metode:'Ekstraksi dari DEM SRTM 30m', resolusi:'Garis (LineString)', tahun:'2023', sumber:'SRTM / BIG', format:'GeoJSON / Shapefile' },
+    potensi:      { nama:'Daerah Potensi Air Tanah', deskripsi:'Zonasi potensi air tanah berdasarkan analisis multi-kriteria di Desa Wonotoro.', metode:'AHP (Analytical Hierarchy Process) — 5 kriteria: tutupan lahan, kemiringan lereng, jenis tanah, curah hujan, geologi.', resolusi:'10m × 10m (Raster GeoTIFF)', tahun:'2024', sumber:'Analisis GIS AQUAVISION — BIG, BMKG, PVMBG', format:'GeoTIFF / GeoJSON' },
+    debit:        { nama:'Debit Puncak Aliran', deskripsi:'Peta debit puncak aliran permukaan bulanan di Desa Wonotoro (12 bulan).', metode:'Metode Rasional: Q = 0.278 × C × I × A — koefisien aliran, intensitas hujan BMKG, luas DAS dari DEM.', resolusi:'30m × 30m (Raster GeoTIFF)', tahun:'2024', sumber:'Analisis GIS AQUAVISION — BMKG Probolinggo 2014–2023', format:'GeoTIFF (12 file bulanan)' },
+    fasilitas:    { nama:'Fasilitas Wisata', deskripsi:'Lokasi hotel, restoran, homestay, dan jasa di kawasan wisata Desa Wonotoro.', metode:'Survey lapangan GPS + validasi Google Maps', resolusi:'Titik (Point)', tahun:'2024', sumber:'Survey Primer Tim AQUAVISION', format:'GeoJSON / CSV / Shapefile' },
+    permukiman:   { nama:'Permukiman', deskripsi:'Lokasi permukiman penduduk dan data demografi per dusun di Desa Wonotoro.', metode:'Survey lapangan GPS + data monografi desa', resolusi:'Titik (Point)', tahun:'2024', sumber:'Data Monografi Desa Wonotoro + Survey Primer', format:'GeoJSON / CSV / Shapefile' },
+};
+
+window.showLayerInfo = function(key) {
+    var meta = LAYER_META[key];
+    if (!meta) return;
+    document.getElementById('liTitle').textContent = meta.nama;
+    document.getElementById('liBody').innerHTML = [
+        ['Deskripsi', meta.deskripsi],
+        ['Metode',    meta.metode],
+        ['Resolusi',  meta.resolusi],
+        ['Tahun',     meta.tahun],
+        ['Sumber',    meta.sumber],
+        ['Format',    meta.format],
+    ].map(function(r) {
+        return '<div class="lyrinfo-row"><span class="lyrinfo-label">' + r[0] + '</span><span class="lyrinfo-val">' + r[1] + '</span></div>';
+    }).join('');
+    document.getElementById('modalLayerInfo').style.display = 'flex';
+};
+
+document.getElementById('modalLayerInfo').addEventListener('click', function(e) {
+    if (e.target === this) this.style.display = 'none';
+});
+
+// ── Story Mode ─────────────────────────────────────────────────
+var STORY_STAGES = [
+    { num:'Tahap 1 / 6', title:'🌍 Latar Belakang Masalah', content:'Desa Wonotoro berada di kawasan penyangga KSPN Bromo Tengger Semeru. Pertumbuhan wisatawan yang pesat menambah tekanan pada ketersediaan air bersih. Sistem pengelolaan air yang ada belum berbasis data spasial yang terstruktur.' },
+    { num:'Tahap 2 / 6', title:'🏗 Infrastruktur Air Eksisting', content:'Survey lapangan mengidentifikasi sumber mata air, tandon distribusi, dan jaringan pipa yang melayani permukiman dan fasilitas wisata. Data dikumpulkan menggunakan GPS RTK dan diintegrasikan ke platform AQUAVISION.' },
+    { num:'Tahap 3 / 6', title:'🌱 Daerah Potensi Air Tanah', content:'Analisis AHP (Analytical Hierarchy Process) dilakukan untuk memetakan zonasi potensi air tanah. Lima kriteria: tutupan lahan, kemiringan lereng, jenis tanah, curah hujan, dan geologi. Hasilnya adalah peta potensi resolusi 10m.' },
+    { num:'Tahap 4 / 6', title:'💧 Debit Puncak Aliran', content:'Metode Rasional digunakan bersama data curah hujan BMKG 10 tahun (2014–2023) untuk menghitung debit puncak aliran bulanan. Data resolusi 30m ini menunjukkan variasi ketersediaan air sepanjang tahun.' },
+    { num:'Tahap 5 / 6', title:'⚖️ Neraca Ketersediaan Air', content:'Ketersediaan dari sumber air dibandingkan kebutuhan total — domestik, hotel, restoran, dan pertanian. Status AMAN, WASPADA, atau KRITIS ditentukan berdasarkan rasio pemanfaatan terhadap ketersediaan.' },
+    { num:'Tahap 6 / 6', title:'✅ Rekomendasi & Solusi', content:'AQUAVISION menyediakan basis data spasial terpadu untuk mendukung pengambilan keputusan berbasis bukti. Rekomendasi mencakup revitalisasi sumber berpotensi tinggi, optimasi distribusi, dan mitigasi risiko defisit air musim kemarau.' },
+];
+var _storyIdx = 0;
+
+function renderStory() {
+    var s = STORY_STAGES[_storyIdx];
+    document.getElementById('storyStageNum').textContent = s.num;
+    document.getElementById('storyTitle').textContent    = s.title;
+    document.getElementById('storyContent').textContent  = s.content;
+    var prog = document.getElementById('storyProgress');
+    prog.innerHTML = STORY_STAGES.map(function(_, i) {
+        return '<div class="story-prog-dot' + (i <= _storyIdx ? ' done' : '') + '"></div>';
+    }).join('');
+    document.getElementById('storyPrev').style.visibility = _storyIdx === 0 ? 'hidden' : '';
+    document.getElementById('storyNext').textContent = _storyIdx === STORY_STAGES.length - 1 ? '✓ Selesai' : 'Selanjutnya →';
+}
+
+window.storyNav = function(dir) {
+    if (dir > 0 && _storyIdx >= STORY_STAGES.length - 1) { closeStory(); return; }
+    _storyIdx = Math.max(0, Math.min(STORY_STAGES.length - 1, _storyIdx + dir));
+    renderStory();
+};
+
+window.closeStory = function() {
+    document.getElementById('storyOverlay').classList.remove('active');
+};
+
+document.getElementById('btnStoryMode').addEventListener('click', function() {
+    _storyIdx = 0;
+    renderStory();
+    document.getElementById('storyOverlay').classList.add('active');
+});
+</script>
 {% endblock %}

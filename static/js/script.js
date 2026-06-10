@@ -997,20 +997,50 @@ document.addEventListener("DOMContentLoaded", function () {
         var resto     = document.getElementById("simResto")?.value     || 0;
         var pertanian = document.getElementById("simPertanian")?.value || 0;
 
+        var btn = this;
+        btn.disabled = true;
+        btn.textContent = 'Menghitung...';
+
         fetch("/api/informasi-debit/?hotel=" + hotel + "&penduduk=" + penduduk + "&resto=" + resto + "&pertanian=" + pertanian)
             .then(function (r) { return r.json(); })
             .then(function (data) {
+                btn.disabled = false;
+                btn.textContent = '⚡ Hitung Simulasi';
                 var p = data.pemanfaatan_persen;
-                document.getElementById("debitSupply").textContent  = data.ketersediaan_m3;
-                document.getElementById("debitDemand").textContent  = data.kebutuhan_m3;
+                // Update Ketersediaan Air panel
+                document.getElementById("debitSupply").textContent  = data.ketersediaan_m3.toLocaleString('id-ID');
+                document.getElementById("debitDemand").textContent  = data.kebutuhan_m3.toLocaleString('id-ID');
                 document.getElementById("statusLabel").textContent  = getStatusLabel(p);
                 document.getElementById("statusLabel").style.color  = getStatusColor(p);
                 document.getElementById("statusPersen").textContent = p + "% terpakai";
                 document.getElementById("statusDot").style.background = getStatusColor(p);
                 document.getElementById("statusBar").style.background = getStatusBg(p);
                 renderChart(data.ketersediaan_m3, data.kebutuhan_m3);
+
+                // Show inline result in simulasi panel
+                var resultEl = document.getElementById('simResult');
+                if (resultEl) {
+                    resultEl.style.display = 'block';
+                    var sisa = data.selisih_m3;
+                    document.getElementById('simDemandVal').textContent = data.kebutuhan_m3.toLocaleString('id-ID') + ' m³/hari';
+                    document.getElementById('simSupplyVal').textContent = data.ketersediaan_m3.toLocaleString('id-ID') + ' m³/hari';
+                    var sisaEl = document.getElementById('simSisaVal');
+                    sisaEl.textContent = (sisa >= 0 ? '+' : '') + sisa.toLocaleString('id-ID') + ' m³/hari';
+                    sisaEl.style.color = sisa >= 0 ? '#4ADE80' : '#F87171';
+                    var badge = document.getElementById('simStatusBadge');
+                    var statusColors = { AMAN: { bg:'rgba(34,197,94,.15)', color:'#4ADE80', border:'rgba(34,197,94,.3)' },
+                                         WASPADA: { bg:'rgba(245,158,11,.15)', color:'#FCD34D', border:'rgba(245,158,11,.3)' },
+                                         KRITIS:  { bg:'rgba(239,68,68,.15)',  color:'#F87171', border:'rgba(239,68,68,.3)' } };
+                    var sc = statusColors[data.status] || statusColors.AMAN;
+                    badge.textContent = data.status;
+                    badge.style.cssText = 'display:inline-block; font-size:11px; font-weight:700; padding:3px 10px; border-radius:20px; letter-spacing:.8px; background:' + sc.bg + '; color:' + sc.color + '; border:1px solid ' + sc.border + ';';
+                }
             })
-            .catch(function () { console.warn("Simulasi debit gagal."); });
+            .catch(function () {
+                btn.disabled = false;
+                btn.textContent = '⚡ Hitung Simulasi';
+                console.warn("Simulasi debit gagal.");
+            });
     });
 
 

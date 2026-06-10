@@ -36,12 +36,15 @@ from rest_framework.permissions import BasePermission, SAFE_METHODS
 # Local
 from .models import (
     AdministrasiDesa,
+    AuditLog,
     CatchmentArea,
     Conversation,
+    DownloadLog,
     Feedback,
     FasilitasWisata,
     JaringanPipa,
     Message,
+    Notification,
     Permukiman,
     RechargeArea,
     Reservoir,
@@ -88,6 +91,43 @@ ALLOWED_SHP_EXTENSIONS = {
 def is_admin_user(user):
     """Cek apakah user adalah superuser atau anggota grup Admin."""
     return user.is_superuser or user.groups.filter(name='Admin').exists()
+
+
+def _get_client_ip(request):
+    x_forwarded = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded:
+        return x_forwarded.split(',')[0].strip()
+    return request.META.get('REMOTE_ADDR')
+
+
+def _log_download(request, dataset, fmt):
+    try:
+        DownloadLog.objects.create(
+            user=request.user if request.user.is_authenticated else None,
+            dataset=dataset,
+            format=fmt,
+            ip_address=_get_client_ip(request),
+        )
+        AuditLog.objects.create(
+            user=request.user if request.user.is_authenticated else None,
+            action='DOWNLOAD',
+            detail=f'{dataset}.{fmt}',
+            ip_address=_get_client_ip(request),
+        )
+    except Exception:
+        pass
+
+
+def _log_audit(request, action, detail=''):
+    try:
+        AuditLog.objects.create(
+            user=request.user if request.user.is_authenticated else None,
+            action=action,
+            detail=detail,
+            ip_address=_get_client_ip(request),
+        )
+    except Exception:
+        pass
 
 
 def get_role_fields(model, user):
@@ -193,38 +233,30 @@ class IsAdminOrReadOnly(BasePermission):
 
 
 # ================================================================
-# GEOJSON ENDPOINTS (read-only, login required)
+# GEOJSON ENDPOINTS (read-only, public — guests can view the map)
 # ================================================================
 
-@login_required
 def sumber_air_geojson(request):
     return JsonResponse(json.loads(serialize('geojson', SumberAir.objects.all())), safe=False)
 
-@login_required
 def fasilitas_geojson(request):
     return JsonResponse(json.loads(serialize('geojson', FasilitasWisata.objects.all())), safe=False)
 
-@login_required
 def permukiman_geojson(request):
     return JsonResponse(json.loads(serialize('geojson', Permukiman.objects.all())), safe=False)
 
-@login_required
 def administrasi_geojson(request):
     return JsonResponse(json.loads(serialize('geojson', AdministrasiDesa.objects.all())), safe=False)
 
-@login_required
 def recharge_geojson(request):
     return JsonResponse(json.loads(serialize('geojson', RechargeArea.objects.all())), safe=False)
 
-@login_required
 def catchment_geojson(request):
     return JsonResponse(json.loads(serialize('geojson', CatchmentArea.objects.all())), safe=False)
 
-@login_required
 def jaringan_pipa_geojson(request):
     return JsonResponse(json.loads(serialize('geojson', JaringanPipa.objects.all())), safe=False)
 
-@login_required
 def reservoir_geojson(request):
     return JsonResponse(json.loads(serialize('geojson', Reservoir.objects.all())), safe=False)
 
@@ -350,6 +382,7 @@ def edit_data(request, model_name, pk):
                 setattr(obj, geo_field, Point(float(data['lng']), float(data['lat']), srid=4326))
 
         obj.save()
+        _log_audit(request, 'EDIT', f'{model_name} id={pk}')
         return JsonResponse({'message': 'Data berhasil diperbarui'})
 
     except model.DoesNotExist:
@@ -375,6 +408,7 @@ def delete_data(request, model_name, pk):
 
     try:
         model.objects.get(pk=pk).delete()
+        _log_audit(request, 'DELETE', f'{model_name} id={pk}')
         return JsonResponse({'message': 'Data berhasil dihapus'})
     except model.DoesNotExist:
         return JsonResponse({'error': 'Data tidak ditemukan'}, status=404)
@@ -524,6 +558,7 @@ def upload_shp(request):
             if errors:
                 msg += f' ({len(errors)} gagal)'
 
+            _log_audit(request, 'UPLOAD', f'{target} ({count} features)')
             return JsonResponse({'message': msg, 'count': count, 'errors': errors[:5]}, status=201)
 
     except Exception as e:
@@ -534,7 +569,6 @@ def upload_shp(request):
 # INFORMASI DEBIT — aggregate query, bukan loop Python
 # ================================================================
 
-@login_required(login_url='/login/')
 def informasi_debit(request):
     total_debit = SumberAir.objects.aggregate(total=Sum('debit'))['total'] or 0
     supply_m3   = total_debit * 86.4
@@ -602,9 +636,9 @@ def data_list(request):
         {'name': 'Fasilitas Wisata',             'slug': 'fasilitas',    'model': FasilitasWisata,
          'description': 'Data hotel, restoran, dan jasa'},
         {'name': 'Daerah Potensi Air Tanah Desa Wonotoro', 'slug': 'recharge',  'model': RechargeArea,
-         'description': 'Zona daerah resapan air tanah'},
+         'description': 'Peta zonasi potensi air tanah metode AHP (resolusi 10m×10m)'},
         {'name': 'Debit Puncak Aliran Desa Wonotoro',    'slug': 'catchment', 'model': CatchmentArea,
-         'description': 'Wilayah daerah tangkapan air'},
+         'description': 'Peta debit puncak aliran metode Rasional (resolusi 30m×30m)'},
         {'name': 'Jaringan Pipa',                        'slug': 'pipa',      'model': JaringanPipa,
          'description': 'Data jaringan pipa distribusi air'},
         {'name': 'Tandon Air',                           'slug': 'reservoir', 'model': Reservoir,
@@ -702,6 +736,8 @@ def download_csv(request, model_name):
     role_fields = get_role_fields(model, request.user)
     geo_field   = get_geo_field(model)
 
+    _log_download(request, model_name, 'csv')
+
     response = HttpResponse(content_type='text/csv; charset=utf-8')
     response['Content-Disposition'] = f'attachment; filename="{model_name}.csv"'
     response.write('﻿')  # BOM — Excel compatibility untuk karakter non-ASCII
@@ -736,6 +772,7 @@ def download_geojson(request, model_name):
     if not admin and model_name in ADMIN_ONLY_DATASETS:
         return JsonResponse({'error': 'Unauthorized'}, status=403)
 
+    _log_download(request, model_name, 'geojson')
     data     = serialize('geojson', model.objects.all())
     response = HttpResponse(data, content_type='application/geo+json; charset=utf-8')
     response['Content-Disposition'] = f'attachment; filename="{model_name}.geojson"'
@@ -787,6 +824,7 @@ def download_kml(request, model_name):
 
     kml_lines += ['</Document>', '</kml>']
 
+    _log_download(request, model_name, 'kml')
     response = HttpResponse('\n'.join(kml_lines), content_type='application/vnd.google-earth.kml+xml')
     response['Content-Disposition'] = f'attachment; filename="{model_name}.kml"'
     return response
@@ -897,6 +935,7 @@ def download_shp(request, model_name):
                 response = HttpResponse(f.read(), content_type='application/zip')
                 response['Content-Disposition'] = f'attachment; filename="{model_name}_shp.zip"'
 
+            _log_download(request, model_name, 'shp')
             return response
 
     except Exception as e:
@@ -943,6 +982,74 @@ def feedback_list(request):
 # P2.1 — HUBUNGI ADMIN (Messaging)
 # ================================================================
 
+# ── AI FAQ responder (rule-based, no external API needed) ────────
+_FAQ = [
+    # Format: (keywords_tuple, answer_string)
+    (('aquavision', 'apa itu', 'tentang', 'platform', 'sistem'),
+     "AQUAVISION adalah platform WebGIS (Web Geographic Information System) untuk pemantauan dan pengelolaan sumber daya air di Desa Wonotoro, Kecamatan Sukapura, Kabupaten Probolinggo. Platform ini dikembangkan sebagai Capstone Design Project Teknik Geodesi dan Geomatika ITB 2026."),
+
+    (('dashboard', 'peta', 'cara buka', 'cara akses', 'bagaimana masuk'),
+     "Dashboard AQUAVISION dapat diakses dari menu utama atau melalui tombol 'Buka Dashboard'. Dashboard menampilkan peta interaktif dengan berbagai lapisan data spasial sumber daya air Desa Wonotoro."),
+
+    (('layer', 'lapisan', 'daftar layer', 'aktifkan layer', 'tampilkan layer'),
+     "Untuk mengelola layer, klik tombol 'Daftar Layer' di sidebar kiri Dashboard. Anda dapat mengaktifkan atau menonaktifkan lapisan data seperti Potensi Air Tanah, Debit Puncak Aliran, Infrastruktur Air, dan lainnya secara bersamaan."),
+
+    (('potensi air tanah', 'recharge', 'resapan', 'zonasi', 'ahp'),
+     "Layer Daerah Potensi Air Tanah menampilkan zonasi resapan air tanah dengan resolusi 10m × 10m. Data dihasilkan menggunakan metode AHP (Analytical Hierarchy Process) berdasarkan tutupan lahan, kemiringan lereng, jenis tanah, dan curah hujan. Warna menunjukkan tingkat potensi dari rendah hingga sangat tinggi."),
+
+    (('debit puncak', 'catchment', 'aliran', 'curah hujan', 'bulan'),
+     "Layer Debit Puncak Aliran menampilkan peta debit puncak (m³/s) dengan resolusi 30m × 30m. Data tersedia untuk 12 bulan (Januari–Desember). Pilih bulan dari dropdown di panel layer, kemudian klik area pada peta untuk membaca nilai debit di lokasi tersebut."),
+
+    (('infrastruktur', 'sumber air', 'pipa', 'tandon', 'reservoir', 'fasilitas'),
+     "Layer Infrastruktur Air menampilkan lokasi sumber mata air, jaringan pipa distribusi, tandon air, permukiman, dan fasilitas wisata (hotel, restoran, jasa). Klik titik atau garis di peta untuk melihat atribut detail setiap objek."),
+
+    (('neraca air', 'ketersediaan', 'kebutuhan air', 'status aman', 'status kritis', 'waspada'),
+     "Neraca Ketersediaan Air membandingkan total ketersediaan air dari sumber dengan kebutuhan harian. Status AMAN berarti surplus, WASPADA mendekati batas, dan KRITIS berarti defisit. Data diperbarui secara berkala dari database AQUAVISION."),
+
+    (('simulasi', 'skenario', 'proyeksi', 'hitung kebutuhan', 'penduduk', 'hotel'),
+     "Fitur Simulasi Skenario memungkinkan Anda memasukkan parameter hipotetis — jumlah penduduk, kamar hotel, kursi restoran, atau luas pertanian — untuk menghitung proyeksi kebutuhan air. Berguna untuk perencanaan pengembangan wisata dan infrastruktur."),
+
+    (('data portal', 'unduh', 'download', 'ekspor', 'csv', 'geojson', 'shapefile', 'kml'),
+     "Data Portal AQUAVISION menyediakan akses ke seluruh dataset spasial. Anda dapat mengunduh data dalam format CSV, GeoJSON, KML, atau Shapefile untuk analisis lanjutan di perangkat lunak GIS desktop atau spreadsheet. Kunjungi menu 'Data Portal' di navbar."),
+
+    (('akun', 'login', 'daftar', 'register', 'password', 'lupa password', 'username'),
+     "Untuk mengakses fitur lengkap AQUAVISION, buat akun melalui halaman Daftar. Gunakan username dan password yang Anda buat untuk masuk. Jika lupa password, hubungi admin AQUAVISION melalui pesan ini."),
+
+    (('bantuan', 'faq', 'panduan', 'cara menggunakan', 'tutorial', 'petunjuk'),
+     "Pusat Bantuan AQUAVISION tersedia di menu navbar dan sidebar. Di sana terdapat FAQ lengkap dalam 6 kategori: Tentang AQUAVISION, Dashboard, Data & Layer, Neraca Air, Akun & Akses, dan Teknis. Gunakan fitur pencarian untuk menemukan jawaban dengan cepat."),
+
+    (('wonotoro', 'desa', 'lokasi', 'bromo', 'probolinggo', 'sukapura'),
+     "Desa Wonotoro terletak di Kecamatan Sukapura, Kabupaten Probolinggo, Jawa Timur. Desa ini berada di kawasan penyangga KSPN (Kawasan Strategis Pariwisata Nasional) Bromo Tengger Semeru, koordinat sekitar 7°53' LS dan 112°59' BT (WGS84/EPSG:4326)."),
+
+    (('health', 'status sistem', 'sistem online', 'database status', 'layer status'),
+     "Panel Status Sistem di sidebar Dashboard menampilkan kondisi real-time komponen AQUAVISION: Database (koneksi PostgreSQL/PostGIS), API (endpoint layanan data), Layer GIS (ketersediaan data spasial), dan Storage (direktori data statis). Status hijau berarti normal, merah berarti ada masalah."),
+
+    (('riwayat download', 'log download', 'siapa yang download', 'rekam jejak unduh'),
+     "Admin dapat melihat Riwayat Download melalui menu Admin Tools > Riwayat Download. Tercatat: nama pengguna, dataset yang diunduh, format file, waktu unduh, dan alamat IP. Audit Log tersedia khusus untuk Super Admin yang mencatat semua aktivitas sistem."),
+
+    (('story mode', 'narasi', 'cerita', 'latar belakang penelitian', 'konteks penelitian'),
+     "Fitur Story Mode (tombol 📖 di sidebar) menyajikan narasi 6 tahap tentang konteks penelitian AQUAVISION: dari latar belakang masalah pariwisata Bromo, identifikasi infrastruktur, analisis potensi air tanah, debit puncak, neraca ketersediaan, hingga rekomendasi solusi."),
+]
+
+def _ai_respond(message):
+    """
+    Rule-based FAQ responder. Returns answer string if confident, else None.
+    Confidence = at least 2 keywords from a tuple match the message (case-insensitive).
+    """
+    msg_lower = message.lower()
+    best_score = 0
+    best_answer = None
+    for keywords, answer in _FAQ:
+        score = sum(1 for kw in keywords if kw in msg_lower)
+        if score > best_score:
+            best_score = score
+            best_answer = answer
+    # Confident if at least 2 keywords matched, or 1 keyword in a short message (<= 5 words)
+    word_count = len(msg_lower.split())
+    threshold = 1 if word_count <= 5 else 2
+    return best_answer if best_score >= threshold else None
+
+
 @login_required(login_url='/login/')
 def hubungi_view(request):
     """Halaman Hubungi Admin — user melihat dan mengirim pesan."""
@@ -955,7 +1062,7 @@ def hubungi_view(request):
 
 @login_required(login_url='/login/')
 def hubungi_send(request):
-    """User mengirim pesan baru."""
+    """User mengirim pesan; AI mencoba menjawab otomatis, jika tidak eskalasi ke admin."""
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     try:
@@ -971,14 +1078,61 @@ def hubungi_send(request):
 
     conv, _ = Conversation.objects.get_or_create(user=request.user)
     msg = Message.objects.create(conversation=conv, sender=request.user, content=content)
-    conv.save()  # update updated_at
-    return JsonResponse({
-        'id':         msg.id,
-        'sender':     msg.sender.username,
-        'content':    msg.content,
-        'created_at': timezone.localtime(msg.created_at).strftime('%d %b %Y, %H:%M'),
-        'is_admin':   False,
-    })
+    _log_audit(request, 'CHAT', f'User message: {content[:60]}')
+
+    # AI attempt to answer
+    ai_answer = _ai_respond(content)
+    ai_msg_data = None
+
+    if ai_answer:
+        # Confident — reply automatically, keep conv open
+        conv.status = 'open'
+        ai_sender = request.user  # borrow sender slot; is_ai_response flag distinguishes it
+        ai_msg = Message.objects.create(
+            conversation=conv,
+            sender=ai_sender,
+            content=ai_answer,
+            is_read=True,
+            is_ai_response=True,
+        )
+        ai_msg_data = {
+            'id':              ai_msg.id,
+            'sender':          'AQUAVISION AI',
+            'content':         ai_msg.content,
+            'created_at':      timezone.localtime(ai_msg.created_at).strftime('%d %b %Y, %H:%M'),
+            'is_admin':        True,
+            'is_ai_response':  True,
+        }
+    else:
+        # Not confident — escalate to admin
+        conv.status = 'WAITING_FOR_ADMIN'
+        escalation = Message.objects.create(
+            conversation=conv,
+            sender=request.user,
+            content="Pertanyaan Anda telah diteruskan kepada Admin AQUAVISION. Admin akan segera membalas. 🔔",
+            is_read=True,
+            is_ai_response=True,
+        )
+        ai_msg_data = {
+            'id':              escalation.id,
+            'sender':          'AQUAVISION AI',
+            'content':         escalation.content,
+            'created_at':      timezone.localtime(escalation.created_at).strftime('%d %b %Y, %H:%M'),
+            'is_admin':        True,
+            'is_ai_response':  True,
+        }
+
+    conv.save()
+
+    user_msg_data = {
+        'id':             msg.id,
+        'sender':         msg.sender.username,
+        'content':        msg.content,
+        'created_at':     timezone.localtime(msg.created_at).strftime('%d %b %Y, %H:%M'),
+        'is_admin':       False,
+        'is_ai_response': False,
+    }
+    return JsonResponse({'user_msg': user_msg_data, 'ai_msg': ai_msg_data})
 
 
 @login_required(login_url='/login/')
@@ -993,11 +1147,12 @@ def hubungi_messages(request):
 
     data = [
         {
-            'id':         m.id,
-            'sender':     m.sender.username,
-            'content':    m.content,
-            'created_at': timezone.localtime(m.created_at).strftime('%d %b %Y, %H:%M'),
-            'is_admin':   m.sender != request.user,
+            'id':             m.id,
+            'sender':         'AQUAVISION AI' if m.is_ai_response else m.sender.username,
+            'content':        m.content,
+            'created_at':     timezone.localtime(m.created_at).strftime('%d %b %Y, %H:%M'),
+            'is_admin':       m.sender != request.user or m.is_ai_response,
+            'is_ai_response': m.is_ai_response,
         }
         for m in msgs
     ]
@@ -1067,13 +1222,26 @@ def hubungi_admin_thread(request, conv_id):
         if not content:
             return JsonResponse({'error': 'Pesan tidak boleh kosong.'}, status=400)
         msg = Message.objects.create(conversation=conv, sender=request.user, content=content, is_read=True)
+        # Admin replied — move status back to open
+        if conv.status == 'WAITING_FOR_ADMIN':
+            conv.status = 'open'
         conv.save()
+        # Notify the user
+        try:
+            Notification.objects.create(
+                user=conv.user,
+                message=f'Admin telah membalas pesan Anda: "{content[:80]}"',
+            )
+        except Exception:
+            pass
+        _log_audit(request, 'CHAT', f'Admin reply to {conv.user.username}')
         return JsonResponse({
-            'id':         msg.id,
-            'sender':     msg.sender.username,
-            'content':    msg.content,
-            'created_at': timezone.localtime(msg.created_at).strftime('%d %b %Y, %H:%M'),
-            'is_admin':   True,
+            'id':             msg.id,
+            'sender':         msg.sender.username,
+            'content':        msg.content,
+            'created_at':     timezone.localtime(msg.created_at).strftime('%d %b %Y, %H:%M'),
+            'is_admin':       True,
+            'is_ai_response': False,
         })
 
     # GET — tandai pesan user sebagai sudah dibaca
@@ -1082,12 +1250,136 @@ def hubungi_admin_thread(request, conv_id):
     msgs.filter(is_read=False, sender=conv.user).update(is_read=True)
     data = [
         {
-            'id':         m.id,
-            'sender':     m.sender.username,
-            'content':    m.content,
-            'created_at': timezone.localtime(m.created_at).strftime('%d %b %Y, %H:%M'),
-            'is_admin':   m.sender != conv.user,
+            'id':             m.id,
+            'sender':         'AQUAVISION AI' if m.is_ai_response else m.sender.username,
+            'content':        m.content,
+            'created_at':     timezone.localtime(m.created_at).strftime('%d %b %Y, %H:%M'),
+            'is_admin':       m.sender != conv.user or m.is_ai_response,
+            'is_ai_response': m.is_ai_response,
         }
         for m in msgs
     ]
     return JsonResponse(data, safe=False)
+
+
+# ================================================================
+# P2.5 — DASHBOARD STATS (real DB counts)
+# ================================================================
+
+def dashboard_stats(request):
+    """Kembalikan jumlah real dari database untuk semua entitas utama."""
+    from django.db.models import Sum as _Sum
+    hotel    = FasilitasWisata.objects.filter(jenis='hotel').count()
+    resto    = FasilitasWisata.objects.filter(jenis='resto').count()
+    jasa     = FasilitasWisata.objects.filter(jenis='jasa').count()
+    penduduk = Permukiman.objects.aggregate(t=_Sum('jumlah_penduduk'))['t'] or 0
+    return JsonResponse({
+        # Granular counts (for GeoJSON layer callbacks)
+        'sumber_air':  SumberAir.objects.count(),
+        'hotel':       hotel,
+        'makan':       resto,
+        'jasa':        jasa,
+        'penduduk':    penduduk,
+        'reservoir':   Reservoir.objects.count(),
+        'permukiman':  Permukiman.objects.count(),
+        'pipa':        JaringanPipa.objects.count(),
+        # Dashboard Summary Panel
+        'layer_count':        9,
+        'dataset_count':      8,
+        'conversation_count': Conversation.objects.count(),
+        'download_count':     DownloadLog.objects.count(),
+    })
+
+
+# ================================================================
+# P2.6 — HEALTH CHECK
+# ================================================================
+
+def health_check(request):
+    """Cek status konektivitas komponen sistem."""
+    results = {}
+
+    # Database check
+    try:
+        SumberAir.objects.count()
+        results['database'] = 'ok'
+    except Exception:
+        results['database'] = 'error'
+
+    # API self-check
+    results['api'] = 'ok'
+
+    # Layer data check — verifikasi data GIS tersedia
+    try:
+        has_data = (
+            SumberAir.objects.exists() or
+            Reservoir.objects.exists() or
+            AdministrasiDesa.objects.exists()
+        )
+        results['layers'] = 'ok' if has_data else 'empty'
+    except Exception:
+        results['layers'] = 'error'
+
+    # Storage check — verifikasi static data dir ada
+    import os as _os
+    static_data = _os.path.join(_os.path.dirname(_os.path.dirname(__file__)), 'static', 'data')
+    results['storage'] = 'ok' if _os.path.isdir(static_data) else 'error'
+
+    overall = 'ok' if all(v == 'ok' for v in results.values()) else 'degraded'
+    return JsonResponse({'status': overall, 'components': results})
+
+
+# ================================================================
+# P2.7 — NOTIFICATIONS
+# ================================================================
+
+@login_required(login_url='/login/')
+def notifications_list(request):
+    """Kembalikan notifikasi belum dibaca untuk user ini."""
+    notifs = Notification.objects.filter(user=request.user, is_read=False)[:20]
+    data = [
+        {
+            'id':         n.id,
+            'message':    n.message,
+            'created_at': timezone.localtime(n.created_at).strftime('%d %b %Y, %H:%M'),
+        }
+        for n in notifs
+    ]
+    return JsonResponse({'count': len(data), 'notifications': data})
+
+
+@login_required(login_url='/login/')
+def notifications_mark_read(request):
+    """Tandai semua notifikasi user sebagai sudah dibaca."""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    Notification.objects.filter(user=request.user, is_read=False).update(is_read=True)
+    return JsonResponse({'message': 'ok'})
+
+
+# ================================================================
+# P2.8 — AUDIT LOG PAGE (super admin only)
+# ================================================================
+
+@login_required(login_url='/login/')
+def audit_log_page(request):
+    """Halaman Audit Log — hanya super admin."""
+    if not request.user.is_superuser:
+        from django.http import HttpResponseForbidden
+        return HttpResponseForbidden("Akses ditolak.")
+    logs = AuditLog.objects.select_related('user').order_by('-waktu')[:500]
+    return render(request, 'audit_log.html', {'logs': logs})
+
+
+# ================================================================
+# P2.9 — DOWNLOAD LOG PAGE (admin only)
+# ================================================================
+
+@login_required(login_url='/login/')
+def download_log_page(request):
+    """Halaman Riwayat Download — admin only."""
+    if not is_admin_user(request.user):
+        from django.http import HttpResponseForbidden
+        return HttpResponseForbidden("Akses ditolak.")
+    logs = DownloadLog.objects.select_related('user').order_by('-waktu')[:500]
+    return render(request, 'download_log.html', {'logs': logs})

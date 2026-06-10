@@ -90,6 +90,9 @@ body {
     color: var(--text);
     line-height: 1.6;
     overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
 img { max-width: 100%; display: block; }
@@ -247,10 +250,10 @@ a   { text-decoration: none; color: inherit; }
     transition: all .2s;
 }
 
-/* Main offset */
+/* Main offset — body is flex column so main-content: flex:1 = sticky footer */
 .main-content {
     padding-top: 56px;
-    min-height: calc(100vh - 56px);
+    flex: 1;
     display: flex;
     flex-direction: column;
 }
@@ -1574,4 +1577,61 @@ a   { text-decoration: none; color: inherit; }
         align-items: center;
         justify-content: center;
     }
+}
+
+/* ================================================================
+   17B. P2 ENHANCEMENT — NEW FEATURE RESPONSIVE
+================================================================ */
+
+/* Story mode — compact on small screens */
+@media (max-width: 600px) {
+    .story-card {
+        padding: 24px 20px;
+    }
+    .story-title {
+        font-size: 20px;
+    }
+    .story-btn {
+        padding: 9px 16px;
+        font-size: 12px;
+    }
+}
+
+/* TOS overlay — scrollable on small screens */
+@media (max-width: 480px) {
+    #tosOverlay {
+        padding: 12px;
+        align-items: flex-end;
+    }
+    #tosOverlay > div {
+        border-radius: 16px 16px 0 0;
+        padding: 24px 20px;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+}
+
+/* Layer info modal — full-width on mobile */
+@media (max-width: 600px) {
+    #modalLayerInfo .modal-box {
+        margin: 12px;
+        width: calc(100% - 24px);
+    }
+    .lyrinfo-row {
+        flex-direction: column;
+        gap: 2px;
+    }
+    .lyrinfo-label {
+        min-width: unset;
+    }
+}
+
+/* Health rows — comfortable spacing */
+.health-row {
+    min-height: 28px;
+}
+
+/* Legend card — no min-height constraint */
+#legendCard {
+    transition: opacity .2s;
 }

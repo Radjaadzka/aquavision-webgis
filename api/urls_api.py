@@ -36,4 +36,10 @@ urlpatterns = [
     # ── Feedback (publik) ───────────────────────────────────
     path('feedback/',      views.feedback_submit),
     path('feedback/list/', views.feedback_list),
+
+    # ── P2: Stats, Health, Notifications ────────────────────
+    path('stats/',                   views.dashboard_stats,          name='dashboard_stats'),
+    path('health/',                  views.health_check,             name='health_check'),
+    path('notifications/',           views.notifications_list,       name='notifications_list'),
+    path('notifications/mark-read/', views.notifications_mark_read,  name='notifications_mark_read'),
 ]

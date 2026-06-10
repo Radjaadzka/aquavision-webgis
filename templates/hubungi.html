@@ -43,8 +43,15 @@
     display: flex; align-items: center; justify-content: center;
     font-size: 11px; font-weight: 600; color: white;
 }
-.msg-avatar.user-av { background: linear-gradient(135deg,#1a5276,#3B82F6); }
+.msg-avatar.user-av  { background: linear-gradient(135deg,#1a5276,#3B82F6); }
 .msg-avatar.admin-av { background: linear-gradient(135deg,#15803D,#16A34A); }
+.msg-avatar.ai-av    { background: linear-gradient(135deg,#7C3AED,#A78BFA); }
+.ai-badge {
+    display: inline-block; font-size: 10px; font-weight: 600;
+    background: rgba(124,58,237,.1); color: #7C3AED;
+    border: 1px solid rgba(124,58,237,.2); border-radius: 4px;
+    padding: 1px 5px; margin-left: 4px; vertical-align: middle; letter-spacing: .3px;
+}
 
 .msg-bubble {
     max-width: 72%; padding: 10px 14px;
@@ -110,6 +117,12 @@
     font-size: 13px; color: #15803D; font-weight: 500;
     display: flex; align-items: center; gap: 10px;
 }
+.waiting-banner {
+    background: rgba(245,158,11,.07); border: 1px solid rgba(245,158,11,.25);
+    border-radius: 10px; padding: 11px 16px; margin-bottom: 16px;
+    font-size: 13px; color: #92400E; font-weight: 400;
+    display: flex; align-items: center; gap: 8px;
+}
 
 /* Status badge */
 .conv-status {
@@ -142,8 +155,12 @@
 <div class="hubungi-wrap">
     <div class="hubungi-head">
         <h1>Hubungi <em>Admin</em></h1>
-        <p>Sampaikan pertanyaan atau laporan kepada admin AQUAVISION. Admin akan membalas secepat mungkin.</p>
+        <p>Kirim pertanyaan kepada AQUAVISION. AI akan mencoba menjawab otomatis; jika tidak berhasil, admin akan membalas secepatnya.</p>
     </div>
+
+    {% if conversation.status == 'WAITING_FOR_ADMIN' %}
+    <div class="waiting-banner">⏳ Pertanyaan Anda telah diteruskan kepada Admin AQUAVISION dan sedang menunggu balasan.</div>
+    {% endif %}
 
     {% if is_admin %}
     <div class="admin-banner">
@@ -185,16 +202,20 @@
         var empty = document.getElementById('chatEmpty');
         if (empty) empty.remove();
 
-        var side = (m.sender === myName) ? 'me' : 'other';
-        var avClass = m.is_admin ? 'admin-av' : 'user-av';
-        var initial = (m.sender || '?')[0].toUpperCase();
+        var isAI    = m.is_ai_response;
+        var side    = (!m.is_admin) ? 'me' : 'other';
+        var avClass = isAI ? 'ai-av' : (m.is_admin ? 'admin-av' : 'user-av');
+        var initial = isAI ? '🤖' : (m.sender || '?')[0].toUpperCase();
+        var senderLabel = isAI
+            ? 'AQUAVISION AI <span class="ai-badge">AI</span>'
+            : escHtml(m.sender) + (m.is_admin ? ' 🛡️' : '');
 
         var row = document.createElement('div');
         row.className = 'msg-row ' + side;
         row.innerHTML =
             '<div class="msg-avatar ' + avClass + '">' + initial + '</div>' +
             '<div>' +
-                (side === 'other' ? '<div class="msg-sender">' + escHtml(m.sender) + (m.is_admin ? ' 🛡️' : '') + '</div>' : '') +
+                (side === 'other' ? '<div class="msg-sender">' + senderLabel + '</div>' : '') +
                 '<div class="msg-bubble">' + escHtml(m.content) + '</div>' +
                 '<div class="msg-time">' + m.created_at + '</div>' +
             '</div>';
@@ -236,7 +257,13 @@
             if (d.error) { alert(d.error); return; }
             inp.value = '';
             inp.style.height = 'auto';
-            appendMsg(d);
+            // New format: {user_msg, ai_msg}
+            if (d.user_msg) {
+                appendMsg(d.user_msg);
+                if (d.ai_msg) appendMsg(d.ai_msg);
+            } else {
+                appendMsg(d); // fallback for old format
+            }
         })
         .catch(function () { btn.disabled = false; });
     }

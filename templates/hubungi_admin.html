@@ -130,10 +130,10 @@
     <div class="conv-list" id="convList">
         {% if conversations %}
             {% for c in conversations %}
-            <div class="conv-item" 
-                data-id="{{ c.id }}" 
+            <div class="conv-item"
+                data-id="{{ c.id }}"
                 data-user="{{ c.user|escapejs }}"
-                onclick="openThread(this)">
+                onclick="openThread(parseInt(this.dataset.id), this.dataset.user, this)">
                 <div class="conv-avatar">{{ c.user|make_list|first|upper }}</div>
                 <div class="conv-info">
                     <div class="conv-top">
@@ -218,13 +218,13 @@
             .catch(function () {});
     }
 
-    window.openThread = function (convId, username) {
+    window.openThread = function (convId, username, el) {
         activeConvId = convId;
         lastId = 0;
 
         // Highlight active row
-        document.querySelectorAll('.conv-item').forEach(function (el) { el.classList.remove('active'); });
-        event.currentTarget.classList.add('active');
+        document.querySelectorAll('.conv-item').forEach(function (r) { r.classList.remove('active'); });
+        if (el) el.classList.add('active');
 
         // Show panel
         var panel = document.getElementById('threadPanel');

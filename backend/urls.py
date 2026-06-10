@@ -6,13 +6,12 @@ Inline view functions for simple pages; GIS and data portal routed to api/.
 from django.contrib import admin
 from django.urls import path, include
 from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth import views as auth_views, login
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import Group
 from django.conf import settings
 from django.conf.urls.static import static
-from api.views import is_admin_user
+from api.views import is_admin_user, audit_log_page, download_log_page
 
 
 # ================================================================
@@ -29,10 +28,9 @@ def landing(request):
     })
 
 
-@login_required(login_url='/login/')
 def map_view(request):
-    """WebGIS dashboard — kirim flag is_admin ke template."""
-    is_admin = is_admin_user(request.user)
+    """WebGIS dashboard — accessible to guests; admin flag only for authenticated users."""
+    is_admin = request.user.is_authenticated and is_admin_user(request.user)
     return render(request, 'index.html', {'is_admin': is_admin})
 
 
@@ -55,9 +53,8 @@ def register(request):
     return render(request, 'register.html', {'form': form})
 
 
-@login_required(login_url='/login/')
 def bantuan_view(request):
-    """Pusat Bantuan AQUAVISION — halaman FAQ dan panduan penggunaan."""
+    """Pusat Bantuan AQUAVISION — halaman FAQ dan panduan penggunaan (publik)."""
     return render(request, 'bantuan.html')
 
 
@@ -101,6 +98,10 @@ urlpatterns = [
 
     # Hubungi Admin (P2.1)
     path('hubungi/', include('api.urls_hubungi')),
+
+    # Audit & Download Log (P2.8, P2.9)
+    path('admin-tools/audit-log/',    audit_log_page,    name='audit_log'),
+    path('admin-tools/download-log/', download_log_page, name='download_log'),
 ]
 
 # Media files — hanya saat DEBUG (di produksi Nginx yang serve)
