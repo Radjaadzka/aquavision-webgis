@@ -3,23 +3,10 @@
    localStorage key: aquavision_dashboard_tour_completed = 'true'
    Reset:  window.resetTour()
    Ulang:  window.startTour()
-
-   Bug-fix notes (vs previous version):
-   - Step 1 uses .sidebar-head (position:static) NOT #sidebar (position:absolute).
-     Driver.js adds "position:relative" to highlighted elements. Applying this to the
-     position:absolute sidebar disrupted its layout on de-select, making step 2's
-     spotlight land on empty space.
-   - Filter now checks getBoundingClientRect() — skips elements with 0×0 dimensions
-     (e.g. .nav-links hidden on mobile viewport). Previously querySelector() found
-     hidden elements; Driver.js then produced an invisible 0×0 spotlight, leaving the
-     overlay up with no popup visible.
-   - #btnHideSidebar disabled via pointer-events:none for the tour duration so an
-     accidental mis-click on the ✕ button cannot collapse the sidebar mid-tour.
-   - Global onHighlightStarted re-locks the sidebar before every step.
-   - Step 15 (Selesai) uses element:null — floating popup, always renders.
 */
 (function () {
     var TOUR_KEY = 'aquavision_dashboard_tour_completed';
+    console.log('[AQUAVISION Tour] loaded');
 
     /* ── Sidebar helpers ──────────────────────────────────────────── */
 
@@ -206,14 +193,17 @@
             },
 
             // ── 15. SELESAI ──────────────────────────────────────────
-            // element:null — no spotlight, floating popup in center.
-            // Guaranteed to render regardless of viewport size or scroll position.
+            // FIX: element:'#btnGuide' instead of null.
+            // Driver.js 0.9.8 typeof-checks element: null becomes typeof 'object',
+            // falls through to call .getBoundingClientRect() on null → TypeError.
+            // try-catch silently swallows this, aborting the ENTIRE tour.
+            // '#btnGuide' is always in the DOM and points to the restart button.
             {
-                element: null,
+                element: '#btnGuide',
                 popover: {
                     title:       '🎉 Panduan Selesai',
-                    description: 'Anda siap menggunakan AQUAVISION. Untuk hasil terbaik: aktifkan layer yang ingin dianalisis, kemudian klik objek pada peta untuk melihat informasi detail. Untuk mengulang panduan ini kapan saja, klik <b>ⓘ Lihat Panduan Dashboard</b> di bagian bawah panel kiri.',
-                    position:    'mid-center'
+                    description: 'Anda siap menggunakan AQUAVISION. Untuk hasil terbaik: aktifkan layer yang ingin dianalisis, kemudian klik objek pada peta untuk melihat informasi detail. Untuk mengulang panduan ini kapan saja, klik tombol <b>ⓘ Lihat Panduan Dashboard</b> ini.',
+                    position:    'right'
                 }
             }
         ];
@@ -237,7 +227,11 @@
 
     function runTour() {
         try {
-            if (typeof Driver === 'undefined') return;
+            if (typeof Driver === 'undefined') {
+                console.warn('[AQUAVISION Tour] Driver.js not loaded — tour aborted.');
+                return;
+            }
+            console.log('[AQUAVISION Tour] started');
             prepareUI();
 
             var steps = buildSteps().filter(function (s) {
@@ -307,7 +301,11 @@
     /* ── Auto-start ───────────────────────────────────────────────── */
 
     function autoStart() {
-        if (localStorage.getItem(TOUR_KEY) === 'true') return;
+        if (localStorage.getItem(TOUR_KEY) === 'true') {
+            console.log('[AQUAVISION Tour] already completed — auto-start skipped (call resetTour() to replay).');
+            return;
+        }
+        console.log('[AQUAVISION Tour] auto-start triggered');
         setTimeout(runTour, 600);
     }
 
