@@ -1583,20 +1583,6 @@ a   { text-decoration: none; color: inherit; }
    17B. P2 ENHANCEMENT — NEW FEATURE RESPONSIVE
 ================================================================ */
 
-/* Story mode — compact on small screens */
-@media (max-width: 600px) {
-    .story-card {
-        padding: 24px 20px;
-    }
-    .story-title {
-        font-size: 20px;
-    }
-    .story-btn {
-        padding: 9px 16px;
-        font-size: 12px;
-    }
-}
-
 /* TOS overlay — scrollable on small screens */
 @media (max-width: 480px) {
     #tosOverlay {

@@ -304,7 +304,18 @@ body { background: #07111F; }
   box-shadow: 0 40px 100px rgba(0,0,0,.5);
   background: #0D2236;
 }
-.prev-wrap img { width: 100%; display: block; min-height: 200px; max-height: 460px; object-fit: cover; }
+.prev-wrap img {
+  width: 100%; display: block;
+  min-height: 260px; max-height: 460px; object-fit: cover;
+  background: #0D2236;
+}
+.prev-img-placeholder {
+  width: 100%; min-height: 260px; max-height: 460px;
+  background: linear-gradient(135deg, #0D2236 0%, #0e2a45 50%, #0D2236 100%);
+  display: flex; align-items: center; justify-content: center;
+  color: rgba(255,255,255,.15); font-size: 13px; font-family: 'Inter',sans-serif;
+  letter-spacing: .5px;
+}
 .prev-bar {
   background: #0D2236; padding: 18px 24px;
   display: flex; justify-content: space-between; align-items: center;
@@ -607,7 +618,16 @@ body { background: #07111F; }
   <span class="lbl lbl-lt rv">Preview</span>
   <h2 class="sec-h sec-h-lt rv d1">Tampilan sistem</h2>
   <div class="prev-wrap rv d2">
-    <img src="{% static 'images/webgis_preview.png' %}" alt="Preview Dashboard AQUAVISION">
+    <img
+      src="{% static 'images/webgis_preview.png' %}"
+      alt="Preview Dashboard AQUAVISION"
+      loading="lazy"
+      decoding="async"
+      width="1280"
+      height="720"
+      onerror="this.style.display='none'; this.nextElementSibling && (this.nextElementSibling.style.display='flex');"
+    >
+    <div class="prev-img-placeholder" style="display:none;">Memuat pratinjau dashboard...</div>
     <div class="prev-bar">
       <div>
         <h4>📍 Desa Wonotoro, Kec. Sukapura, Kab. Probolinggo</h4>

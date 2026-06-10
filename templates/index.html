@@ -40,59 +40,6 @@
 .health-label { color:rgba(255,255,255,.5); flex:1; }
 .health-val   { color:rgba(255,255,255,.3); font-size:11px; }
 
-/* Story mode overlay */
-#storyOverlay {
-    position:fixed; inset:0; z-index:2000;
-    background:rgba(7,17,31,.95);
-    display:none; flex-direction:column;
-    align-items:center; justify-content:center;
-    padding:20px;
-}
-#storyOverlay.active { display:flex; }
-.story-card {
-    max-width:560px; width:100%;
-    background:rgba(255,255,255,.04);
-    border:1px solid rgba(255,255,255,.08);
-    border-radius:20px; padding:36px 40px;
-    text-align:left;
-}
-.story-stage-num {
-    font-size:11px; font-weight:600; letter-spacing:2px;
-    color:rgba(99,179,237,.7); text-transform:uppercase; margin-bottom:12px;
-}
-.story-title {
-    font-family:'Fraunces',serif; font-size:clamp(22px,4vw,30px);
-    font-weight:300; color:white; line-height:1.3; margin-bottom:16px;
-}
-.story-content {
-    font-size:14px; color:rgba(255,255,255,.6); line-height:1.75; margin-bottom:28px;
-}
-.story-progress {
-    display:flex; gap:6px; margin-bottom:24px;
-}
-.story-prog-dot {
-    height:3px; flex:1; border-radius:2px; background:rgba(255,255,255,.1);
-    transition:background .3s;
-}
-.story-prog-dot.done { background:rgba(99,179,237,.7); }
-.story-nav {
-    display:flex; gap:12px; justify-content:space-between; align-items:center;
-}
-.story-btn {
-    padding:10px 24px; border-radius:10px; font-size:13px; font-weight:500;
-    cursor:pointer; transition:all .15s; border:none;
-}
-.story-btn-next { background:#3B82F6; color:white; }
-.story-btn-next:hover { background:#2563EB; }
-.story-btn-prev { background:rgba(255,255,255,.07); color:rgba(255,255,255,.6); border:1px solid rgba(255,255,255,.1); }
-.story-btn-prev:hover { background:rgba(255,255,255,.12); }
-.story-close {
-    position:absolute; top:20px; right:20px;
-    background:none; border:none; color:rgba(255,255,255,.3);
-    font-size:22px; cursor:pointer; padding:8px;
-}
-.story-close:hover { color:rgba(255,255,255,.7); }
-
 /* Layer info modal */
 #modalLayerInfo .modal-box { max-width:520px; }
 .lyrinfo-row { display:flex; gap:8px; margin-bottom:10px; font-size:13px; }
@@ -225,12 +172,6 @@
             </a>
             {% endif %}
 
-            <!-- Story Mode -->
-            <button class="menu-btn" id="btnStoryMode" style="border-color:rgba(139,92,246,.3); color:rgba(167,139,250,.8);">📖 Story Mode</button>
-
-            <!-- Mulai Tour -->
-            <button class="menu-btn" id="btnStartTour" onclick="if(window.aquavisionStartTour) window.aquavisionStartTour();" style="border-color:rgba(245,158,11,.3); color:rgba(245,158,11,.7);">🗺️ Mulai Tour</button>
-
             <!-- Info Wilayah (muncul saat polygon diklik) -->
             <div class="card" id="polygonStatsPanel" style="display:none;">
                 <div class="polygon-stats-card">
@@ -250,22 +191,35 @@
                 </div>
                 <div class="accordion-body open" id="statsBody">
                     <div class="stats-compact">
+                    {% if is_admin %}
+                        <!-- Admin / Superadmin: statistik internal sistem -->
                         <div class="stat-mini"><div class="stat-mini-icon">🗂️</div><div class="stat-mini-num" id="statLayer">9</div><div class="stat-mini-label">Layer GIS</div></div>
                         <div class="stat-mini"><div class="stat-mini-icon">📦</div><div class="stat-mini-num" id="statDataset">8</div><div class="stat-mini-label">Dataset</div></div>
                         <div class="stat-mini"><div class="stat-mini-icon">💧</div><div class="stat-mini-num" id="countAir">—</div><div class="stat-mini-label">Sumber Air</div></div>
                         <div class="stat-mini"><div class="stat-mini-icon">🏗</div><div class="stat-mini-num" id="countReservoir">—</div><div class="stat-mini-label">Tandon Air</div></div>
                         <div class="stat-mini"><div class="stat-mini-icon">✉️</div><div class="stat-mini-num" id="statConv">—</div><div class="stat-mini-label">Percakapan</div></div>
                         <div class="stat-mini"><div class="stat-mini-icon">📥</div><div class="stat-mini-num" id="statDl">—</div><div class="stat-mini-label">Download</div></div>
+                    {% else %}
+                        <!-- Guest / User: statistik objek wisata & air -->
+                        <div class="stat-mini"><div class="stat-mini-icon">💧</div><div class="stat-mini-num" id="countAir">—</div><div class="stat-mini-label">Sumber Air</div></div>
+                        <div class="stat-mini"><div class="stat-mini-icon">🏨</div><div class="stat-mini-num" id="countHotel">—</div><div class="stat-mini-label">Hotel</div></div>
+                        <div class="stat-mini"><div class="stat-mini-icon">🍽️</div><div class="stat-mini-num" id="countMakan">—</div><div class="stat-mini-label">Rumah Makan</div></div>
+                        <div class="stat-mini"><div class="stat-mini-icon">🛠️</div><div class="stat-mini-num" id="countJasa">—</div><div class="stat-mini-label">Jasa</div></div>
+                        <div class="stat-mini"><div class="stat-mini-icon">🏗</div><div class="stat-mini-num" id="countReservoir">—</div><div class="stat-mini-label">Tandon Air</div></div>
+                        <div class="stat-mini"><div class="stat-mini-icon">🌊</div><div class="stat-mini-num" id="countSungai">28</div><div class="stat-mini-label">Jalur Sungai</div></div>
+                    {% endif %}
                     </div>
                 </div>
             </div>
 
-            <!-- Hidden stat elements kept for script.js GeoJSON callbacks -->
-            <div style="display:none;">
+            <!-- Elemen tersembunyi untuk script.js callbacks (selalu ada di DOM) -->
+            <div style="display:none;" aria-hidden="true">
+                <span id="totalPenduduk">0</span>
+                {% if is_admin %}
                 <span id="countHotel">0</span>
                 <span id="countMakan">0</span>
                 <span id="countJasa">0</span>
-                <span id="totalPenduduk">0</span>
+                {% endif %}
             </div>
 
             <!-- Ketersediaan Air -->
@@ -351,7 +305,8 @@
                 </div>
             </div>
 
-            <!-- Health Status -->
+            {% if is_admin %}
+            <!-- Health Status — admin/superadmin only -->
             <div class="card">
                 <div class="accordion-header" data-target="healthBody">
                     <h3>Status Sistem</h3>
@@ -366,6 +321,14 @@
                     </div>
                 </div>
             </div>
+            {% endif %}
+
+            <!-- Panduan Dashboard -->
+            <button class="menu-btn" id="btnGuide"
+                onclick="window.resetTour && window.resetTour();"
+                style="border-color:rgba(99,179,237,.2); color:rgba(99,179,237,.55); font-size:12px; margin-top:4px;">
+                ⓘ Lihat Panduan Dashboard
+            </button>
 
         </div><!-- /sidebar-scroll -->
     </aside><!-- /sidebar -->
@@ -536,23 +499,6 @@
 </div>
 
 
-<!-- ================================================================
-     STORY MODE OVERLAY
-================================================================ -->
-<div id="storyOverlay" role="dialog" aria-modal="true">
-    <button class="story-close" onclick="closeStory()">✕</button>
-    <div class="story-card">
-        <div class="story-stage-num" id="storyStageNum">Tahap 1 / 6</div>
-        <div class="story-progress" id="storyProgress"></div>
-        <div class="story-title"    id="storyTitle"></div>
-        <div class="story-content"  id="storyContent"></div>
-        <div class="story-nav">
-            <button class="story-btn story-btn-prev" id="storyPrev" onclick="storyNav(-1)">← Sebelumnya</button>
-            <button class="story-btn story-btn-next" id="storyNext" onclick="storyNav(1)">Selanjutnya →</button>
-        </div>
-    </div>
-</div>
-
 {% endblock %}
 
 
@@ -612,29 +558,31 @@
         .catch(function() {});
 })();
 
-// ── Health Status Panel ────────────────────────────────────────
-(function checkHealth() {
-    fetch('/api/health/')
-        .then(function(r) { return r.json(); })
-        .then(function(d) {
-            var map = { database:'Database', api:'API', layers:'Layer GIS', storage:'Storage' };
-            Object.keys(map).forEach(function(k) {
-                var val = d.components[k] || 'error';
-                var dot = document.getElementById('hDot-' + k);
-                var lbl = document.getElementById('hVal-' + k);
-                if (dot) { dot.className = 'health-dot ' + val; }
-                if (lbl) { lbl.textContent = val === 'ok' ? 'Online' : val === 'empty' ? 'Kosong' : 'Offline'; }
+// ── Health Status Panel (admin only — skip if panel not in DOM) ──
+if (document.getElementById('hDot-database')) {
+    (function checkHealth() {
+        fetch('/api/health/')
+            .then(function(r) { return r.json(); })
+            .then(function(d) {
+                var map = { database:'Database', api:'API', layers:'Layer GIS', storage:'Storage' };
+                Object.keys(map).forEach(function(k) {
+                    var val = d.components[k] || 'error';
+                    var dot = document.getElementById('hDot-' + k);
+                    var lbl = document.getElementById('hVal-' + k);
+                    if (dot) { dot.className = 'health-dot ' + val; }
+                    if (lbl) { lbl.textContent = val === 'ok' ? 'Online' : val === 'empty' ? 'Kosong' : 'Offline'; }
+                });
+            })
+            .catch(function() {
+                ['database','api','layers','storage'].forEach(function(k) {
+                    var dot = document.getElementById('hDot-' + k);
+                    var lbl = document.getElementById('hVal-' + k);
+                    if (dot) dot.className = 'health-dot error';
+                    if (lbl) lbl.textContent = 'Offline';
+                });
             });
-        })
-        .catch(function() {
-            ['database','api','layers','storage'].forEach(function(k) {
-                var dot = document.getElementById('hDot-' + k);
-                var lbl = document.getElementById('hVal-' + k);
-                if (dot) dot.className = 'health-dot error';
-                if (lbl) lbl.textContent = 'Offline';
-            });
-        });
-})();
+    })();
+}
 
 // ── Notification Badge (authenticated users only) ──────────────
 (function pollNotif() {
@@ -735,44 +683,5 @@ document.getElementById('modalLayerInfo').addEventListener('click', function(e) 
     if (e.target === this) this.style.display = 'none';
 });
 
-// ── Story Mode ─────────────────────────────────────────────────
-var STORY_STAGES = [
-    { num:'Tahap 1 / 6', title:'🌍 Latar Belakang Masalah', content:'Desa Wonotoro berada di kawasan penyangga KSPN Bromo Tengger Semeru. Pertumbuhan wisatawan yang pesat menambah tekanan pada ketersediaan air bersih. Sistem pengelolaan air yang ada belum berbasis data spasial yang terstruktur.' },
-    { num:'Tahap 2 / 6', title:'🏗 Infrastruktur Air Eksisting', content:'Survey lapangan mengidentifikasi sumber mata air, tandon distribusi, dan jaringan pipa yang melayani permukiman dan fasilitas wisata. Data dikumpulkan menggunakan GPS RTK dan diintegrasikan ke platform AQUAVISION.' },
-    { num:'Tahap 3 / 6', title:'🌱 Daerah Potensi Air Tanah', content:'Analisis AHP (Analytical Hierarchy Process) dilakukan untuk memetakan zonasi potensi air tanah. Lima kriteria: tutupan lahan, kemiringan lereng, jenis tanah, curah hujan, dan geologi. Hasilnya adalah peta potensi resolusi 10m.' },
-    { num:'Tahap 4 / 6', title:'💧 Debit Puncak Aliran', content:'Metode Rasional digunakan bersama data curah hujan BMKG 10 tahun (2014–2023) untuk menghitung debit puncak aliran bulanan. Data resolusi 30m ini menunjukkan variasi ketersediaan air sepanjang tahun.' },
-    { num:'Tahap 5 / 6', title:'⚖️ Neraca Ketersediaan Air', content:'Ketersediaan dari sumber air dibandingkan kebutuhan total — domestik, hotel, restoran, dan pertanian. Status AMAN, WASPADA, atau KRITIS ditentukan berdasarkan rasio pemanfaatan terhadap ketersediaan.' },
-    { num:'Tahap 6 / 6', title:'✅ Rekomendasi & Solusi', content:'AQUAVISION menyediakan basis data spasial terpadu untuk mendukung pengambilan keputusan berbasis bukti. Rekomendasi mencakup revitalisasi sumber berpotensi tinggi, optimasi distribusi, dan mitigasi risiko defisit air musim kemarau.' },
-];
-var _storyIdx = 0;
-
-function renderStory() {
-    var s = STORY_STAGES[_storyIdx];
-    document.getElementById('storyStageNum').textContent = s.num;
-    document.getElementById('storyTitle').textContent    = s.title;
-    document.getElementById('storyContent').textContent  = s.content;
-    var prog = document.getElementById('storyProgress');
-    prog.innerHTML = STORY_STAGES.map(function(_, i) {
-        return '<div class="story-prog-dot' + (i <= _storyIdx ? ' done' : '') + '"></div>';
-    }).join('');
-    document.getElementById('storyPrev').style.visibility = _storyIdx === 0 ? 'hidden' : '';
-    document.getElementById('storyNext').textContent = _storyIdx === STORY_STAGES.length - 1 ? '✓ Selesai' : 'Selanjutnya →';
-}
-
-window.storyNav = function(dir) {
-    if (dir > 0 && _storyIdx >= STORY_STAGES.length - 1) { closeStory(); return; }
-    _storyIdx = Math.max(0, Math.min(STORY_STAGES.length - 1, _storyIdx + dir));
-    renderStory();
-};
-
-window.closeStory = function() {
-    document.getElementById('storyOverlay').classList.remove('active');
-};
-
-document.getElementById('btnStoryMode').addEventListener('click', function() {
-    _storyIdx = 0;
-    renderStory();
-    document.getElementById('storyOverlay').classList.add('active');
-});
 </script>
 {% endblock %}

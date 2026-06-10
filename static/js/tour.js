@@ -1,180 +1,180 @@
 /* Dashboard Onboarding Tour — Driver.js 0.9.8
-   Runs once per browser (localStorage key: aquavision_tour_done)
-   Force restart: add ?tour=1 to URL, or call window.aquavisionStartTour()
-   Starts only after aquavision:mapReady event fired by script.js (post 2 s).
-   12 langkah: AQUAVISION, Tujuan Dashboard, Layer, Potensi, Debit, Infrastruktur,
-               Neraca, Simulasi, Data Portal, Hubungi Admin, Pusat Bantuan, Selesai
+   Berjalan otomatis sekali per browser saat peta siap.
+   localStorage key: aquavision_dashboard_tour_completed = 'true'
+   Reset:  window.resetTour()
+   Ulang:  window.startTour()
 */
 (function () {
-    var TOUR_KEY = "aquavision_tour_done";
-
-    // URL param ?tour=1 forces restart (clean URL afterwards)
-    var forceRestart = (window.location.search.indexOf('tour=1') !== -1);
-    if (forceRestart) {
-        localStorage.removeItem(TOUR_KEY);
-        try {
-            history.replaceState(null, '', window.location.pathname + window.location.hash);
-        } catch (e) {}
-    }
-
-    if (localStorage.getItem(TOUR_KEY) === "1") return;
-
-    function prepareUI() {
-        var sidebar = document.getElementById("sidebar");
-        if (sidebar) sidebar.classList.remove("collapsed");
-        var showBtn = document.getElementById("btnShowSidebar");
-        if (showBtn) showBtn.style.display = "none";
-
-        var layerPanel = document.getElementById("layerPanel");
-        if (layerPanel) layerPanel.style.display = "block";
-
-        var simBody = document.getElementById("simBody");
-        if (simBody && !simBody.classList.contains("open")) {
-            simBody.classList.add("open");
-            var simArrow = document.querySelector('[data-target="simBody"] .accordion-arrow');
-            if (simArrow) simArrow.classList.add("open");
-        }
-    }
+    var TOUR_KEY = 'aquavision_dashboard_tour_completed';
 
     function buildSteps() {
         return [
             {
-                element: "#map",
+                element: '#map',
                 popover: {
-                    title:       "👋 Selamat Datang di AQUAVISION",
-                    description: "AQUAVISION adalah platform informasi spasial sumber daya air Desa Wonotoro, dikembangkan sebagai Capstone Design Project ITB 2026. Ikuti tur singkat ini untuk mengenal setiap fitur yang tersedia.",
-                    position:    "left"
+                    title:       '👋 Selamat Datang di AQUAVISION',
+                    description: 'AQUAVISION adalah platform WebGIS pengelolaan sumber daya air Desa Wonotoro. Navigasi peta dengan scroll untuk zoom dan drag untuk bergerak. Klik objek di peta untuk melihat atribut detail.',
+                    position:    'left'
                 }
             },
             {
-                element: "#map",
+                element: '#map',
                 popover: {
-                    title:       "🎯 Tujuan Dashboard",
-                    description: "Dashboard ini membantu pemangku kepentingan — pemerintah desa, pengelola air, dan peneliti — untuk memantau kondisi sumber daya air secara spasial, merencanakan infrastruktur, dan mengambil keputusan berbasis data.",
-                    position:    "left"
+                    title:       '🎯 Tujuan Dashboard',
+                    description: 'Dashboard ini membantu pemangku kepentingan — pemerintah desa, pengelola air, dan peneliti — memantau kondisi sumber daya air secara spasial, menganalisis ketersediaan versus kebutuhan, dan merencanakan infrastruktur berbasis data.',
+                    position:    'left'
                 }
             },
             {
-                element: "#btnLayer",
+                element: '#btnLayer',
                 popover: {
-                    title:       "🗂️ Daftar Layer",
-                    description: "Klik tombol ini untuk membuka panel layer. Aktifkan atau nonaktifkan lapisan data sesuai kebutuhan analisis. Beberapa layer dapat dikombinasikan secara bersamaan.",
-                    position:    "right"
+                    title:       '🗂️ Panel Fitur',
+                    description: 'Klik <b>Daftar Layer</b> untuk membuka panel kontrol layer. Aktifkan satu atau beberapa layer sekaligus. Legenda peta muncul otomatis di bawah panel saat ada layer yang aktif.',
+                    position:    'right'
                 }
             },
             {
-                element: "#chkPotensiAirTanah",
+                element: '#chkPotensiAirTanah',
                 popover: {
-                    title:       "🌿 Daerah Potensi Air Tanah",
-                    description: "Peta zonasi resapan air tanah resolusi 10m × 10m, dihasilkan dari metode AHP menggunakan data tutupan lahan, kemiringan lereng, jenis tanah, dan curah hujan. Warna menunjukkan tingkat potensi dari rendah hingga sangat tinggi.",
-                    position:    "right"
+                    title:       '🌿 Daerah Potensi Air Tanah (10m × 10m)',
+                    description: 'Peta zonasi potensi resapan air tanah resolusi 10m × 10m, dihasilkan dari metode AHP menggunakan 5 kriteria: tutupan lahan, kemiringan lereng, jenis tanah, curah hujan, dan geologi. Warna hijau tua = potensi sangat tinggi. Klik pixel di peta untuk membaca nilai.',
+                    position:    'right'
                 }
             },
             {
-                element: "#chkDebitPuncak",
+                element: '#chkDebitPuncak',
                 popover: {
-                    title:       "💧 Debit Puncak Aliran",
-                    description: "Peta debit puncak aliran permukaan (m³/s) resolusi 30m × 30m, tersedia untuk 12 bulan (Januari–Desember). Pilih bulan dari dropdown untuk melihat variasi musiman. Klik area peta untuk membaca nilai debit.",
-                    position:    "right"
+                    title:       '💧 Debit Puncak Aliran (30m × 30m)',
+                    description: 'Peta debit puncak aliran permukaan resolusi 30m × 30m menggunakan metode Rasional dan data curah hujan BMKG 2014–2023. Pilih bulan dari dropdown yang muncul untuk melihat variasi musiman Januari–Desember.',
+                    position:    'right'
                 }
             },
             {
-                element: "#chkAir",
+                element: '.sidebar-scroll a[href*="/data/"]',
                 popover: {
-                    title:       "🏗️ Infrastruktur Air",
-                    description: "Tampilkan lokasi sumber mata air, jaringan pipa distribusi, tandon air, dan fasilitas wisata. Klik titik atau garis di peta untuk melihat atribut detail setiap objek.",
-                    position:    "right"
+                    title:       '📊 Data Portal',
+                    description: 'Data Portal menyediakan tabel lengkap semua dataset dengan fitur pencarian dan paginasi. Setiap dataset dapat diunduh dalam format CSV, GeoJSON, KML, atau Shapefile setelah menyetujui ketentuan penggunaan.',
+                    position:    'right'
                 }
             },
             {
-                element: "#debitBody",
+                element: '.sidebar-scroll a[href="/hubungi/"]',
                 popover: {
-                    title:       "⚖️ Neraca Ketersediaan Air",
-                    description: "Membandingkan ketersediaan air (total debit sumber) versus kebutuhan harian. Status: <b>AMAN</b> = surplus, <b>WASPADA</b> = mendekati batas, <b>KRITIS</b> = defisit. Diperbarui otomatis dari database.",
-                    position:    "right"
+                    title:       '✉️ Hubungi Admin',
+                    description: 'Sampaikan pertanyaan teknis atau permintaan data kepada Admin AQUAVISION. Sistem AI akan mencoba menjawab otomatis dari 15 topik FAQ. Jika tidak berhasil, admin akan membalas langsung.',
+                    position:    'right'
                 }
             },
             {
-                element: "#simHeader",
+                element: '#debitBody',
                 popover: {
-                    title:       "🔢 Simulasi Skenario",
-                    description: "Masukkan skenario hipotetis — jumlah penduduk, kamar hotel, kursi restoran, atau luas pertanian — untuk menghitung proyeksi kebutuhan air dan merencanakan pengembangan infrastruktur.",
-                    position:    "right"
+                    title:       '⚖️ Ketersediaan Air',
+                    description: 'Panel ini membandingkan ketersediaan (total debit sumber air) versus kebutuhan harian dalam m³. Status: <b>AMAN</b> = rasio ≥ 120%, <b>WASPADA</b> = 80–120%, <b>KRITIS</b> = di bawah 80%. Diperbarui otomatis dari database.',
+                    position:    'right'
                 }
             },
             {
-                element: ".sidebar-scroll a[href*='/data/']",
+                element: '#simHeader',
                 popover: {
-                    title:       "📊 Data Portal",
-                    description: "Akses dan unduh seluruh dataset spasial dalam format CSV, GeoJSON, KML, atau Shapefile. Data Portal menyediakan tabel lengkap dengan fitur pencarian dan paginasi.",
-                    position:    "right"
+                    title:       '🔢 Simulasi Skenario',
+                    description: 'Masukkan skenario hipotetis — jumlah penduduk, kamar hotel, kursi restoran, luas pertanian — lalu klik <b>Hitung Simulasi</b> untuk memproyeksikan kebutuhan air masa depan dan merencanakan kapasitas infrastruktur.',
+                    position:    'right'
                 }
             },
             {
-                element: ".sidebar-scroll a[href='/hubungi/']",
+                element: '#chartHeader',
                 popover: {
-                    title:       "✉️ Hubungi Admin",
-                    description: "Sampaikan pertanyaan kepada Admin AQUAVISION. Sistem akan mencoba menjawab otomatis; jika tidak berhasil, admin akan membalas secepatnya.",
-                    position:    "right"
+                    title:       '📈 Grafik Ketersediaan Air',
+                    description: 'Gauge chart menampilkan persentase pemanfaatan air (demand ÷ supply × 100%). Angka di atas 100% berarti defisit — kapasitas sumber tidak mencukupi kebutuhan saat ini dan perlu tambahan infrastruktur.',
+                    position:    'right'
                 }
             },
             {
-                element: ".sidebar-scroll a[href='/bantuan/']",
+                element: '#map',
                 popover: {
-                    title:       "❓ Pusat Bantuan",
-                    description: "Temukan panduan lengkap penggunaan AQUAVISION, penjelasan fitur, dan FAQ dalam 6 kategori. Tersedia fitur pencarian cepat.",
-                    position:    "right"
+                    title:       '🖱️ Interaksi Layer dan Popup',
+                    description: 'Klik titik, garis, atau area di peta untuk membuka popup atribut. Gunakan tombol <b>+/−</b> di pojok kanan bawah untuk zoom. Tombol <b>🖨️ Export</b> mencetak tampilan peta saat ini sebagai gambar PNG.',
+                    position:    'left'
                 }
             },
             {
-                element: "#map",
+                element: '#map',
                 popover: {
-                    title:       "🎉 Selesai!",
-                    description: "Tur selesai! Anda telah mengenal semua fitur utama AQUAVISION. Mulailah dengan mengaktifkan layer yang Anda butuhkan. Untuk mengulangi tur ini, klik tombol <b>Mulai Tour</b> di sidebar.",
-                    position:    "left"
+                    title:       '🎉 Panduan Selesai',
+                    description: 'Anda siap menggunakan AQUAVISION. Untuk mengulangi panduan ini kapan saja, klik <b>ⓘ Lihat Panduan Dashboard</b> di bagian bawah panel kiri.',
+                    position:    'left'
                 }
             }
         ];
     }
 
+    function prepareUI() {
+        var sidebar = document.getElementById('sidebar');
+        if (sidebar) sidebar.classList.remove('collapsed');
+        var showBtn = document.getElementById('btnShowSidebar');
+        if (showBtn) showBtn.style.display = 'none';
+
+        var layerPanel = document.getElementById('layerPanel');
+        if (layerPanel) layerPanel.style.display = 'block';
+
+        var simBody = document.getElementById('simBody');
+        if (simBody && !simBody.classList.contains('open')) {
+            simBody.classList.add('open');
+            var simArrow = document.querySelector('[data-target="simBody"] .accordion-arrow');
+            if (simArrow) simArrow.classList.add('open');
+        }
+
+        var chartBody = document.getElementById('chartBody');
+        if (chartBody && !chartBody.classList.contains('open')) {
+            chartBody.classList.add('open');
+            var chartArrow = document.querySelector('[data-target="chartBody"] .accordion-arrow');
+            if (chartArrow) chartArrow.classList.add('open');
+        }
+    }
+
     function runTour() {
         try {
-            if (typeof Driver === "undefined") return;
+            if (typeof Driver === 'undefined') return;
             prepareUI();
-            // Filter out steps whose target element doesn't exist (e.g. guest vs authenticated)
+
             var steps = buildSteps().filter(function (s) {
                 return !s.element || document.querySelector(s.element);
             });
             if (steps.length === 0) return;
+
             var d = new Driver({
                 animate:      true,
                 opacity:      0.75,
                 padding:      8,
                 allowClose:   true,
-                doneBtnText:  "Selesai",
-                closeBtnText: "Lewati",
-                nextBtnText:  "Lanjut →",
-                prevBtnText:  "← Kembali",
+                doneBtnText:  'Selesai',
+                closeBtnText: 'Lewati',
+                nextBtnText:  'Lanjut →',
+                prevBtnText:  '← Kembali',
                 onReset: function () {
-                    localStorage.setItem(TOUR_KEY, "1");
+                    localStorage.setItem(TOUR_KEY, 'true');
                 }
             });
             d.defineSteps(steps);
             d.start();
         } catch (e) {
-            console.warn("Tour gagal dimulai:", e);
+            console.warn('Tour gagal dimulai:', e);
         }
     }
 
-    function startTour() {
+    window.startTour = function () {
+        setTimeout(runTour, 300);
+    };
+
+    window.resetTour = function () {
+        localStorage.removeItem(TOUR_KEY);
+        window.startTour();
+    };
+
+    function autoStart() {
+        if (localStorage.getItem(TOUR_KEY) === 'true') return;
         setTimeout(runTour, 600);
     }
 
-    // Called by "Mulai Tour" sidebar button
-    window.aquavisionStartTour = function () {
-        localStorage.removeItem(TOUR_KEY);
-        runTour();
-    };
-
-    window.addEventListener("aquavision:mapReady", startTour, { once: true });
+    window.addEventListener('aquavision:mapReady', autoStart, { once: true });
 })();

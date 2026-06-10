@@ -1004,7 +1004,7 @@ _FAQ = [
      "Layer Infrastruktur Air menampilkan lokasi sumber mata air, jaringan pipa distribusi, tandon air, permukiman, dan fasilitas wisata (hotel, restoran, jasa). Klik titik atau garis di peta untuk melihat atribut detail setiap objek."),
 
     (('neraca air', 'ketersediaan', 'kebutuhan air', 'status aman', 'status kritis', 'waspada'),
-     "Neraca Ketersediaan Air membandingkan total ketersediaan air dari sumber dengan kebutuhan harian. Status AMAN berarti surplus, WASPADA mendekati batas, dan KRITIS berarti defisit. Data diperbarui secara berkala dari database AQUAVISION."),
+     "Neraca Ketersediaan Air membandingkan total ketersediaan air dari sumber dengan kebutuhan harian. Status AMAN berarti pemanfaatan di bawah 50% dari ketersediaan, WASPADA berarti 50–80%, dan KRITIS berarti 80% ke atas. Data diperbarui secara berkala dari sistem AQUAVISION."),
 
     (('simulasi', 'skenario', 'proyeksi', 'hitung kebutuhan', 'penduduk', 'hotel'),
      "Fitur Simulasi Skenario memungkinkan Anda memasukkan parameter hipotetis — jumlah penduduk, kamar hotel, kursi restoran, atau luas pertanian — untuk menghitung proyeksi kebutuhan air. Berguna untuk perencanaan pengembangan wisata dan infrastruktur."),
@@ -1022,13 +1022,13 @@ _FAQ = [
      "Desa Wonotoro terletak di Kecamatan Sukapura, Kabupaten Probolinggo, Jawa Timur. Desa ini berada di kawasan penyangga KSPN (Kawasan Strategis Pariwisata Nasional) Bromo Tengger Semeru, koordinat sekitar 7°53' LS dan 112°59' BT (WGS84/EPSG:4326)."),
 
     (('health', 'status sistem', 'sistem online', 'database status', 'layer status'),
-     "Panel Status Sistem di sidebar Dashboard menampilkan kondisi real-time komponen AQUAVISION: Database (koneksi PostgreSQL/PostGIS), API (endpoint layanan data), Layer GIS (ketersediaan data spasial), dan Storage (direktori data statis). Status hijau berarti normal, merah berarti ada masalah."),
+     "Panel Status Sistem di sidebar Dashboard menampilkan kondisi komponen utama AQUAVISION secara langsung: koneksi data, ketersediaan layer GIS, dan penyimpanan file. Status hijau berarti semua berjalan normal. Jika ada komponen berwarna merah, silakan hubungi tim pengelola melalui menu Hubungi Admin."),
 
     (('riwayat download', 'log download', 'siapa yang download', 'rekam jejak unduh'),
-     "Admin dapat melihat Riwayat Download melalui menu Admin Tools > Riwayat Download. Tercatat: nama pengguna, dataset yang diunduh, format file, waktu unduh, dan alamat IP. Audit Log tersedia khusus untuk Super Admin yang mencatat semua aktivitas sistem."),
+     "Setiap unduhan data di AQUAVISION dicatat secara otomatis. Tim pengelola dapat memantau riwayat unduhan untuk menjaga keamanan dan penggunaan data. Jika Anda memiliki pertanyaan tentang data yang pernah diunduh, silakan hubungi tim pengelola melalui menu Hubungi Admin."),
 
-    (('story mode', 'narasi', 'cerita', 'latar belakang penelitian', 'konteks penelitian'),
-     "Fitur Story Mode (tombol 📖 di sidebar) menyajikan narasi 6 tahap tentang konteks penelitian AQUAVISION: dari latar belakang masalah pariwisata Bromo, identifikasi infrastruktur, analisis potensi air tanah, debit puncak, neraca ketersediaan, hingga rekomendasi solusi."),
+    (('panduan dashboard', 'tour', 'lihat panduan', 'cara mulai', 'onboarding', 'mulai dari mana'),
+     "AQUAVISION menyediakan Panduan Dashboard interaktif yang dapat diakses melalui tombol <b>ⓘ Lihat Panduan Dashboard</b> di bagian bawah panel kiri. Panduan ini akan menjelaskan semua fitur utama satu per satu. Klik tombol tersebut untuk memulai atau mengulang panduan kapan saja."),
 ]
 
 def _ai_respond(message):
