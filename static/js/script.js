@@ -23,23 +23,10 @@ document.addEventListener("DOMContentLoaded", function () {
         zoomControl: false
     });
 
-    var basemaps = {
-        "OpenStreetMap": L.tileLayer(
-            "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
-            { maxZoom: 19, attribution: "&copy; OpenStreetMap contributors" }
-        ),
-        "Satelit": L.tileLayer(
-            "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-            { maxZoom: 19, attribution: "&copy; Esri" }
-        ),
-        "Topografi": L.tileLayer(
-            "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}",
-            { maxZoom: 19, attribution: "&copy; Esri" }
-        )
-    };
-
-    basemaps["OpenStreetMap"].addTo(map);
-    L.control.layers(basemaps, null, { position: "topright", collapsed: true }).addTo(map);
+    L.tileLayer(
+        "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+        { maxZoom: 19, attribution: "&copy; OpenStreetMap contributors" }
+    ).addTo(map);
 
 
     // ================================================================
