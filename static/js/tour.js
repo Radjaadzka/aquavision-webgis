@@ -3,23 +3,72 @@
    localStorage key: aquavision_dashboard_tour_completed = 'true'
    Reset:  window.resetTour()
    Ulang:  window.startTour()
+
+   Bug-fix notes (vs previous version):
+   - Step 1 uses .sidebar-head (position:static) NOT #sidebar (position:absolute).
+     Driver.js adds "position:relative" to highlighted elements. Applying this to the
+     position:absolute sidebar disrupted its layout on de-select, making step 2's
+     spotlight land on empty space.
+   - Filter now checks getBoundingClientRect() — skips elements with 0×0 dimensions
+     (e.g. .nav-links hidden on mobile viewport). Previously querySelector() found
+     hidden elements; Driver.js then produced an invisible 0×0 spotlight, leaving the
+     overlay up with no popup visible.
+   - #btnHideSidebar disabled via pointer-events:none for the tour duration so an
+     accidental mis-click on the ✕ button cannot collapse the sidebar mid-tour.
+   - Global onHighlightStarted re-locks the sidebar before every step.
+   - Step 15 (Selesai) uses element:null — floating popup, always renders.
 */
 (function () {
     var TOUR_KEY = 'aquavision_dashboard_tour_completed';
 
+    /* ── Sidebar helpers ──────────────────────────────────────────── */
+
+    function lockSidebar() {
+        var sidebar = document.getElementById('sidebar');
+        if (sidebar) sidebar.classList.remove('collapsed');
+
+        var hideBtn = document.getElementById('btnHideSidebar');
+        if (hideBtn) hideBtn.style.pointerEvents = 'none';
+
+        var showBtn = document.getElementById('btnShowSidebar');
+        if (showBtn) showBtn.style.display = 'none';
+    }
+
+    function unlockSidebar() {
+        var hideBtn = document.getElementById('btnHideSidebar');
+        if (hideBtn) hideBtn.style.pointerEvents = '';
+    }
+
+    /* ── Accordion helper ─────────────────────────────────────────── */
+
+    function openAccordion(bodyId) {
+        var body = document.getElementById(bodyId);
+        if (!body) return;
+        if (!body.classList.contains('open')) {
+            body.classList.add('open');
+            var arrow = document.querySelector('[data-target="' + bodyId + '"] .accordion-arrow');
+            if (arrow) arrow.classList.add('open');
+        }
+    }
+
+    /* ── Steps ────────────────────────────────────────────────────── */
+
     function buildSteps() {
         return [
-            // ── 1. Panel Fitur Peta ──────────────────────────────────────
+
+            // ── 1. FITUR PETA ────────────────────────────────────────
+            // FIX: .sidebar-head (position:static) instead of #sidebar
+            // (position:absolute) to prevent Driver.js from breaking layout.
             {
-                element: '#sidebar',
+                element: '.sidebar-head',
                 popover: {
                     title:       '🗂️ Panel Fitur Peta',
-                    description: 'Panel ini merupakan pusat pengendalian Dashboard AQUAVISION. Seluruh fitur analisis, visualisasi data, dan informasi sumber daya air dapat diakses melalui bagian ini.',
+                    description: 'Panel kiri ini adalah pusat pengendalian Dashboard AQUAVISION. Seluruh fitur analisis, visualisasi data, dan informasi sumber daya air dapat diakses melalui bagian ini.',
                     position:    'right'
                 }
             },
 
-            // ── 2. Daftar Layer ──────────────────────────────────────────
+            // ── 2. DAFTAR LAYER ──────────────────────────────────────
             {
                 element: '#btnLayer',
                 popover: {
@@ -29,29 +78,21 @@
                 }
             },
 
-            // ── 3. Input Data (hanya jika elemen ada — admin/user login) ─
-            {
-                element: '#btnInputToggle',
-                popover: {
-                    title:       '✏️ Input Data',
-                    description: 'Tombol ini digunakan untuk menambahkan atau memperbarui data pada sistem. Tersedia dua cara: <b>Input Manual</b> untuk data individual, atau <b>Upload Shapefile</b> untuk dataset spasial. Fitur ini hanya aktif untuk pengguna dengan hak akses Admin.',
-                    position:    'right'
-                }
-            },
-
-            // ── 4. Ringkasan Data ────────────────────────────────────────
+            // ── 3. RINGKASAN DATA ────────────────────────────────────
             {
                 element: '.accordion-header[data-target="statsBody"]',
+                onHighlightStarted: function () { openAccordion('statsBody'); },
                 popover: {
                     title:       '📊 Ringkasan Data',
-                    description: 'Panel ini menampilkan ringkasan jumlah objek yang tersedia dalam sistem, seperti sumber air, hotel, rumah makan, jasa, tandon air, dan jaringan sungai. Data diperbarui otomatis dari sistem.',
+                    description: 'Panel ini menampilkan ringkasan jumlah objek yang tersedia dalam sistem — sumber air, hotel, rumah makan, jasa, tandon air, dan jaringan sungai. Data diperbarui otomatis dari sistem.',
                     position:    'right'
                 }
             },
 
-            // ── 5. Ketersediaan Air ──────────────────────────────────────
+            // ── 4. KETERSEDIAAN AIR ──────────────────────────────────
             {
                 element: '.accordion-header[data-target="debitBody"]',
+                onHighlightStarted: function () { openAccordion('debitBody'); },
                 popover: {
                     title:       '💧 Ketersediaan Air',
                     description: 'Panel ini menampilkan kondisi ketersediaan air berdasarkan hasil analisis sistem. Status dapat berupa: <b>AMAN</b> (kebutuhan &lt; 50% dari ketersediaan), <b>WASPADA</b> (50–80%), atau <b>KRITIS</b> (≥ 80%).',
@@ -59,9 +100,10 @@
                 }
             },
 
-            // ── 6. Simulasi Skenario ─────────────────────────────────────
+            // ── 5. SIMULASI SKENARIO ─────────────────────────────────
             {
                 element: '#simHeader',
+                onHighlightStarted: function () { openAccordion('simBody'); },
                 popover: {
                     title:       '🔢 Simulasi Skenario',
                     description: 'Gunakan fitur ini untuk mensimulasikan berbagai kondisi penggunaan air. Masukkan jumlah penduduk, kamar hotel, kursi restoran, atau luas pertanian, lalu klik <b>Hitung Simulasi</b> untuk melihat proyeksi kebutuhan air.',
@@ -69,9 +111,10 @@
                 }
             },
 
-            // ── 7. Grafik Ketersediaan Air ───────────────────────────────
+            // ── 6. GRAFIK KETERSEDIAAN AIR ───────────────────────────
             {
                 element: '#chartHeader',
+                onHighlightStarted: function () { openAccordion('chartBody'); },
                 popover: {
                     title:       '📈 Grafik Ketersediaan Air',
                     description: 'Grafik ini menyajikan hasil analisis ketersediaan air dalam bentuk visual sehingga kondisi dan tren air lebih mudah dipahami. Angka di atas 100% menunjukkan kondisi defisit — kapasitas sumber tidak mencukupi kebutuhan.',
@@ -79,7 +122,7 @@
                 }
             },
 
-            // ── 8. Cari Lokasi ───────────────────────────────────────────
+            // ── 7. CARI LOKASI ───────────────────────────────────────
             {
                 element: '#mapSearchInput',
                 popover: {
@@ -89,7 +132,7 @@
                 }
             },
 
-            // ── 9. Export ────────────────────────────────────────────────
+            // ── 8. EXPORT ────────────────────────────────────────────
             {
                 element: '#btnPrintMap',
                 popover: {
@@ -99,7 +142,7 @@
                 }
             },
 
-            // ── 10. Legenda ──────────────────────────────────────────────
+            // ── 9. LEGENDA ───────────────────────────────────────────
             {
                 element: '#legendToggle',
                 popover: {
@@ -109,17 +152,9 @@
                 }
             },
 
-            // ── 11. Interaksi Peta ───────────────────────────────────────
-            {
-                element: '#map',
-                popover: {
-                    title:       '🖱️ Interaksi Peta',
-                    description: 'Gunakan <b>scroll</b> untuk memperbesar atau memperkecil peta, dan <b>drag</b> untuk menggeser. Aktifkan layer di panel kiri, kemudian <b>klik objek pada peta</b> (titik, garis, atau area) untuk melihat informasi detail.',
-                    position:    'left'
-                }
-            },
-
-            // ── 12. Beranda (navbar) ─────────────────────────────────────
+            // ── 10. BERANDA ──────────────────────────────────────────
+            // FIX: visibility filter (below) skips these when .nav-links is
+            // display:none on mobile, preventing the 0×0 spotlight bug.
             {
                 element: '.nav-links a[href="/"]',
                 popover: {
@@ -129,7 +164,7 @@
                 }
             },
 
-            // ── 13. Dashboard (navbar) ───────────────────────────────────
+            // ── 11. DASHBOARD ────────────────────────────────────────
             {
                 element: '.nav-links a[href="/map/"]',
                 popover: {
@@ -139,7 +174,7 @@
                 }
             },
 
-            // ── 14. Data Portal (navbar) ─────────────────────────────────
+            // ── 12. DATA PORTAL ──────────────────────────────────────
             {
                 element: '.nav-links a[href="/data/"]',
                 popover: {
@@ -149,7 +184,8 @@
                 }
             },
 
-            // ── 15. Hubungi Admin (navbar — hanya jika elemen ada) ───────
+            // ── 13. HUBUNGI ADMIN ────────────────────────────────────
+            // Also skipped when user is not authenticated (element absent from DOM).
             {
                 element: '.nav-links a[href="/hubungi/"]',
                 popover: {
@@ -159,7 +195,7 @@
                 }
             },
 
-            // ── 16. Pusat Bantuan (navbar) ───────────────────────────────
+            // ── 14. PUSAT BANTUAN ────────────────────────────────────
             {
                 element: '.nav-links a[href="/bantuan/"]',
                 popover: {
@@ -169,51 +205,35 @@
                 }
             },
 
-            // ── 17. Informasi Data Layer ─────────────────────────────────
+            // ── 15. SELESAI ──────────────────────────────────────────
+            // element:null — no spotlight, floating popup in center.
+            // Guaranteed to render regardless of viewport size or scroll position.
             {
-                element: '#chkPotensiAirTanah',
-                popover: {
-                    title:       '📡 Informasi Data Layer',
-                    description: 'Dua layer utama AQUAVISION tersedia dalam resolusi tinggi: <b>Potensi Air Tanah</b> (resolusi 10m × 10m) untuk zonasi resapan air tanah, dan <b>Debit Puncak Aliran</b> (resolusi 30m × 30m) untuk estimasi debit per bulan Januari–Desember.',
-                    position:    'right'
-                }
-            },
-
-            // ── 18. Selesai ──────────────────────────────────────────────
-            {
-                element: '#map',
+                element: null,
                 popover: {
                     title:       '🎉 Panduan Selesai',
                     description: 'Anda siap menggunakan AQUAVISION. Untuk hasil terbaik: aktifkan layer yang ingin dianalisis, kemudian klik objek pada peta untuk melihat informasi detail. Untuk mengulang panduan ini kapan saja, klik <b>ⓘ Lihat Panduan Dashboard</b> di bagian bawah panel kiri.',
-                    position:    'left'
+                    position:    'mid-center'
                 }
             }
         ];
     }
 
+    /* ── UI Prep ──────────────────────────────────────────────────── */
+
     function prepareUI() {
-        var sidebar = document.getElementById('sidebar');
-        if (sidebar) sidebar.classList.remove('collapsed');
-        var showBtn = document.getElementById('btnShowSidebar');
-        if (showBtn) showBtn.style.display = 'none';
+        lockSidebar();
 
         var layerPanel = document.getElementById('layerPanel');
         if (layerPanel) layerPanel.style.display = 'block';
 
-        var simBody = document.getElementById('simBody');
-        if (simBody && !simBody.classList.contains('open')) {
-            simBody.classList.add('open');
-            var simArrow = document.querySelector('[data-target="simBody"] .accordion-arrow');
-            if (simArrow) simArrow.classList.add('open');
-        }
-
-        var chartBody = document.getElementById('chartBody');
-        if (chartBody && !chartBody.classList.contains('open')) {
-            chartBody.classList.add('open');
-            var chartArrow = document.querySelector('[data-target="chartBody"] .accordion-arrow');
-            if (chartArrow) chartArrow.classList.add('open');
-        }
+        openAccordion('statsBody');
+        openAccordion('debitBody');
+        openAccordion('simBody');
+        openAccordion('chartBody');
     }
+
+    /* ── Run ──────────────────────────────────────────────────────── */
 
     function runTour() {
         try {
@@ -221,9 +241,30 @@
             prepareUI();
 
             var steps = buildSteps().filter(function (s) {
-                return !s.element || document.querySelector(s.element);
+                if (!s.element) return true;
+
+                var el = document.querySelector(s.element);
+                if (!el) {
+                    console.warn('[AQUAVISION Tour] Skipped — element not found:', s.element);
+                    return false;
+                }
+
+                // Skip elements that are hidden (display:none → 0×0 bounding rect).
+                // This is the fix for the "overlay without popup" bug on mobile where
+                // .nav-links is display:none but querySelector still returns the element.
+                var rect = el.getBoundingClientRect();
+                if (rect.width === 0 && rect.height === 0) {
+                    console.warn('[AQUAVISION Tour] Skipped — element not visible:', s.element);
+                    return false;
+                }
+
+                return true;
             });
-            if (steps.length === 0) return;
+
+            if (steps.length === 0) {
+                console.warn('[AQUAVISION Tour] No visible steps — tour aborted.');
+                return;
+            }
 
             var d = new Driver({
                 animate:      true,
@@ -234,16 +275,25 @@
                 closeBtnText: 'Lewati',
                 nextBtnText:  'Lanjut →',
                 prevBtnText:  '← Kembali',
+                onHighlightStarted: function () {
+                    lockSidebar();
+                },
                 onReset: function () {
                     localStorage.setItem(TOUR_KEY, 'true');
+                    unlockSidebar();
                 }
             });
+
             d.defineSteps(steps);
             d.start();
+
         } catch (e) {
-            console.warn('Tour gagal dimulai:', e);
+            console.warn('[AQUAVISION Tour] Failed to start:', e);
+            unlockSidebar();
         }
     }
+
+    /* ── Public API ───────────────────────────────────────────────── */
 
     window.startTour = function () {
         setTimeout(runTour, 300);
@@ -254,10 +304,13 @@
         window.startTour();
     };
 
+    /* ── Auto-start ───────────────────────────────────────────────── */
+
     function autoStart() {
         if (localStorage.getItem(TOUR_KEY) === 'true') return;
         setTimeout(runTour, 600);
     }
 
     window.addEventListener('aquavision:mapReady', autoStart, { once: true });
+
 })();
