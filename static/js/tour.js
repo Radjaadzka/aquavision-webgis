@@ -6,36 +6,61 @@
 */
 (function () {
     var TOUR_KEY = 'aquavision_dashboard_tour_completed';
+    var ACCORDION_BODIES = ['statsBody', 'debitBody', 'simBody', 'chartBody'];
+    var activeDriver = null;
+
     console.log('[AQUAVISION Tour] loaded');
 
     /* ── Sidebar helpers ──────────────────────────────────────────── */
 
     function lockSidebar() {
         var sidebar = document.getElementById('sidebar');
-        if (sidebar) sidebar.classList.remove('collapsed');
-
+        if (sidebar) {
+            sidebar.classList.remove('collapsed');
+            // Elevate above Driver.js overlay (z-index 100000) so sidebar content
+            // stays visible during tour; popover (z-index 100002) remains on top.
+            sidebar.style.zIndex = '100001';
+        }
         var hideBtn = document.getElementById('btnHideSidebar');
         if (hideBtn) hideBtn.style.pointerEvents = 'none';
-
         var showBtn = document.getElementById('btnShowSidebar');
         if (showBtn) showBtn.style.display = 'none';
     }
 
     function unlockSidebar() {
+        var sidebar = document.getElementById('sidebar');
+        if (sidebar) sidebar.style.zIndex = '';
         var hideBtn = document.getElementById('btnHideSidebar');
         if (hideBtn) hideBtn.style.pointerEvents = '';
+        var legendCard = document.getElementById('legendCard');
+        if (legendCard && legendCard.dataset.tourHidden === 'true') {
+            legendCard.style.display = 'none';
+            delete legendCard.dataset.tourHidden;
+        }
+        activeDriver = null;
     }
 
-    /* ── Accordion helper ─────────────────────────────────────────── */
+    /* ── Accordion helpers ────────────────────────────────────────── */
 
     function openAccordion(bodyId) {
         var body = document.getElementById(bodyId);
         if (!body) return;
-        if (!body.classList.contains('open')) {
-            body.classList.add('open');
-            var arrow = document.querySelector('[data-target="' + bodyId + '"] .accordion-arrow');
-            if (arrow) arrow.classList.add('open');
-        }
+        body.classList.add('open');
+        var arrow = document.querySelector('[data-target="' + bodyId + '"] .accordion-arrow');
+        if (arrow) arrow.classList.add('open');
+    }
+
+    function closeAccordion(bodyId) {
+        var body = document.getElementById(bodyId);
+        if (!body) return;
+        body.classList.remove('open');
+        var arrow = document.querySelector('[data-target="' + bodyId + '"] .accordion-arrow');
+        if (arrow) arrow.classList.remove('open');
+    }
+
+    function openOnlyAccordion(bodyId) {
+        ACCORDION_BODIES.forEach(function (id) { closeAccordion(id); });
+        openAccordion(bodyId);
     }
 
     /* ── Steps ────────────────────────────────────────────────────── */
@@ -44,10 +69,11 @@
         return [
 
             // ── 1. FITUR PETA ────────────────────────────────────────
-            // FIX: .sidebar-head (position:static) instead of #sidebar
-            // (position:absolute) to prevent Driver.js from breaking layout.
+            // #sidebar (position:absolute) — Driver.js does NOT change its position.
+            // lockSidebar() elevates it to z-index 100001 (above the overlay),
+            // so the sidebar shows naturally with its dark background — no white box.
             {
-                element: '.sidebar-head',
+                element: '#sidebar',
                 popover: {
                     title:       '🗂️ Panel Fitur Peta',
                     description: 'Panel kiri ini adalah pusat pengendalian Dashboard AQUAVISION. Seluruh fitur analisis, visualisasi data, dan informasi sumber daya air dapat diakses melalui bagian ini.',
@@ -68,7 +94,11 @@
             // ── 3. RINGKASAN DATA ────────────────────────────────────
             {
                 element: '.accordion-header[data-target="statsBody"]',
-                onHighlightStarted: function () { openAccordion('statsBody'); },
+                onHighlightStarted: function () {
+                    var lp = document.getElementById('layerPanel');
+                    if (lp) lp.style.display = 'none';
+                    openOnlyAccordion('statsBody');
+                },
                 popover: {
                     title:       '📊 Ringkasan Data',
                     description: 'Panel ini menampilkan ringkasan jumlah objek yang tersedia dalam sistem — sumber air, hotel, rumah makan, jasa, tandon air, dan jaringan sungai. Data diperbarui otomatis dari sistem.',
@@ -79,7 +109,7 @@
             // ── 4. KETERSEDIAAN AIR ──────────────────────────────────
             {
                 element: '.accordion-header[data-target="debitBody"]',
-                onHighlightStarted: function () { openAccordion('debitBody'); },
+                onHighlightStarted: function () { openOnlyAccordion('debitBody'); },
                 popover: {
                     title:       '💧 Ketersediaan Air',
                     description: 'Panel ini menampilkan kondisi ketersediaan air berdasarkan hasil analisis sistem. Status dapat berupa: <b>AMAN</b> (kebutuhan &lt; 50% dari ketersediaan), <b>WASPADA</b> (50–80%), atau <b>KRITIS</b> (≥ 80%).',
@@ -90,7 +120,7 @@
             // ── 5. SIMULASI SKENARIO ─────────────────────────────────
             {
                 element: '#simHeader',
-                onHighlightStarted: function () { openAccordion('simBody'); },
+                onHighlightStarted: function () { openOnlyAccordion('simBody'); },
                 popover: {
                     title:       '🔢 Simulasi Skenario',
                     description: 'Gunakan fitur ini untuk mensimulasikan berbagai kondisi penggunaan air. Masukkan jumlah penduduk, kamar hotel, kursi restoran, atau luas pertanian, lalu klik <b>Hitung Simulasi</b> untuk melihat proyeksi kebutuhan air.',
@@ -101,7 +131,7 @@
             // ── 6. GRAFIK KETERSEDIAAN AIR ───────────────────────────
             {
                 element: '#chartHeader',
-                onHighlightStarted: function () { openAccordion('chartBody'); },
+                onHighlightStarted: function () { openOnlyAccordion('chartBody'); },
                 popover: {
                     title:       '📈 Grafik Ketersediaan Air',
                     description: 'Grafik ini menyajikan hasil analisis ketersediaan air dalam bentuk visual sehingga kondisi dan tren air lebih mudah dipahami. Angka di atas 100% menunjukkan kondisi defisit — kapasitas sumber tidak mencukupi kebutuhan.',
@@ -129,21 +159,23 @@
                 }
             },
 
-            // ── 9. LEGENDA ───────────────────────────────────────────
+            // ── 9. LEGENDA PETA ──────────────────────────────────────
+            // #legendCard has display:none by default (shows only when layers active).
+            // prepareUI() forces it visible so getBoundingClientRect() returns non-zero.
             {
-                element: '#legendToggle',
+                element: '.accordion-header[data-target="legendBody"]',
                 popover: {
                     title:       '🗺️ Legenda Peta',
-                    description: 'Legenda ini berada di pojok kanan atas peta. Klik untuk membuka atau menutup legenda. Legenda membantu memahami arti warna, simbol, dan kategori yang tampil pada peta saat layer aktif.',
-                    position:    'left'
+                    description: 'Legenda ini muncul otomatis di sidebar kiri saat Anda mengaktifkan layer pada peta. Legenda membantu memahami arti warna, simbol, dan kategori yang tampil pada peta.',
+                    position:    'right'
                 }
             },
 
             // ── 10. BERANDA ──────────────────────────────────────────
-            // FIX: visibility filter (below) skips these when .nav-links is
-            // display:none on mobile, preventing the 0×0 spotlight bug.
+            // Selector updated: landing page moved to /tentang/ (homepage is now Dashboard).
+            // Visibility filter skips this when .nav-links is display:none on mobile.
             {
-                element: '.nav-links a[href="/"]',
+                element: '.nav-links a[href="/tentang/"]',
                 popover: {
                     title:       '🏠 Beranda',
                     description: 'Menu Beranda berisi informasi umum mengenai AQUAVISION, latar belakang sistem, dan gambaran fitur utama. Dapat diakses kapan saja tanpa login.',
@@ -152,8 +184,9 @@
             },
 
             // ── 11. DASHBOARD ────────────────────────────────────────
+            // Selector updated: Dashboard is now the root URL /.
             {
-                element: '.nav-links a[href="/map/"]',
+                element: '.nav-links a[href="/"]',
                 popover: {
                     title:       '🗺️ Dashboard',
                     description: 'Menu Dashboard membawa Anda ke halaman ini — pusat analisis spasial dan visualisasi data sumber daya air dalam sistem AQUAVISION.',
@@ -172,7 +205,7 @@
             },
 
             // ── 13. HUBUNGI ADMIN ────────────────────────────────────
-            // Also skipped when user is not authenticated (element absent from DOM).
+            // Skipped automatically when user is not authenticated (element absent).
             {
                 element: '.nav-links a[href="/hubungi/"]',
                 popover: {
@@ -193,11 +226,6 @@
             },
 
             // ── 15. SELESAI ──────────────────────────────────────────
-            // FIX: element:'#btnGuide' instead of null.
-            // Driver.js 0.9.8 typeof-checks element: null becomes typeof 'object',
-            // falls through to call .getBoundingClientRect() on null → TypeError.
-            // try-catch silently swallows this, aborting the ENTIRE tour.
-            // '#btnGuide' is always in the DOM and points to the restart button.
             {
                 element: '#btnGuide',
                 popover: {
@@ -217,10 +245,15 @@
         var layerPanel = document.getElementById('layerPanel');
         if (layerPanel) layerPanel.style.display = 'block';
 
-        openAccordion('statsBody');
-        openAccordion('debitBody');
-        openAccordion('simBody');
-        openAccordion('chartBody');
+        // Force legendCard visible so step 9 passes the getBoundingClientRect filter.
+        // unlockSidebar() restores display:none if no layers were active.
+        var legendCard = document.getElementById('legendCard');
+        if (legendCard && legendCard.style.display === 'none') {
+            legendCard.dataset.tourHidden = 'true';
+            legendCard.style.display = '';
+        }
+
+        // Accordions opened per-step via onHighlightStarted (not all at once).
     }
 
     /* ── Run ──────────────────────────────────────────────────────── */
@@ -231,6 +264,12 @@
                 console.warn('[AQUAVISION Tour] Driver.js not loaded — tour aborted.');
                 return;
             }
+
+            if (activeDriver) {
+                try { activeDriver.reset(); } catch (e) {}
+                activeDriver = null;
+            }
+
             console.log('[AQUAVISION Tour] started');
             prepareUI();
 
@@ -243,9 +282,6 @@
                     return false;
                 }
 
-                // Skip elements that are hidden (display:none → 0×0 bounding rect).
-                // This is the fix for the "overlay without popup" bug on mobile where
-                // .nav-links is display:none but querySelector still returns the element.
                 var rect = el.getBoundingClientRect();
                 if (rect.width === 0 && rect.height === 0) {
                     console.warn('[AQUAVISION Tour] Skipped — element not visible:', s.element);
@@ -278,6 +314,7 @@
                 }
             });
 
+            activeDriver = d;
             d.defineSteps(steps);
             d.start();
 
@@ -295,6 +332,10 @@
 
     window.resetTour = function () {
         localStorage.removeItem(TOUR_KEY);
+        if (activeDriver) {
+            try { activeDriver.reset(); } catch (e) {}
+            activeDriver = null;
+        }
         window.startTour();
     };
 

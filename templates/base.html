@@ -44,8 +44,8 @@ document.querySelectorAll('a[href^="#"]').forEach(function(a) {
 
         <!-- CENTER: Nav Links -->
         <div class="nav-links">
-            <a href="/" class="nav-link {% if request.resolver_match.url_name == 'landing' %}active{% endif %}">Beranda</a>
-            <a href="/map/" class="nav-link {% if request.resolver_match.url_name == 'map' %}active{% endif %}">Dashboard</a>
+            <a href="/tentang/" class="nav-link {% if request.resolver_match.url_name == 'landing' %}active{% endif %}">Beranda</a>
+            <a href="/" class="nav-link {% if request.resolver_match.url_name == 'map' %}active{% endif %}">Dashboard</a>
             <a href="/data/" class="nav-link {% if request.resolver_match.url_name == 'data_list' or request.resolver_match.url_name == 'dataset_detail' %}active{% endif %}">Data Portal</a>
             {% if user.is_authenticated %}
             <a href="/hubungi/" class="nav-link {% if request.resolver_match.url_name == 'hubungi' %}active{% endif %}">Hubungi Admin</a>
@@ -89,13 +89,13 @@ document.querySelectorAll('a[href^="#"]').forEach(function(a) {
     </div>
 
     <nav class="nav-drawer-links">
-        <a href="/" class="nav-drawer-link {% if request.resolver_match.url_name == 'landing' %}active{% endif %}">
+        <a href="/tentang/" class="nav-drawer-link {% if request.resolver_match.url_name == 'landing' %}active{% endif %}">
             <span class="nav-drawer-link-icon">🏠</span> Beranda
         </a>
-        <a href="/#tim" class="nav-drawer-link" id="navLinkTim">
+        <a href="/tentang/#tim" class="nav-drawer-link" id="navLinkTim">
             <span class="nav-drawer-link-icon">👥</span> Tentang Kami
         </a>
-        <a href="/map/" class="nav-drawer-link {% if request.resolver_match.url_name == 'map' %}active{% endif %}">
+        <a href="/" class="nav-drawer-link {% if request.resolver_match.url_name == 'map' %}active{% endif %}">
             <span class="nav-drawer-link-icon">🗺️</span> Dashboard
         </a>
         <a href="/data/" class="nav-drawer-link {% if request.resolver_match.url_name == 'data_list' or request.resolver_match.url_name == 'dataset_detail' %}active{% endif %}">

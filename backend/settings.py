@@ -181,7 +181,7 @@ SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.user.user_details',
 )
 
-SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/map/'
+SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/'
 SOCIAL_AUTH_LOGIN_ERROR_URL    = '/login/'
 SOCIAL_AUTH_RAISE_EXCEPTIONS   = False
 
@@ -226,7 +226,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # ================================================================
 
 LOGIN_URL           = '/login/'
-LOGIN_REDIRECT_URL  = '/map/'
+LOGIN_REDIRECT_URL  = '/'
 LOGOUT_REDIRECT_URL = '/'
 
 # ================================================================

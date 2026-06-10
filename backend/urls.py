@@ -6,6 +6,7 @@ Inline view functions for simple pages; GIS and data portal routed to api/.
 from django.contrib import admin
 from django.urls import path, include
 from django.shortcuts import render, redirect
+from django.views.generic import RedirectView
 from django.contrib.auth import views as auth_views, login
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import Group
@@ -72,8 +73,9 @@ def custom_500(request):
 
 urlpatterns = [
     # Halaman utama
-    path('',          landing,      name='landing'),
-    path('map/',      map_view,     name='map'),
+    path('',          map_view,     name='map'),
+    path('tentang/',  landing,      name='landing'),
+    path('map/',      RedirectView.as_view(url='/', permanent=False), name='map_redirect'),
     path('bantuan/',  bantuan_view, name='bantuan'),
     path('register/', register,     name='register'),
 

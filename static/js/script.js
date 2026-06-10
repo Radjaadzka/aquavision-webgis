@@ -1163,63 +1163,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     // ================================================================
-    // 24. LEGENDA
-    // ================================================================
-
-    var legendCtrl = L.control({ position: "topright" });
-    legendCtrl.onAdd = function () {
-        var div = L.DomUtil.create("div", "legend");
-        div.innerHTML =
-            '<div id="legendToggle" style="display:flex;justify-content:space-between;align-items:center;cursor:pointer;">' +
-                '<h4 style="margin:0;">Legenda</h4>' +
-                '<span id="legendArrow" style="font-size:12px;">▼</span>' +
-            "</div>" +
-            '<div id="legendBody" style="display:none;margin-top:6px;">' +
-                // Infrastruktur
-                '<div style="font-weight:600;font-size:11px;color:#666;margin:4px 0 2px;">Infrastruktur</div>' +
-                '<div><img src="https://cdn-icons-png.flaticon.com/512/728/728093.png"   width="16"> Sumber Air</div>' +
-                '<div><img src="https://cdn-icons-png.flaticon.com/512/139/139899.png"   width="16"> Hotel</div>' +
-                '<div><img src="https://cdn-icons-png.flaticon.com/512/1046/1046784.png" width="16"> Tempat Makan</div>' +
-                '<div><img src="https://cdn-icons-png.flaticon.com/512/3067/3067451.png" width="16"> Jasa</div>' +
-                '<div><img src="https://cdn-icons-png.flaticon.com/512/2038/2038152.png" width="16"> Tandon Air</div>' +
-                '<div><span style="display:inline-block;width:16px;height:3px;background:#e67e22;vertical-align:middle;margin-right:4px;"></span> Jaringan Pipa</div>' +
-                '<div><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#8e44ad;vertical-align:middle;margin-right:4px;"></span> Permukiman</div>' +
-                '<div><span style="display:inline-block;width:16px;height:3px;background:#2980b9;vertical-align:middle;margin-right:4px;"></span> Daerah Aliran Sungai</div>' +
-                // Potensi Air Tanah
-                '<div style="margin-top:6px;border-top:1px solid #eee;padding-top:4px;font-weight:600;font-size:11px;color:#666;">Daerah Potensi Air Tanah</div>' +
-                '<div><span style="display:inline-block;width:14px;height:10px;background:#27ae60;opacity:0.8;border:1px solid #333;margin-right:4px;"></span> Sangat Tinggi</div>' +
-                '<div><span style="display:inline-block;width:14px;height:10px;background:#f1c40f;opacity:0.8;border:1px solid #333;margin-right:4px;"></span> Tinggi</div>' +
-                '<div><span style="display:inline-block;width:14px;height:10px;background:#e67e22;opacity:0.8;border:1px solid #333;margin-right:4px;"></span> Sedang</div>' +
-                '<div><span style="display:inline-block;width:14px;height:10px;background:#e74c3c;opacity:0.8;border:1px solid #333;margin-right:4px;"></span> Rendah</div>' +
-                // Debit Puncak
-                '<div style="margin-top:6px;border-top:1px solid #eee;padding-top:4px;font-weight:600;font-size:11px;color:#666;">Debit Puncak Aliran</div>' +
-                '<div><span style="display:inline-block;width:14px;height:10px;background:#c7e9ff;border:1px solid #333;margin-right:4px;"></span> 0–5 m³/s</div>' +
-                '<div><span style="display:inline-block;width:14px;height:10px;background:#5fb5de;border:1px solid #333;margin-right:4px;"></span> 5–15 m³/s</div>' +
-                '<div><span style="display:inline-block;width:14px;height:10px;background:#1a7fad;border:1px solid #333;margin-right:4px;"></span> 15–26 m³/s</div>' +
-                '<div><span style="display:inline-block;width:14px;height:10px;background:#022d4d;border:1px solid #333;margin-right:4px;"></span> 26–41 m³/s</div>' +
-                // Batas Desa
-                '<div style="margin-top:6px;border-top:1px solid #eee;padding-top:4px;">' +
-                    '<div><span style="display:inline-block;width:14px;height:10px;background:rgba(231,76,60,0.08);border:2px solid #e74c3c;margin-right:4px;"></span> Desa Wonotoro</div>' +
-                    '<div><span style="display:inline-block;width:14px;height:10px;background:transparent;border:1.5px dashed #2c3e50;margin-right:4px;"></span> Desa Sekitar</div>' +
-                "</div>" +
-            "</div>";
-
-        L.DomEvent.disableClickPropagation(div);
-        return div;
-    };
-    legendCtrl.addTo(map);
-
-    document.addEventListener("click", function (e) {
-        if (e.target.closest("#legendToggle")) {
-            var body  = document.getElementById("legendBody");
-            var arrow = document.getElementById("legendArrow");
-            if (body.style.display === "none") { body.style.display = "block"; arrow.textContent = "▲"; }
-            else                               { body.style.display = "none";  arrow.textContent = "▼"; }
-        }
-    });
-
-
-    // ================================================================
     // 25. PENCARIAN LOKASI
     // ================================================================
 
