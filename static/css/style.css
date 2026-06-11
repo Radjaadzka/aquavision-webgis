@@ -262,50 +262,135 @@ a   { text-decoration: none; color: inherit; }
 
 
 /* ================================================================
-   4. FOOTER
+   4. FOOTER — Professional multi-column
 ================================================================ */
 
 .footer {
     background: var(--ocean);
-    border-top: 1px solid rgba(255,255,255,.05);
-    padding: 20px 24px;
+    border-top: 1px solid rgba(255,255,255,.06);
+    padding: 0;
 }
 
-.footer-inner {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 14px;
+.footer-grid {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1.25fr;
+    border-bottom: 1px solid rgba(255,255,255,.05);
 }
 
-.footer-left {
-    display: flex;
-    align-items: center;
-    gap: 14px;
+.footer-col {
+    padding: 36px 32px;
+    border-right: 1px solid rgba(255,255,255,.05);
+}
+.footer-col:last-child { border-right: none; }
+
+.footer-col-head {
+    font-size: 10px; font-weight: 600; letter-spacing: 2px;
+    text-transform: uppercase; color: rgba(255,255,255,.22);
+    margin-bottom: 16px; display: block;
 }
 
-.footer-logo-itb { height: 30px; opacity: .6; }
+/* Col 1 — brand + about */
+.footer-brand {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 14px;
+}
+.footer-logo-itb { height: 22px; opacity: .4; }
+.footer-brand-name {
+    font-family: var(--font-display);
+    font-size: 15px; font-weight: 300; font-style: italic;
+    color: rgba(255,255,255,.55); letter-spacing: .3px;
+}
+.footer-about-text {
+    font-size: 12px; font-weight: 300; line-height: 1.85;
+    color: rgba(255,255,255,.28); max-width: 280px;
+}
 
-.footer-info .footer-title    { font-size: 12px; font-weight: 500; color: rgba(255,255,255,.55); }
-.footer-info .footer-subtitle,
-.footer-info .footer-address   { font-size: 11px; color: rgba(255,255,255,.25); margin-top: 1px; }
-
-.footer-caption { font-size: 11px; color: rgba(255,255,255,.2); }
-
+/* Col 2 — quick nav */
 .footer-nav {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
+    display: flex; flex-direction: column; gap: 4px;
 }
 .footer-nav-link {
-    font-size: 11px;
-    color: rgba(255,255,255,.3);
-    text-decoration: none;
-    transition: color .15s;
+    font-size: 13px; color: rgba(255,255,255,.38);
+    text-decoration: none; transition: color .15s;
+    padding: 4px 0;
 }
-.footer-nav-link:hover { color: rgba(255,255,255,.65); }
+.footer-nav-link:hover { color: rgba(255,255,255,.75); }
+
+/* Col 3 — system status */
+.footer-status-list { display: flex; flex-direction: column; gap: 9px; margin-bottom: 16px; }
+.footer-status-item {
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 12px; color: rgba(255,255,255,.38);
+}
+.footer-status-val { color: rgba(255,255,255,.65); font-weight: 500; }
+.footer-status-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 11px; font-weight: 600; letter-spacing: .8px;
+    padding: 3px 11px; border-radius: 20px;
+    background: rgba(255,255,255,.06); color: rgba(255,255,255,.35);
+    transition: background .4s, color .4s;
+}
+.footer-status-badge.aman    { background: rgba(34,197,94,.14);  color: #4ADE80; }
+.footer-status-badge.waspada { background: rgba(234,179,8,.14);  color: #FACC15; }
+.footer-status-badge.kritis  { background: rgba(239,68,68,.14);  color: #F87171; }
+
+/* Footer bottom */
+.footer-bottom {
+    padding: 14px 32px;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 6px;
+}
+.footer-copy { font-size: 11px; color: rgba(255,255,255,.2); }
+.footer-copy strong { color: rgba(255,255,255,.35); font-weight: 500; }
+.footer-itb-note { font-size: 11px; color: rgba(255,255,255,.15); }
+
+/* Floating CTA — non-dashboard pages */
+.floating-cta-btn {
+    position: fixed; bottom: 24px; right: 24px; z-index: 940;
+    display: none; align-items: center; gap: 8px;
+    padding: 11px 20px;
+    background: linear-gradient(135deg, #1a5276 0%, #3B82F6 100%);
+    color: #fff; border: none; border-radius: 28px;
+    font-size: 13px; font-weight: 600; font-family: var(--font-body);
+    cursor: pointer; text-decoration: none;
+    box-shadow: 0 6px 20px rgba(59,130,246,.35);
+    transition: transform .15s ease, box-shadow .15s ease, opacity .25s, visibility .25s;
+    white-space: nowrap;
+}
+.floating-cta-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 26px rgba(59,130,246,.5); }
+.floating-cta-btn.aq-hidden { opacity: 0 !important; pointer-events: none; transform: translateY(6px); }
+
+/* Skeleton loading pulse */
+@keyframes aqSkel {
+    0%   { background-position: -200px 0; }
+    100% { background-position: calc(200px + 100%) 0; }
+}
+.skel {
+    color: transparent !important;
+    background: linear-gradient(90deg,
+        rgba(255,255,255,.06) 25%,
+        rgba(255,255,255,.14) 50%,
+        rgba(255,255,255,.06) 75%
+    ) !important;
+    background-size: 200px 100% !important;
+    animation: aqSkel 1.4s ease infinite !important;
+    border-radius: 4px !important;
+    min-width: 24px; display: inline-block; min-height: 1em;
+    pointer-events: none;
+}
+
+/* Footer responsive */
+@media (max-width: 768px) {
+    .footer-grid { grid-template-columns: 1fr; }
+    .footer-col { padding: 22px 20px; border-right: none; border-bottom: 1px solid rgba(255,255,255,.05); }
+    .footer-col:last-child { border-bottom: none; }
+    .footer-bottom { padding: 12px 20px; }
+    .floating-cta-btn { bottom: 16px; right: 16px; padding: 10px 16px; font-size: 12px; }
+}
+@media (max-width: 480px) {
+    .footer-col { padding: 18px 16px; }
+    .footer-bottom { padding: 10px 16px; flex-direction: column; align-items: flex-start; }
+}
 
 
 /* ================================================================
@@ -582,10 +667,10 @@ a   { text-decoration: none; color: inherit; }
     bottom: 44px;
     width: 280px;
     z-index: 500;
-    background: rgba(7,17,31,.9);
+    background: rgba(10,22,42,.94);
     backdrop-filter: blur(20px) saturate(160%);
     -webkit-backdrop-filter: blur(20px) saturate(160%);
-    border: 1px solid rgba(255,255,255,.08);
+    border: 1px solid rgba(255,255,255,.12);
     border-radius: 16px;
     display: flex;
     flex-direction: column;
@@ -669,12 +754,12 @@ a   { text-decoration: none; color: inherit; }
 .menu-btn {
     width: 100%;
     padding: 8px 10px;
-    background: rgba(255,255,255,.04);
-    border: 1px solid rgba(255,255,255,.07);
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.1);
     border-radius: 6px;
     font-size: 12px;
     font-weight: 400;
-    color: rgba(255,255,255,.6);
+    color: rgba(255,255,255,.72);
     text-align: left;
     cursor: pointer;
     margin-bottom: 4px;
@@ -682,12 +767,12 @@ a   { text-decoration: none; color: inherit; }
     display: block;
     transition: all .15s;
 }
-.menu-btn:hover { background: rgba(255,255,255,.08); color: rgba(255,255,255,.9); }
+.menu-btn:hover { background: rgba(255,255,255,.11); color: rgba(255,255,255,.95); border-color: rgba(255,255,255,.18); }
 
 /* Layer panel */
 .layer-panel {
-    background: rgba(255,255,255,.03);
-    border: 1px solid rgba(255,255,255,.06);
+    background: rgba(255,255,255,.05);
+    border: 1px solid rgba(255,255,255,.1);
     border-radius: 6px;
     padding: 10px 11px;
     margin-bottom: 4px;
@@ -698,7 +783,7 @@ a   { text-decoration: none; color: inherit; }
     display: block;
     margin-bottom: 5px;
     cursor: pointer;
-    color: rgba(255,255,255,.5);
+    color: rgba(255,255,255,.68);
     font-weight: 300;
 }
 .layer-panel input[type="checkbox"] {
@@ -712,9 +797,9 @@ a   { text-decoration: none; color: inherit; }
     border-top: 1px solid rgba(255,255,255,.06);
 }
 .layer-panel p {
-    font-weight: 500;
+    font-weight: 600;
     font-size: 10px;
-    color: rgba(255,255,255,.3);
+    color: rgba(255,255,255,.45);
     margin-bottom: 5px;
     letter-spacing: .5px;
     text-transform: uppercase;
@@ -768,8 +853,8 @@ a   { text-decoration: none; color: inherit; }
 ================================================================ */
 
 .card {
-    background: rgba(255,255,255,.04);
-    border: 1px solid rgba(255,255,255,.07);
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.1);
     border-radius: 6px;
     margin-bottom: 4px;
 }
@@ -782,14 +867,16 @@ a   { text-decoration: none; color: inherit; }
     padding: 7px 9px;
     -webkit-user-select: none;
     user-select: none;
+    transition: background .15s;
 }
+.accordion-header:hover { background: rgba(255,255,255,.04); }
 .accordion-header h3 {
     font-size: 11px;
-    font-weight: 500;
-    color: rgba(255,255,255,.6);
+    font-weight: 600;
+    color: rgba(255,255,255,.75);
     margin: 0;
 }
-.accordion-arrow       { font-size: 10px; color: rgba(255,255,255,.2); transition: transform .2s; }
+.accordion-arrow       { font-size: 10px; color: rgba(255,255,255,.35); transition: transform .2s; }
 .accordion-arrow.open  { transform: rotate(180deg); }
 
 .accordion-body       { display: none; padding: 0 9px 9px; }
@@ -805,12 +892,12 @@ a   { text-decoration: none; color: inherit; }
     text-align: center;
     padding: 10px 3px;
     border-radius: 8px;
-    background: rgba(255,255,255,.03);
-    border: 1px solid rgba(255,255,255,.06);
+    background: rgba(255,255,255,.05);
+    border: 1px solid rgba(255,255,255,.09);
 }
 .stat-mini-icon  { font-size: 24px; line-height: 1; margin-bottom: 4px; }
-.stat-mini-num   { font-size: 16px; font-weight: 700; color: #60A5FA; margin: 2px 0; }
-.stat-mini-label { font-size: 10px; color: rgba(255,255,255,.35); }
+.stat-mini-num   { font-size: 16px; font-weight: 700; color: #7EC8FD; margin: 2px 0; }
+.stat-mini-label { font-size: 10px; color: rgba(255,255,255,.45); }
 
 /* Debit boxes */
 .debit-info {
@@ -822,8 +909,8 @@ a   { text-decoration: none; color: inherit; }
 .debit-box         { text-align: center; padding: 8px; border-radius: 6px; }
 .debit-box-supply  { background: rgba(22,163,74,.12); }
 .debit-box-demand  { background: rgba(245,158,11,.1); }
-.debit-box-num     { font-size: 13px; font-weight: 600; color: rgba(255,255,255,.8); }
-.debit-box-label   { font-size: 10px; color: rgba(255,255,255,.3); margin-top: 2px; }
+.debit-box-num     { font-size: 13px; font-weight: 700; color: rgba(255,255,255,.9); }
+.debit-box-label   { font-size: 10px; color: rgba(255,255,255,.45); margin-top: 2px; }
 
 .status-bar {
     display: flex;

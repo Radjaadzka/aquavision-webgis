@@ -135,29 +135,68 @@ document.querySelectorAll('a[href^="#"]').forEach(function(a) {
 </div>
 
 <!-- ================= FOOTER ================= -->
-<footer class="footer">
-    <div class="footer-inner">
-        <div class="footer-left">
-            <img src="{% static 'images/logo_itb.png' %}" class="footer-logo-itb" alt="Logo ITB">
-            <div class="footer-info">
-                <p class="footer-title">Teknik Geodesi dan Geomatika</p>
-                <p class="footer-subtitle">Institut Teknologi Bandung</p>
-                <p class="footer-address">Labtek IX-C, Jl. Ganesa No.10, Bandung 40132</p>
+<footer class="footer" id="siteFooter">
+    <div class="footer-grid">
+
+        <!-- Kolom 1 — Tentang AQUAVISION -->
+        <div class="footer-col">
+            <div class="footer-brand">
+                <img src="{% static 'images/logo_itb.png' %}" alt="Logo ITB" class="footer-logo-itb" loading="lazy">
+                <span class="footer-brand-name">AQUAVISION</span>
+            </div>
+            <p class="footer-about-text">Platform informasi sumber daya air berbasis WebGIS untuk mendukung pengelolaan sumber daya air dan pengambilan keputusan berbasis data di Desa Wonotoro, Kawasan Bromo Tengger Semeru.</p>
+        </div>
+
+        <!-- Kolom 2 — Navigasi Cepat -->
+        <div class="footer-col">
+            <span class="footer-col-head">Navigasi Cepat</span>
+            <nav class="footer-nav">
+                <a href="/" class="footer-nav-link">Dashboard</a>
+                <a href="/data/" class="footer-nav-link">Data Portal</a>
+                <a href="/tentang/" class="footer-nav-link">Tentang AQUAVISION</a>
+                <a href="/bantuan/" class="footer-nav-link">Pusat Bantuan</a>
+                {% if user.is_authenticated %}
+                <a href="/hubungi/" class="footer-nav-link">Hubungi Admin</a>
+                {% else %}
+                <a href="{% url 'login' %}" class="footer-nav-link">Login</a>
+                {% endif %}
+            </nav>
+        </div>
+
+        <!-- Kolom 3 — Status Sistem (diisi lazily via JS) -->
+        <div class="footer-col">
+            <span class="footer-col-head">Status Sistem</span>
+            <div class="footer-status-list">
+                <div class="footer-status-item">
+                    <span>💧 Sumber Air</span>
+                    <span class="footer-status-val skel" id="ftAir">00</span>
+                </div>
+                <div class="footer-status-item">
+                    <span>🔧 Segmen Pipa</span>
+                    <span class="footer-status-val skel" id="ftPipa">00</span>
+                </div>
+                <div class="footer-status-item">
+                    <span>📊 Ketersediaan</span>
+                    <span class="footer-status-val skel" id="ftM3">0.000 m³/hari</span>
+                </div>
+            </div>
+            <div>
+                <span class="footer-col-head" style="margin-bottom:8px;">Ketersediaan Air</span>
+                <span class="footer-status-badge" id="ftBadge">Memuat…</span>
             </div>
         </div>
-        <nav class="footer-nav">
-            <a href="/" class="footer-nav-link">Dashboard</a>
-            <a href="/data/" class="footer-nav-link">Data Portal</a>
-            <a href="/bantuan/" class="footer-nav-link">Pusat Bantuan</a>
-            <a href="{% url 'login' %}" class="footer-nav-link">Login</a>
-            <a href="{% url 'register' %}" class="footer-nav-link">Daftar</a>
-            <a href="/hubungi/" class="footer-nav-link">Hubungi Admin</a>
-        </nav>
-        <div class="footer-right">
-            <p class="footer-caption">Capstone Design Project 2026</p>
-        </div>
+
+    </div>
+    <div class="footer-bottom">
+        <p class="footer-copy">AQUAVISION <strong>© 2026</strong></p>
+        <p class="footer-itb-note">Capstone Design Project · Teknik Geodesi dan Geomatika · Institut Teknologi Bandung</p>
     </div>
 </footer>
+
+<!-- Floating CTA — "Buka Dashboard" pada halaman non-dashboard -->
+<a href="/" class="floating-cta-btn" id="floatingCTA" aria-label="Buka Dashboard">
+    🚀 Buka Dashboard
+</a>
 
 {% block extra_js %}{% endblock %}
 
@@ -196,6 +235,98 @@ document.querySelectorAll('a[href^="#"]').forEach(function(a) {
     document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape') closeDrawer();
     });
+})();
+</script>
+
+<script>
+// ── Floating CTA: show on non-dashboard/non-hubungi pages ─────
+(function () {
+    var btn  = document.getElementById('floatingCTA');
+    var path = window.location.pathname;
+    if (!btn) return;
+    var hide = ['/', '/hubungi/', '/login/', '/register/'];
+    var blocked = hide.some(function (p) { return path === p; })
+        || path.startsWith('/admin/')
+        || path.startsWith('/hubungi/');
+    if (!blocked) {
+        btn.style.display = 'flex';
+        // Hide when footer is visible (avoid overlap)
+        var footer = document.getElementById('siteFooter');
+        if (footer && 'IntersectionObserver' in window) {
+            new IntersectionObserver(function (entries) {
+                btn.classList.toggle('aq-hidden', entries[0].isIntersecting);
+            }, { threshold: 0.05 }).observe(footer);
+        }
+    }
+})();
+
+// ── Footer status (lazy fetch — fires only when footer scrolls into view) ──
+(function () {
+    var footer = document.getElementById('siteFooter');
+    if (!footer) return;
+    var loaded = false;
+
+    function fetchFooterStatus() {
+        if (loaded) return;
+        loaded = true;
+
+        // Stats counts
+        fetch('/api/stats/')
+            .then(function (r) { return r.json(); })
+            .then(function (d) {
+                function setFt(id, val) {
+                    var el = document.getElementById(id);
+                    if (!el) return;
+                    el.classList.remove('skel');
+                    el.textContent = val;
+                }
+                setFt('ftAir',  d.sumber_air  != null ? d.sumber_air  : '—');
+                setFt('ftPipa', d.pipa        != null ? d.pipa        : '—');
+            })
+            .catch(function () {
+                ['ftAir','ftPipa'].forEach(function(id) {
+                    var el = document.getElementById(id);
+                    if (el) { el.classList.remove('skel'); el.textContent = '—'; }
+                });
+            });
+
+        // Water balance status
+        fetch('/api/informasi-debit/')
+            .then(function (r) { return r.json(); })
+            .then(function (d) {
+                var m3El  = document.getElementById('ftM3');
+                var badge = document.getElementById('ftBadge');
+                if (m3El) {
+                    m3El.classList.remove('skel');
+                    var val = d.ketersediaan_m3;
+                    m3El.textContent = val != null
+                        ? (val.toLocaleString('id-ID', {maximumFractionDigits: 0}) + ' m³/hari')
+                        : '—';
+                }
+                if (badge && d.status) {
+                    var s = (d.status || '').toUpperCase();
+                    badge.textContent = s;
+                    badge.className = 'footer-status-badge' + (
+                        s === 'AMAN'    ? ' aman' :
+                        s === 'WASPADA' ? ' waspada' :
+                        s === 'KRITIS'  ? ' kritis' : ''
+                    );
+                }
+            })
+            .catch(function () {
+                var el = document.getElementById('ftM3');
+                if (el) { el.classList.remove('skel'); el.textContent = '—'; }
+            });
+    }
+
+    if ('IntersectionObserver' in window) {
+        new IntersectionObserver(function (entries) {
+            if (entries[0].isIntersecting) fetchFooterStatus();
+        }, { threshold: 0.1 }).observe(footer);
+    } else {
+        // Fallback: fetch after 2 s
+        setTimeout(fetchFooterStatus, 2000);
+    }
 })();
 </script>
 

@@ -129,6 +129,201 @@
 @media (max-width:480px) {
     .floating-tour-btn { padding:10px 16px; font-size:12px; bottom:16px; right:16px; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   MOBILE DASHBOARD — Complete overhaul ≤768px
+   Prinsip: Peta = 100% layar. Sidebar = drawer. Stats = bottom sheet.
+═══════════════════════════════════════════════════════════════════ */
+
+/* Elements only shown/hidden on mobile */
+.mobile-bottom-sheet,
+.mobile-fab-layers,
+#mobileSidebarOverlay { display: none !important; }
+
+@media (max-width: 768px) {
+
+    /* ── Map = full screen ──────────────────────────────────────── */
+    .webgis-container { height: calc(100dvh - 56px) !important; }
+
+    /* ── Footer: hidden on dashboard ───────────────────────────── */
+    .footer, #siteFooter { display: none !important; }
+
+    /* ── Hero overlay: hidden on mobile (bottom sheet handles it) ── */
+    .hero-dashboard { display: none !important; }
+
+    /* ── Floating tour btn: hidden on mobile ───────────────────── */
+    #floatingTourBtn { display: none !important; }
+
+    /* ── Map info bar + north arrow: hidden ─────────────────────── */
+    .map-info-bar { display: none !important; }
+    #northArrow   { display: none !important; }
+
+    /* ── Desktop sidebar toggle: hidden (FAB replaces it) ───────── */
+    #btnShowSidebar { display: none !important; }
+
+    /* ── Sidebar: slide-in drawer from left ─────────────────────── */
+    .sidebar {
+        position: fixed !important;
+        top: 56px !important;
+        left: 0 !important;
+        bottom: 0 !important;
+        width: min(88vw, 320px) !important;
+        border-radius: 0 16px 16px 0 !important;
+        z-index: 1060 !important;
+        transform: translateX(-110%) !important;
+        opacity: 1 !important;
+        transition: transform .3s cubic-bezier(.4,0,.2,1) !important;
+        pointer-events: auto !important;
+    }
+    .sidebar.mobile-open {
+        transform: translateX(0) !important;
+    }
+    /* Keep collapsed class working for desktop compat */
+    .sidebar.collapsed:not(.mobile-open) {
+        transform: translateX(-110%) !important;
+    }
+
+    /* ── Sidebar overlay ────────────────────────────────────────── */
+    #mobileSidebarOverlay {
+        display: none !important;
+        position: fixed !important;
+        inset: 0 !important;
+        background: rgba(0,0,0,.55) !important;
+        z-index: 1059 !important;
+        -webkit-backdrop-filter: blur(2px) !important;
+        backdrop-filter: blur(2px) !important;
+    }
+    #mobileSidebarOverlay.open { display: block !important; }
+
+    /* ── Search bar: full-width floating below navbar ────────────── */
+    .map-ctrl-topleft {
+        position: fixed !important;
+        top: 62px !important;
+        left: 12px !important;
+        right: 12px !important;
+        bottom: auto !important;
+        width: auto !important;
+        z-index: 700 !important;
+        padding: 0 !important;
+        gap: 8px !important;
+        display: flex !important;
+    }
+    .map-ctrl-topleft input[type="text"] {
+        flex: 1 !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        font-size: 15px !important;
+        padding: 11px 16px !important;
+        border-radius: 12px !important;
+        background: rgba(7,17,31,.96) !important;
+        border: 1px solid rgba(255,255,255,.18) !important;
+        box-shadow: 0 4px 20px rgba(0,0,0,.35) !important;
+    }
+    /* Export button: hidden from search bar on mobile, accessible via sidebar */
+    #btnPrintMap { display: none !important; }
+
+    /* ── Zoom: top right ─────────────────────────────────────────── */
+    .map-ctrl-zoom {
+        bottom: auto !important;
+        top: 118px !important;
+        right: 12px !important;
+    }
+    .map-ctrl-zoom button {
+        width: 44px !important;
+        height: 44px !important;
+        font-size: 22px !important;
+        border-radius: 11px !important;
+    }
+
+    /* ── Leaflet popup: mobile-safe ─────────────────────────────── */
+    .leaflet-popup        { max-width: 82vw !important; }
+    .leaflet-popup-content-wrapper { border-radius: 14px !important; }
+    .leaflet-popup-content { margin: 14px 16px !important; }
+
+    /* ── Mobile FAB: open sidebar ────────────────────────────────── */
+    .mobile-fab-layers {
+        display: flex !important;
+        position: fixed !important;
+        bottom: 72px !important;
+        left: 16px !important;
+        z-index: 700 !important;
+        width: 50px !important;
+        height: 50px !important;
+        border-radius: 50% !important;
+        background: rgba(7,17,31,.96) !important;
+        border: 1px solid rgba(255,255,255,.2) !important;
+        color: rgba(255,255,255,.85) !important;
+        font-size: 22px !important;
+        align-items: center !important;
+        justify-content: center !important;
+        cursor: pointer !important;
+        box-shadow: 0 4px 18px rgba(0,0,0,.45) !important;
+        transition: background .15s !important;
+    }
+
+    /* ── Bottom sheet: stats summary ─────────────────────────────── */
+    .mobile-bottom-sheet {
+        display: flex !important;
+        flex-direction: column !important;
+        position: fixed !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        z-index: 690 !important;
+        background: rgba(7,18,33,.97) !important;
+        -webkit-backdrop-filter: blur(20px) !important;
+        backdrop-filter: blur(20px) !important;
+        border-radius: 20px 20px 0 0 !important;
+        border-top: 1px solid rgba(255,255,255,.12) !important;
+        transform: translateY(calc(100% - 54px)) !important;
+        transition: transform .3s cubic-bezier(.4,0,.2,1) !important;
+        max-height: 78vh !important;
+        overflow: hidden !important;
+    }
+    .mobile-bottom-sheet.expanded {
+        transform: translateY(0) !important;
+    }
+    .mobile-bs-handle {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        padding: 0 20px !important;
+        height: 54px !important;
+        cursor: pointer !important;
+        flex-shrink: 0 !important;
+        -webkit-user-select: none !important;
+        user-select: none !important;
+        border-bottom: 1px solid rgba(255,255,255,.06) !important;
+    }
+    .mobile-bs-title {
+        font-size: 13px !important;
+        font-weight: 600 !important;
+        color: rgba(255,255,255,.82) !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 9px !important;
+    }
+    .mobile-bs-arrow {
+        font-size: 11px !important;
+        color: rgba(255,255,255,.4) !important;
+        transition: transform .3s !important;
+    }
+    .mobile-bottom-sheet.expanded .mobile-bs-arrow {
+        transform: rotate(180deg) !important;
+    }
+    .mobile-bs-content {
+        overflow-y: auto !important;
+        padding: 16px 16px 28px !important;
+        flex: 1 !important;
+        -webkit-overflow-scrolling: touch !important;
+    }
+}
+
+/* Tightest breakpoint: 320px */
+@media (max-width: 375px) {
+    .map-ctrl-topleft input[type="text"] { font-size: 14px !important; padding: 10px 12px !important; }
+    .mobile-fab-layers { width: 44px !important; height: 44px !important; font-size: 20px !important; bottom: 66px !important; }
+}
 </style>
 {% endblock %}
 
@@ -309,19 +504,19 @@
                         <!-- Admin / Superadmin: statistik internal sistem -->
                         <div class="stat-mini"><div class="stat-mini-icon">🗂️</div><div class="stat-mini-num" id="statLayer">9</div><div class="stat-mini-label">Layer GIS</div></div>
                         <div class="stat-mini"><div class="stat-mini-icon">📦</div><div class="stat-mini-num" id="statDataset">8</div><div class="stat-mini-label">Dataset</div></div>
-                        <div class="stat-mini"><div class="stat-mini-icon">💧</div><div class="stat-mini-num" id="countAir">—</div><div class="stat-mini-label">Sumber Air</div></div>
-                        <div class="stat-mini"><div class="stat-mini-icon">🏗</div><div class="stat-mini-num" id="countReservoir">—</div><div class="stat-mini-label">Tandon Air</div></div>
-                        <div class="stat-mini"><div class="stat-mini-icon">✉️</div><div class="stat-mini-num" id="statConv">—</div><div class="stat-mini-label">Percakapan</div></div>
-                        <div class="stat-mini"><div class="stat-mini-icon">📥</div><div class="stat-mini-num" id="statDl">—</div><div class="stat-mini-label">Download</div></div>
+                        <div class="stat-mini"><div class="stat-mini-icon">💧</div><div class="stat-mini-num skel" id="countAir">0</div><div class="stat-mini-label">Sumber Air</div></div>
+                        <div class="stat-mini"><div class="stat-mini-icon">🏗</div><div class="stat-mini-num skel" id="countReservoir">0</div><div class="stat-mini-label">Tandon Air</div></div>
+                        <div class="stat-mini"><div class="stat-mini-icon">✉️</div><div class="stat-mini-num skel" id="statConv">0</div><div class="stat-mini-label">Percakapan</div></div>
+                        <div class="stat-mini"><div class="stat-mini-icon">📥</div><div class="stat-mini-num skel" id="statDl">0</div><div class="stat-mini-label">Download</div></div>
                     {% else %}
                         <!-- Guest / User: statistik objek wisata & air -->
-                        <div class="stat-mini"><div class="stat-mini-icon">💧</div><div class="stat-mini-num" id="countAir">—</div><div class="stat-mini-label">Sumber Air</div></div>
-                        <div class="stat-mini"><div class="stat-mini-icon">🚰</div><div class="stat-mini-num" id="countReservoir">—</div><div class="stat-mini-label">Tandon Air</div></div>
-                        <div class="stat-mini"><div class="stat-mini-icon">🔧</div><div class="stat-mini-num" id="countPipa">—</div><div class="stat-mini-label">Segmen Pipa</div></div>
-                        <div class="stat-mini"><div class="stat-mini-icon">🏨</div><div class="stat-mini-num" id="countHotel">—</div><div class="stat-mini-label">Hotel</div></div>
-                        <div class="stat-mini"><div class="stat-mini-icon">🍽️</div><div class="stat-mini-num" id="countMakan">—</div><div class="stat-mini-label">Rumah Makan</div></div>
-                        <div class="stat-mini"><div class="stat-mini-icon">🛠️</div><div class="stat-mini-num" id="countJasa">—</div><div class="stat-mini-label">Jasa</div></div>
-                        <div class="stat-mini" style="grid-column:span 3;"><div class="stat-mini-icon">👥</div><div class="stat-mini-num" id="statPenduduk">—</div><div class="stat-mini-label">Total Penduduk</div></div>
+                        <div class="stat-mini"><div class="stat-mini-icon">💧</div><div class="stat-mini-num skel" id="countAir">0</div><div class="stat-mini-label">Sumber Air</div></div>
+                        <div class="stat-mini"><div class="stat-mini-icon">🚰</div><div class="stat-mini-num skel" id="countReservoir">0</div><div class="stat-mini-label">Tandon Air</div></div>
+                        <div class="stat-mini"><div class="stat-mini-icon">🔧</div><div class="stat-mini-num skel" id="countPipa">0</div><div class="stat-mini-label">Segmen Pipa</div></div>
+                        <div class="stat-mini"><div class="stat-mini-icon">🏨</div><div class="stat-mini-num skel" id="countHotel">0</div><div class="stat-mini-label">Hotel</div></div>
+                        <div class="stat-mini"><div class="stat-mini-icon">🍽️</div><div class="stat-mini-num skel" id="countMakan">0</div><div class="stat-mini-label">Rumah Makan</div></div>
+                        <div class="stat-mini"><div class="stat-mini-icon">🛠️</div><div class="stat-mini-num skel" id="countJasa">0</div><div class="stat-mini-label">Jasa</div></div>
+                        <div class="stat-mini" style="grid-column:span 3;"><div class="stat-mini-icon">👥</div><div class="stat-mini-num skel" id="statPenduduk">0</div><div class="stat-mini-label">Total Penduduk</div></div>
                     {% endif %}
                     </div>
                 </div>
@@ -552,6 +747,63 @@
         ✨ Jelajahi Dashboard
     </button>
 
+    <!-- ── Mobile: Sidebar Overlay ──────────────────────────────── -->
+    <div id="mobileSidebarOverlay"></div>
+
+    <!-- ── Mobile: Layer FAB ────────────────────────────────────── -->
+    <button class="mobile-fab-layers" id="mobileFabLayers" aria-label="Buka Panel Fitur Peta">🗺️</button>
+
+    <!-- ── Mobile: Bottom Sheet (Ringkasan Dashboard) ──────────── -->
+    <div class="mobile-bottom-sheet" id="mobileBottomSheet" role="region" aria-label="Ringkasan Dashboard">
+        <div class="mobile-bs-handle" id="mobileBsHandle">
+            <div class="mobile-bs-title">
+                <span id="mobileBsStatusDot" style="width:8px;height:8px;border-radius:50%;background:#F59E0B;flex-shrink:0;display:inline-block;"></span>
+                <span>Ringkasan Dashboard</span>
+            </div>
+            <span class="mobile-bs-arrow" id="mobileBsArrow">▲</span>
+        </div>
+        <div class="mobile-bs-content">
+            <!-- Status badge -->
+            <div style="text-align:center;padding:8px 0 14px;">
+                <span style="font-size:10px;color:rgba(255,255,255,.35);letter-spacing:1.5px;text-transform:uppercase;display:block;margin-bottom:8px;">Status Ketersediaan Air</span>
+                <span style="display:inline-block;font-size:13px;font-weight:700;letter-spacing:1px;padding:5px 20px;border-radius:20px;background:rgba(255,255,255,.07);color:rgba(255,255,255,.5);" id="mobileBsBadge">Memuat…</span>
+            </div>
+            <!-- Supply / Demand grid -->
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
+                <div style="background:rgba(22,163,74,.1);border:1px solid rgba(22,163,74,.2);border-radius:10px;padding:12px;text-align:center;">
+                    <div style="font-size:10px;color:rgba(255,255,255,.4);margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px;">Ketersediaan</div>
+                    <div style="font-size:17px;font-weight:700;color:#4ADE80;" id="mobileBsSupply">—</div>
+                    <div style="font-size:10px;color:rgba(255,255,255,.3);margin-top:2px;">m³/hari</div>
+                </div>
+                <div style="background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.2);border-radius:10px;padding:12px;text-align:center;">
+                    <div style="font-size:10px;color:rgba(255,255,255,.4);margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px;">Kebutuhan</div>
+                    <div style="font-size:17px;font-weight:700;color:#FACC15;" id="mobileBsDemand">—</div>
+                    <div style="font-size:10px;color:rgba(255,255,255,.3);margin-top:2px;">m³/hari</div>
+                </div>
+            </div>
+            <!-- Key stats -->
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:14px;">
+                <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:9px;padding:10px 4px;text-align:center;">
+                    <div style="font-size:19px;font-weight:700;color:#60A5FA;" id="mobileBsAir">—</div>
+                    <div style="font-size:10px;color:rgba(255,255,255,.35);margin-top:2px;">Sumber Air</div>
+                </div>
+                <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:9px;padding:10px 4px;text-align:center;">
+                    <div style="font-size:19px;font-weight:700;color:#60A5FA;" id="mobileBsPipa">—</div>
+                    <div style="font-size:10px;color:rgba(255,255,255,.35);margin-top:2px;">Segmen Pipa</div>
+                </div>
+                <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:9px;padding:10px 4px;text-align:center;">
+                    <div style="font-size:19px;font-weight:700;color:#60A5FA;" id="mobileBsReservoir">—</div>
+                    <div style="font-size:10px;color:rgba(255,255,255,.35);margin-top:2px;">Tandon Air</div>
+                </div>
+            </div>
+            <!-- CTA actions -->
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                <button id="mobileBsOpenLayers" style="padding:11px 8px;background:rgba(59,130,246,.15);border:1px solid rgba(59,130,246,.3);border-radius:9px;color:#93C5FD;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">🗺️ Buka Layer</button>
+                <a href="/data/" style="padding:11px 8px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:9px;color:rgba(255,255,255,.65);font-size:12px;font-weight:600;text-decoration:none;display:flex;align-items:center;justify-content:center;box-sizing:border-box;">📊 Data Portal</a>
+            </div>
+        </div>
+    </div>
+
 </div><!-- /webgis-container -->
 
 
@@ -692,37 +944,58 @@
 <script src="{% static 'js/tour.js' %}"></script>
 
 <script>
-// ── Dashboard Stats from real DB ──────────────────────────────
+// ── Dashboard Stats from real DB (sessionStorage cache 2 min) ──
 (function loadStats() {
+    var CACHE_KEY = 'aqStats';
+    var CACHE_TTL = 120000; // 2 minutes
+
+    function apply(d) {
+        function set(id, val) {
+            var el = document.getElementById(id);
+            if (!el) return;
+            el.classList.remove('skel');
+            if (val != null) el.textContent = val;
+        }
+        set('statLayer',      d.layer_count   || 9);
+        set('statDataset',    d.dataset_count || 8);
+        set('countAir',       d.sumber_air);
+        set('countReservoir', d.reservoir);
+        set('countPipa',      d.pipa);
+        set('statConv',       d.conversation_count);
+        set('statDl',         d.download_count);
+        set('countHotel',     d.hotel);
+        set('countMakan',     d.makan);
+        set('countJasa',      d.jasa);
+        set('totalPenduduk',  d.penduduk);
+        set('statPenduduk',   d.penduduk);
+        set('heroAir',        d.sumber_air);
+        set('heroReservoir',  d.reservoir);
+        set('heroPipa',       d.pipa);
+        set('heroStatAir',    d.sumber_air);
+        set('heroStatPipa',   d.pipa);
+    }
+
+    // Try cached data first for instant display
+    try {
+        var cached = sessionStorage.getItem(CACHE_KEY);
+        if (cached) {
+            var obj = JSON.parse(cached);
+            if (Date.now() - obj.ts < CACHE_TTL) { apply(obj.data); return; }
+        }
+    } catch (e) {}
+
     fetch('/api/stats/')
         .then(function(r) { return r.json(); })
         .then(function(d) {
-            function set(id, val) {
-                var el = document.getElementById(id);
-                if (el) el.textContent = val;
-            }
-            set('statLayer',     d.layer_count   || 9);
-            set('statDataset',   d.dataset_count || 8);
-            set('countAir',      d.sumber_air);
-            set('countReservoir', d.reservoir);
-            set('countPipa',     d.pipa);
-            set('statConv',      d.conversation_count);
-            set('statDl',        d.download_count);
-            // hidden legacy elements kept for script.js GeoJSON callbacks
-            set('countHotel',    d.hotel);
-            set('countMakan',    d.makan);
-            set('countJasa',     d.jasa);
-            set('totalPenduduk', d.penduduk);
-            set('statPenduduk',  d.penduduk);
-            // Sync sidebar hero counts
-            set('heroAir',       d.sumber_air);
-            set('heroReservoir', d.reservoir);
-            set('heroPipa',      d.pipa);
-            // Sync Hero Dashboard stats
-            set('heroStatAir',   d.sumber_air);
-            set('heroStatPipa',  d.pipa);
+            apply(d);
+            try { sessionStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data: d })); } catch(e) {}
         })
-        .catch(function() {});
+        .catch(function() {
+            // Remove skeleton on error so UI doesn't stay animated
+            document.querySelectorAll('.stat-mini-num.skel').forEach(function(el) {
+                el.classList.remove('skel'); el.textContent = '—';
+            });
+        });
 })();
 
 // ── Health Status Panel (admin only — skip if panel not in DOM) ──
@@ -966,6 +1239,122 @@ document.getElementById('modalLayerInfo').addEventListener('click', function(e) 
     }
     cbs.forEach(function (cb) { cb.addEventListener('change', update); });
     update();
+})();
+
+// ── Mobile Dashboard Controls ─────────────────────────────────────
+(function () {
+    if (window.innerWidth > 768) return;   // Desktop: skip entirely
+
+    var overlay    = document.getElementById('mobileSidebarOverlay');
+    var sidebar    = document.getElementById('sidebar');
+    var fab        = document.getElementById('mobileFabLayers');
+    var sheet      = document.getElementById('mobileBottomSheet');
+    var sheetHandle= document.getElementById('mobileBsHandle');
+    var openLayers = document.getElementById('mobileBsOpenLayers');
+
+    // ── FAB opens sidebar drawer ─────────────────────────────────
+    if (fab && sidebar) {
+        fab.addEventListener('click', function () {
+            sidebar.classList.add('mobile-open');
+            if (overlay) overlay.classList.add('open');
+        });
+    }
+
+    // ── Overlay closes sidebar ───────────────────────────────────
+    if (overlay && sidebar) {
+        overlay.addEventListener('click', function () {
+            sidebar.classList.remove('mobile-open');
+            overlay.classList.remove('open');
+        });
+    }
+
+    // ── Sidebar X button also closes drawer ──────────────────────
+    var closeBtn = document.getElementById('btnHideSidebar');
+    if (closeBtn && sidebar) {
+        closeBtn.addEventListener('click', function () {
+            sidebar.classList.remove('mobile-open');
+            if (overlay) overlay.classList.remove('open');
+        });
+    }
+
+    // ── Bottom sheet: toggle on handle click ─────────────────────
+    if (sheetHandle && sheet) {
+        sheetHandle.addEventListener('click', function () {
+            sheet.classList.toggle('expanded');
+        });
+    }
+
+    // ── "Buka Layer" in bottom sheet ─────────────────────────────
+    if (openLayers && sidebar) {
+        openLayers.addEventListener('click', function () {
+            if (sheet) sheet.classList.remove('expanded');
+            sidebar.classList.add('mobile-open');
+            if (overlay) overlay.classList.add('open');
+            // Open the layer panel automatically
+            var btnLayer = document.getElementById('btnLayer');
+            if (btnLayer) {
+                var panel = document.getElementById('layerPanel');
+                if (panel && panel.style.display === 'none') btnLayer.click();
+            }
+        });
+    }
+
+    // ── Populate bottom sheet from already-loaded DOM data ───────
+    function populateMobileSheet() {
+        var wscBadge = document.getElementById('wscBadge');
+        var mbBadge  = document.getElementById('mobileBsBadge');
+        if (wscBadge && mbBadge) {
+            var s = (wscBadge.textContent || '').trim();
+            if (s && s !== 'Memuat...' && s !== 'Memuat…') {
+                mbBadge.textContent = s;
+                var bgColor, txtColor;
+                if (s.indexOf('AMAN') !== -1) {
+                    bgColor = 'rgba(34,197,94,.14)'; txtColor = '#4ADE80';
+                } else if (s.indexOf('WASPADA') !== -1) {
+                    bgColor = 'rgba(234,179,8,.14)'; txtColor = '#FACC15';
+                } else if (s.indexOf('KRITIS') !== -1) {
+                    bgColor = 'rgba(239,68,68,.14)'; txtColor = '#F87171';
+                } else {
+                    bgColor = 'rgba(255,255,255,.08)'; txtColor = 'rgba(255,255,255,.5)';
+                }
+                mbBadge.style.background = bgColor;
+                mbBadge.style.color = txtColor;
+            }
+        }
+
+        // Status dot color
+        var srcDot = document.getElementById('statusDot');
+        var dstDot = document.getElementById('mobileBsStatusDot');
+        if (srcDot && dstDot) dstDot.style.background = srcDot.style.background || '#F59E0B';
+
+        // Supply / Demand
+        function syncText(srcId, dstId) {
+            var src = document.getElementById(srcId);
+            var dst = document.getElementById(dstId);
+            if (src && dst) {
+                var v = src.textContent.trim();
+                if (v && v !== '0' && v !== '—') dst.textContent = v;
+            }
+        }
+        syncText('debitSupply',   'mobileBsSupply');
+        syncText('debitDemand',   'mobileBsDemand');
+        syncText('countAir',      'mobileBsAir');
+        syncText('countPipa',     'mobileBsPipa');
+        syncText('countReservoir','mobileBsReservoir');
+    }
+
+    // Sync after data loads (MutationObserver on supply value)
+    setTimeout(populateMobileSheet, 1800);
+    var debitEl = document.getElementById('debitSupply');
+    if (debitEl) {
+        new MutationObserver(function () { setTimeout(populateMobileSheet, 300); })
+            .observe(debitEl, { childList: true, characterData: true, subtree: true });
+    }
+    var statusEl = document.getElementById('wscBadge');
+    if (statusEl) {
+        new MutationObserver(function () { setTimeout(populateMobileSheet, 300); })
+            .observe(statusEl, { childList: true, characterData: true, subtree: true });
+    }
 })();
 
 </script>

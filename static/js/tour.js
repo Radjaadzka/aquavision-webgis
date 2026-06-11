@@ -190,12 +190,11 @@
     }
 
     /* ── Steps — adapt to login state ────────────────────────────────
-       Guest      (17 steps): ... Pusat Bantuan, Login, Daftar, Selesai
-       User login (18 steps): ... Hubungi Admin, Pusat Bantuan, Profil,
-                                   Logout, Selesai
-       __accordionId marks steps that should open one of
-       ACCORDION_BODIES while active (closed again once the user moves
-       on to the next step). */
+       Guest      (11 steps): Panel Peta → Layer → Legenda → Cari →
+                               Export → Tentang → Data Portal →
+                               Bantuan → Login → Daftar → Selesai
+       User login (12 steps): + Hubungi Admin, Profil, Logout (no Login/Daftar)
+       Targets that are missing/invisible are skipped automatically. */
 
     function buildSteps() {
         var isLoggedIn = !!document.querySelector('.nav-btn-logout');
@@ -207,7 +206,7 @@
                 element: '#sidebar',
                 popover: {
                     title:       '🗂️ Panel Fitur Peta',
-                    description: 'Panel kiri ini adalah pusat pengendalian Dashboard AQUAVISION. Seluruh fitur analisis, visualisasi data, dan informasi sumber daya air dapat diakses melalui bagian ini. Panel ini akan tetap terlihat selama panduan berlangsung.',
+                    description: 'Panel ini adalah tempat utama untuk menggunakan semua fitur AQUAVISION — mengaktifkan layer peta, melihat legenda, mencari lokasi, dan mengakses analisis data sumber daya air.',
                     position:    'right'
                 }
             },
@@ -216,8 +215,8 @@
             {
                 element: '#btnLayer',
                 popover: {
-                    title:       '🗂️ Daftar Layer',
-                    description: 'Klik tombol ini untuk membuka atau menutup daftar layer peta. Aktifkan layer yang ingin dianalisis — misalnya Potensi Air Tanah, Debit Puncak Aliran, atau Infrastruktur Air.',
+                    title:       '🗺️ Tampilkan Data di Peta',
+                    description: 'Klik tombol ini untuk memilih data apa yang ingin ditampilkan di peta — misalnya lokasi sumber air, jaringan pipa, potensi air tanah, atau debit aliran sungai.',
                     position:    'right'
                 }
             },
@@ -226,190 +225,126 @@
             {
                 element: '#legendCard',
                 popover: {
-                    title:       '🎨 Legenda Peta',
-                    description: 'Legenda menampilkan arti warna dan simbol pada peta. Legenda akan otomatis menyesuaikan dengan layer yang sedang Anda aktifkan.',
+                    title:       '🎨 Keterangan Warna Peta',
+                    description: 'Bagian ini menjelaskan arti setiap warna dan simbol yang muncul di peta. Keterangan akan berubah sesuai data yang sedang ditampilkan.',
                     position:    'right'
                 }
             },
 
-            // ── 4. PENGUKURAN JARAK ───────────────────────────────────
-            {
-                element: '#btnDistance',
-                popover: {
-                    title:       '📏 Pengukuran Jarak',
-                    description: 'Ukur jarak antar dua titik di peta — klik dua titik langsung di peta, atau masukkan koordinat secara manual.',
-                    position:    'right'
-                }
-            },
-
-            // ── 5. RINGKASAN DATA ─────────────────────────────────────
-            {
-                element: '.accordion-header[data-target="statsBody"]',
-                __accordionId: 'statsBody',
-                popover: {
-                    title:       '📊 Ringkasan Data',
-                    description: 'Ringkasan jumlah objek yang tersedia: sumber air, segmen sungai, hotel, rumah makan, jasa, dan penduduk. Data diperbarui otomatis dari sistem.',
-                    position:    'right'
-                }
-            },
-
-            // ── 6. KETERSEDIAAN AIR ───────────────────────────────────
-            {
-                element: '.accordion-header[data-target="debitBody"]',
-                __accordionId: 'debitBody',
-                popover: {
-                    title:       '💧 Ketersediaan Air',
-                    description: 'Kondisi ketersediaan air berdasarkan analisis sistem. Status <b>AMAN</b> = kebutuhan &lt; 50% ketersediaan; <b>WASPADA</b> = 50–80%; <b>KRITIS</b> = ≥ 80%.',
-                    position:    'right'
-                }
-            },
-
-            // ── 7. SIMULASI SKENARIO ──────────────────────────────────
-            {
-                element: '#simHeader',
-                __accordionId: 'simBody',
-                popover: {
-                    title:       '🔢 Simulasi Skenario',
-                    description: 'Simulasikan kebutuhan air berdasarkan skenario wisata. Masukkan jumlah penduduk, kamar hotel, kursi restoran, atau luas pertanian, lalu klik <b>Hitung Simulasi</b>.',
-                    position:    'right'
-                }
-            },
-
-            // ── 8. GRAFIK KETERSEDIAAN AIR ────────────────────────────
-            {
-                element: '#chartHeader',
-                __accordionId: 'chartBody',
-                popover: {
-                    title:       '📈 Grafik Ketersediaan Air',
-                    description: 'Visualisasi hasil analisis ketersediaan air. Nilai di atas 100% menunjukkan kondisi defisit — kapasitas sumber tidak mencukupi kebutuhan.',
-                    position:    'right'
-                }
-            },
-
-            // ── 9. CARI LOKASI ─────────────────────────────────────────
+            // ── 4. CARI LOKASI ─────────────────────────────────────────
             {
                 element: '#mapSearchInput',
                 popover: {
                     title:       '🔍 Cari Lokasi',
-                    description: 'Ketikkan nama lokasi di sini untuk menemukan tempat tertentu dengan cepat. Tekan <b>Enter</b> untuk mulai pencarian.',
+                    description: 'Ketik nama tempat atau desa untuk langsung menemukan lokasinya di peta. Tekan <b>Enter</b> untuk mulai mencari.',
                     position:    'bottom'
                 }
             },
 
-            // ── 10. EXPORT ─────────────────────────────────────────────
+            // ── 5. EXPORT ─────────────────────────────────────────────
             {
                 element: '#btnPrintMap',
                 popover: {
-                    title:       '🖨️ Ekspor Peta',
-                    description: 'Ekspor tampilan peta saat ini sebagai gambar PNG. Aktifkan layer yang ingin disertakan sebelum mengekspor.',
+                    title:       '🖨️ Simpan Gambar Peta',
+                    description: 'Simpan tampilan peta saat ini sebagai gambar. Aktifkan layer yang diinginkan terlebih dahulu, lalu klik tombol ini.',
                     position:    'bottom'
                 }
             },
 
-            // ── 11. TENTANG AQUAVISION ───────────────────────────────────
+            // ── 6. TENTANG AQUAVISION ─────────────────────────────────
             {
                 element: '.nav-links a[href="/tentang/"]',
                 popover: {
-                    title:       '🏠 Tentang AQUAVISION',
-                    description: 'Menu Tentang AQUAVISION berisi informasi umum AQUAVISION, latar belakang sistem, dan gambaran fitur utama.',
+                    title:       'ℹ️ Tentang AQUAVISION',
+                    description: 'Pelajari lebih lanjut tentang AQUAVISION — apa itu, untuk siapa, dan bagaimana platform ini membantu pengelolaan sumber daya air Desa Wonotoro.',
                     position:    'bottom'
                 }
             },
 
-            // ── 12. DASHBOARD ──────────────────────────────────────────
-            {
-                element: '.nav-links a[href="/"]',
-                popover: {
-                    title:       '🗺️ Dashboard',
-                    description: 'Menu Dashboard membawa Anda ke halaman ini — pusat analisis spasial dan visualisasi data sumber daya air AQUAVISION.',
-                    position:    'bottom'
-                }
-            },
-
-            // ── 13. DATA PORTAL ────────────────────────────────────────
+            // ── 7. DATA PORTAL ────────────────────────────────────────
             {
                 element: '.nav-links a[href="/data/"]',
                 popover: {
-                    title:       '📊 Data Portal',
-                    description: 'Tabel lengkap seluruh dataset dengan pencarian dan paginasi. Unduh dalam format CSV, GeoJSON, KML, atau Shapefile.',
+                    title:       '📊 Unduh Data',
+                    description: 'Lihat dan unduh semua data yang tersedia dalam sistem — dalam format spreadsheet, peta digital, atau file GIS untuk keperluan analisis lanjutan.',
                     position:    'bottom'
                 }
             }
         ];
 
         if (isLoggedIn) {
-            // ── 14. HUBUNGI ADMIN ─────────────────────────────────────
+            // ── 8. HUBUNGI ADMIN ──────────────────────────────────────
             steps.push({
                 element: '.nav-links a[href="/hubungi/"]',
                 popover: {
-                    title:       '✉️ Hubungi Admin',
-                    description: 'Punya pertanyaan? Kirim pesan ke tim AQUAVISION melalui menu ini. AI Assistant akan mencoba menjawab dulu — jika belum bisa, pertanyaan Anda diteruskan ke Admin.',
+                    title:       '✉️ Tanya atau Hubungi Tim',
+                    description: 'Ada pertanyaan tentang data atau sistem? Kirim pesan langsung ke tim AQUAVISION. Pertanyaan umum dijawab otomatis, pertanyaan khusus akan diteruskan ke admin.',
                     position:    'bottom'
                 }
             });
-            // ── 15. PUSAT BANTUAN ──────────────────────────────────────
+            // ── 9. PUSAT BANTUAN ──────────────────────────────────────
             steps.push({
                 element: '.nav-links a[href="/bantuan/"]',
                 popover: {
-                    title:       '❓ Pusat Bantuan',
-                    description: 'Kumpulan panduan dan FAQ seputar AQUAVISION — mulai dari cara membaca peta hingga mengunduh data.',
+                    title:       '❓ Panduan Penggunaan',
+                    description: 'Kumpulan panduan singkat dan jawaban atas pertanyaan yang sering ditanyakan — cara membaca peta, cara mengunduh data, dan lainnya.',
                     position:    'bottom'
                 }
             });
-            // ── 16. PROFIL ─────────────────────────────────────────────
+            // ── 10. PROFIL ────────────────────────────────────────────
             steps.push({
                 element: '.nav-user',
                 popover: {
-                    title:       '👤 Profil',
-                    description: 'Menampilkan akun yang sedang Anda gunakan untuk mengakses AQUAVISION.',
+                    title:       '👤 Akun Anda',
+                    description: 'Ini adalah akun yang sedang Anda gunakan untuk masuk ke AQUAVISION.',
                     position:    'bottom'
                 }
             });
-            // ── 17. LOGOUT ─────────────────────────────────────────────
+            // ── 11. LOGOUT ────────────────────────────────────────────
             steps.push({
                 element: '.nav-btn-logout',
                 popover: {
-                    title:       '🚪 Logout',
-                    description: 'Keluar dari akun Anda dengan aman setelah selesai menggunakan AQUAVISION.',
+                    title:       '🚪 Keluar',
+                    description: 'Klik di sini untuk keluar dari akun Anda dengan aman setelah selesai menggunakan AQUAVISION.',
                     position:    'bottom'
                 }
             });
         } else {
-            // ── 14. PUSAT BANTUAN ──────────────────────────────────────
+            // ── 8. PUSAT BANTUAN ──────────────────────────────────────
             steps.push({
                 element: '.nav-links a[href="/bantuan/"]',
                 popover: {
-                    title:       '❓ Pusat Bantuan',
-                    description: 'Kumpulan panduan dan FAQ seputar AQUAVISION — mulai dari cara membaca peta hingga mengunduh data.',
+                    title:       '❓ Panduan Penggunaan',
+                    description: 'Kumpulan panduan singkat dan jawaban atas pertanyaan yang sering ditanyakan — cara membaca peta, cara mengunduh data, dan lainnya.',
                     position:    'bottom'
                 }
             });
-            // ── 15. LOGIN ──────────────────────────────────────────────
+            // ── 9. LOGIN ──────────────────────────────────────────────
             steps.push({
                 element: '.nav-btn-login',
                 popover: {
-                    title:       '🔑 Login',
-                    description: 'Masuk dengan akun Anda untuk mengakses fitur tambahan seperti Hubungi Admin dan input data (khusus pengelola).',
+                    title:       '🔑 Masuk ke Sistem',
+                    description: 'Masuk dengan akun Anda untuk mengakses fitur lengkap AQUAVISION, termasuk kirim pertanyaan ke admin.',
                     position:    'bottom'
                 }
             });
-            // ── 16. DAFTAR ─────────────────────────────────────────────
+            // ── 10. DAFTAR ────────────────────────────────────────────
             steps.push({
                 element: '.nav-btn-register',
                 popover: {
-                    title:       '📝 Daftar',
-                    description: 'Belum punya akun? Daftar gratis untuk mendapatkan akses fitur tambahan AQUAVISION.',
+                    title:       '📝 Buat Akun Baru',
+                    description: 'Belum punya akun? Daftar gratis untuk mengakses semua fitur AQUAVISION.',
                     position:    'bottom'
                 }
             });
         }
 
-        // ── SELESAI ────────────────────────────────────────────────────
+        // ── SELESAI ───────────────────────────────────────────────────
         steps.push({
             element: '#btnGuide',
             popover: {
-                title:       '🎉 Panduan Selesai',
-                description: 'Anda siap menggunakan AQUAVISION! Aktifkan layer, klik objek di peta untuk detail. Untuk mengulang panduan kapan saja, klik tombol <b>✨ Jelajahi Dashboard</b> di pojok kanan bawah, atau tombol <b>ⓘ Lihat Panduan Dashboard</b> ini.',
+                title:       '🎉 Siap Menjelajah!',
+                description: 'Panduan selesai. Sekarang Anda bisa mulai menjelajahi data sumber daya air Desa Wonotoro. Untuk mengulang panduan ini kapan saja, klik tombol <b>ⓘ Lihat Panduan Dashboard</b> ini.',
                 position:    'right'
             }
         });

@@ -290,12 +290,14 @@ document.addEventListener("DOMContentLoaded", function () {
                         var color = getPotensiColor(dn);
 
                         l.bindPopup(
-                            '<div style="font-size:13px;min-width:180px;">' +
-                                '<div style="font-weight:600;color:' + color + ';border-bottom:1px solid #eee;padding-bottom:4px;margin-bottom:6px;">💧 Daerah Potensi Air Tanah</div>' +
-                                "<div>Kelas: <b>" + dn + "</b></div>" +
-                                '<div>Potensi: <b style="color:' + color + ';">' + label + "</b></div>" +
-                            "</div>"
+                            '<div style="font-family:\'Inter\',sans-serif;padding:2px 0;min-width:160px;">' +
+                                '<div style="font-weight:700;font-size:13px;color:' + color + ';margin-bottom:8px;border-bottom:1px solid rgba(0,0,0,.08);padding-bottom:6px;">💧 Potensi Air Tanah</div>' +
+                                '<div style="font-size:22px;font-weight:700;color:' + color + ';letter-spacing:-.3px;">' + label + '</div>' +
+                            '</div>'
                         );
+
+                        // Prevent map-level click popup from firing on top of this popup
+                        l.on("click", function (ev) { L.DomEvent.stopPropagation(ev); });
 
                         l.on("mouseover", function () { mouseOnPotensi = true; });
 
@@ -350,18 +352,39 @@ document.addEventListener("DOMContentLoaded", function () {
                     },
                     onEachFeature: function (f, l) {
                         l.on("click", function (ev) {
-                            var kelas = f.properties.DN || f.properties.dn || f.properties.VALUE || 1;
-                            var warna = getDebitColor(kelas);
                             var bulanLabel = BULAN_LABEL[BULAN.indexOf(kode)];
-                            var ranges = ["0–5", "5–10", "10–15", "15–21", "21–26", "26–31", "31–36", ">36"];
-                            var rangeStr = ranges[Math.max(0, Math.min(7, Math.round(kelas) - 1))];
-                            L.popup().setLatLng(ev.latlng).setContent(
-                                '<div style="font-size:13px;min-width:180px;">' +
-                                    '<div style="font-weight:600;color:' + warna + ';border-bottom:1px solid #eee;padding-bottom:4px;margin-bottom:6px;">🌊 Debit Puncak — ' + bulanLabel + "</div>" +
-                                    '<div>Kelas: <b>' + kelas + "</b></div>" +
-                                    '<div>Debit: <b style="color:' + warna + ';">' + rangeStr + " m³/s</b></div>" +
-                                "</div>"
-                            ).openOn(map);
+                            var lat = ev.latlng.lat;
+                            var lng = ev.latlng.lng;
+                            var actualVal = getDebitRasterValue(lat, lng);
+                            var content;
+
+                            if (actualVal !== null) {
+                                var dKelas =
+                                    actualVal <= 5  ? 1 : actualVal <= 10 ? 2 : actualVal <= 15 ? 3 :
+                                    actualVal <= 21 ? 4 : actualVal <= 26 ? 5 : actualVal <= 31 ? 6 :
+                                    actualVal <= 36 ? 7 : 8;
+                                var warna = getDebitColor(dKelas);
+                                content =
+                                    '<div style="font-family:\'Inter\',sans-serif;padding:2px 0;min-width:160px;">' +
+                                        '<div style="font-weight:700;font-size:13px;color:' + warna + ';margin-bottom:8px;border-bottom:1px solid rgba(0,0,0,.08);padding-bottom:6px;">🌊 Debit Puncak — ' + bulanLabel + '</div>' +
+                                        '<div style="font-size:22px;font-weight:700;color:' + warna + ';letter-spacing:-.3px;">' + actualVal.toFixed(2) + ' <span style="font-size:13px;font-weight:400;color:#666;">m³/s</span></div>' +
+                                    '</div>';
+                            } else {
+                                // TIFF belum dimuat — tampilkan estimasi tanpa kelas
+                                var kelas = f.properties.DN || f.properties.dn || f.properties.VALUE || 1;
+                                var warna = getDebitColor(Math.max(1, Math.min(8, Math.round(kelas))));
+                                var ranges = ["0–5","5–10","10–15","15–21","21–26","26–31","31–36",">36"];
+                                var rangeStr = ranges[Math.max(0, Math.min(7, Math.round(kelas) - 1))];
+                                content =
+                                    '<div style="font-family:\'Inter\',sans-serif;padding:2px 0;min-width:160px;">' +
+                                        '<div style="font-weight:700;font-size:13px;color:' + warna + ';margin-bottom:8px;border-bottom:1px solid rgba(0,0,0,.08);padding-bottom:6px;">🌊 Debit Puncak — ' + bulanLabel + '</div>' +
+                                        '<div style="font-size:22px;font-weight:700;color:' + warna + ';letter-spacing:-.3px;">~' + rangeStr + ' <span style="font-size:13px;font-weight:400;color:#666;">m³/s</span></div>' +
+                                        '<div style="font-size:10px;color:#aaa;margin-top:6px;">Data piksel sedang dimuat…</div>' +
+                                    '</div>';
+                            }
+
+                            L.popup({ maxWidth: 240 }).setLatLng(ev.latlng).setContent(content).openOn(map);
+                            ev.originalEvent.stopPropagation();
                             L.DomEvent.stopPropagation(ev);
                         });
                     }

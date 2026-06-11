@@ -1217,12 +1217,18 @@ def hubungi_send(request):
             status__in=['waiting_admin', 'WAITING_FOR_ADMIN'],
             updated_at__lte=conv.updated_at,
         ).count()
+        if queue_position <= 2:
+            eta = "10–30 menit"
+        elif queue_position <= 6:
+            eta = "30–60 menit"
+        else:
+            eta = "1–24 jam"
         reply_text = (
-            "Baik, pertanyaan Anda telah diteruskan ke Admin AQUAVISION.\n\n"
+            "🟡 Pertanyaan Anda telah diteruskan ke Admin AQUAVISION.\n\n"
             f"📋 Nomor Tiket: {conv.ticket_id}\n"
-            f"👥 Posisi Antrian: {queue_position}\n"
-            "⏱ Estimasi Respon: < 24 Jam\n\n"
-            "Anda akan menerima balasan segera setelah Admin merespons."
+            f"🔢 Posisi Antrian: #{queue_position}\n"
+            f"⏱ Estimasi Balasan: {eta}\n\n"
+            "Anda akan menerima notifikasi segera setelah Admin merespons."
         )
     elif declines_escalation:
         conv.status = 'ai_answered'
