@@ -182,13 +182,17 @@ class Feedback(models.Model):
 class Conversation(models.Model):
     STATUS_CHOICES = [
         ('open',              'Open'),
-        ('WAITING_FOR_ADMIN', 'Waiting for Admin'),
-        ('closed',            'Closed'),
+        ('ai_answered',       'Dijawab AI'),
+        ('waiting_admin',     'Menunggu Admin'),
+        ('WAITING_FOR_ADMIN', 'Menunggu Admin (lama)'),
+        ('reviewing',         'Sedang Ditinjau'),
+        ('closed',            'Selesai'),
     ]
 
     user       = models.OneToOneField(User, on_delete=models.CASCADE, related_name='conversation')
     subject    = models.CharField(max_length=200, blank=True, default='')
     status     = models.CharField(max_length=20, choices=STATUS_CHOICES, default='open')
+    ticket_id  = models.CharField(max_length=30, blank=True, default='')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

@@ -294,6 +294,87 @@ a   { text-decoration: none; color: inherit; }
 
 .footer-caption { font-size: 11px; color: rgba(255,255,255,.2); }
 
+.footer-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+.footer-nav-link {
+    font-size: 11px;
+    color: rgba(255,255,255,.3);
+    text-decoration: none;
+    transition: color .15s;
+}
+.footer-nav-link:hover { color: rgba(255,255,255,.65); }
+
+
+/* ================================================================
+   AQUAVISION ENHANCEMENT — UX & Engagement Components
+================================================================ */
+
+/* ── Sidebar Hero Block ─────────────────────────────────────── */
+.shb {
+    padding: 12px 14px 11px;
+    border-bottom: 1px solid rgba(255,255,255,.06);
+    margin-bottom: 6px;
+}
+.shb-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:2px; }
+.shb-brand { font-size:14px; font-weight:700; color:#60A5FA; letter-spacing:.5px; }
+.shb-dot-status {
+    width:9px; height:9px; border-radius:50%;
+    background:rgba(255,255,255,.2); flex-shrink:0;
+    transition:background .6s; box-shadow:0 0 4px currentColor;
+}
+.shb-sub { font-size:10px; color:rgba(255,255,255,.3); margin-bottom:9px; }
+.shb-stats-row { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:9px; }
+.shb-stat { font-size:11px; color:rgba(255,255,255,.45); }
+.shb-stat strong { color:#93C5FD; }
+.shb-welcome {
+    font-size:11px; color:rgba(255,255,255,.35);
+    border-top:1px solid rgba(255,255,255,.05);
+    padding-top:8px; line-height:1.55;
+}
+.shb-welcome strong { color:rgba(255,255,255,.6); }
+
+/* ── Quick Action Grid ───────────────────────────────────────── */
+.qa-grid { display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:4px; }
+.qa-btn {
+    display:block; width:100%;
+    background:rgba(255,255,255,.04);
+    border:1px solid rgba(255,255,255,.08);
+    color:rgba(255,255,255,.55);
+    border-radius:8px; padding:10px 6px;
+    font-size:11px; text-align:center; cursor:pointer;
+    line-height:1.5; transition:background .15s, color .15s;
+    font-family:'Inter',sans-serif;
+}
+.qa-btn:hover { background:rgba(59,130,246,.12); color:rgba(147,197,253,.9); border-color:rgba(59,130,246,.2); }
+
+/* ── Quick Insight ────────────────────────────────────────────── */
+.quick-insight {
+    font-size:11px; color:rgba(255,255,255,.45);
+    margin-top:8px; padding:8px 10px;
+    background:rgba(255,255,255,.03);
+    border-radius:6px; border-left:3px solid rgba(255,255,255,.1);
+    line-height:1.6; transition:border-color .4s;
+}
+.qi-aman    { border-left-color:#22C55E; }
+.qi-waspada { border-left-color:#EAB308; }
+.qi-kritis  { border-left-color:#EF4444; }
+
+/* ── Tahukah Anda? ─────────────────────────────────────────────── */
+.dyk-text { font-size:11px; color:rgba(255,255,255,.5); line-height:1.7; margin:0; transition:opacity .3s; }
+
+/* ── Map Empty State ─────────────────────────────────────────────── */
+.map-empty-state {
+    position:absolute; top:42%; left:50%; transform:translateX(-50%);
+    z-index:200; text-align:center; pointer-events:none;
+    transition:opacity .3s;
+}
+.mes-icon  { font-size:28px; display:block; margin-bottom:6px; }
+.mes-title { font-size:13px; font-weight:500; color:rgba(255,255,255,.3); display:block; margin-bottom:4px; }
+.mes-text  { font-size:11px; color:rgba(255,255,255,.18); display:block; max-width:240px; line-height:1.6; margin:0 auto; }
+
 
 /* ================================================================
    5. SHARED BUTTONS
@@ -1486,6 +1567,7 @@ a   { text-decoration: none; color: inherit; }
         align-items: center;
     }
     .footer-left { flex-direction: column; align-items: center; text-align: center; }
+    .footer-nav { flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 8px 16px; }
     .footer-right { border-top: 1px solid rgba(255,255,255,.07); padding-top: 14px; width: 100%; text-align: center; }
 }
 

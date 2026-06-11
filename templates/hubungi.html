@@ -148,6 +148,31 @@
     .chat-messages { height: 260px; }
     .chat-send-btn { padding: 10px 14px; font-size: 13px; }
 }
+
+/* Help Desk — ticket & status UI */
+.ticket-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    background: rgba(59,130,246,.06); border: 1px solid rgba(59,130,246,.15);
+    border-radius: 10px; padding: 10px 16px; margin-bottom: 14px;
+    font-size: 13px; gap: 12px; flex-wrap: wrap;
+}
+.ticket-num { color: #374151; }
+.status-sbadge {
+    font-size: 12px; font-weight: 600; padding: 4px 12px;
+    border-radius: 20px; background: rgba(107,114,128,.1); color: #374151;
+    white-space: nowrap;
+}
+.queue-info {
+    background: rgba(245,158,11,.06); border: 1px solid rgba(245,158,11,.2);
+    border-radius: 8px; padding: 9px 14px; margin-bottom: 14px;
+    font-size: 12.5px; color: #78350F;
+}
+.notif-reply-banner {
+    background: rgba(16,185,129,.07); border: 1px solid rgba(16,185,129,.25);
+    border-radius: 10px; padding: 10px 14px; margin-bottom: 12px;
+    font-size: 13px; color: #065F46;
+    display: none; align-items: center; gap: 8px;
+}
 </style>
 {% endblock %}
 
@@ -155,12 +180,21 @@
 <div class="hubungi-wrap">
     <div class="hubungi-head">
         <h1>Hubungi <em>Admin</em></h1>
-        <p>Kirim pertanyaan kepada AQUAVISION. AI akan mencoba menjawab otomatis; jika tidak berhasil, admin akan membalas secepatnya.</p>
+        <p>Punya pertanyaan? Ketik di bawah — AQUAVISION akan berusaha menjawab. Jika perlu bantuan lebih lanjut, tim Admin kami akan membalas secepatnya.</p>
     </div>
 
-    {% if conversation.status == 'WAITING_FOR_ADMIN' %}
-    <div class="waiting-banner">⏳ Pertanyaan Anda telah diteruskan kepada Admin AQUAVISION dan sedang menunggu balasan.</div>
-    {% endif %}
+    <div class="ticket-bar" id="ticketBar" {% if not conversation.ticket_id %}style="display:none;"{% endif %}>
+        <span class="ticket-num">🎫 Tiket: <strong id="ticketNum">{{ conversation.ticket_id|default:"—" }}</strong></span>
+        <span class="status-sbadge" id="statusSbadge">{% if conversation.status == 'ai_answered' %}🟢 Dijawab AI{% elif conversation.status == 'waiting_admin' or conversation.status == 'WAITING_FOR_ADMIN' %}🟡 Menunggu Admin{% elif conversation.status == 'reviewing' %}🔵 Sedang Ditinjau{% elif conversation.status == 'closed' %}✅ Selesai{% else %}💬 Aktif{% endif %}</span>
+    </div>
+
+    <div class="queue-info" id="queueInfo" {% if conversation.status != 'waiting_admin' and conversation.status != 'WAITING_FOR_ADMIN' %}style="display:none;"{% endif %}>
+        📋 Saat ini ada <strong id="queueCountDyn">{{ queue_count }}</strong> pertanyaan yang menunggu balasan Admin AQUAVISION.
+    </div>
+
+    <div class="notif-reply-banner" id="notifReplyBanner">
+        🔔 Admin AQUAVISION telah membalas pertanyaan Anda.
+    </div>
 
     {% if is_admin %}
     <div class="admin-banner">
@@ -188,6 +222,35 @@
     var myName   = "{{ request.user.username|escapejs }}";
     var lastId   = 0;
     var pollTimer = null;
+
+    var _STATUS_LABELS = {
+        'ai_answered':       '🟢 Dijawab AI',
+        'waiting_admin':     '🟡 Menunggu Admin',
+        'WAITING_FOR_ADMIN': '🟡 Menunggu Admin',
+        'reviewing':         '🔵 Sedang Ditinjau',
+        'closed':            '✅ Selesai',
+        'open':              '💬 Aktif',
+    };
+
+    function updateStatusDisplay(status, ticketId, queueCount) {
+        var badge = document.getElementById('statusSbadge');
+        var bar   = document.getElementById('ticketBar');
+        var tn    = document.getElementById('ticketNum');
+        var qi    = document.getElementById('queueInfo');
+        var qc    = document.getElementById('queueCountDyn');
+        if (badge) badge.textContent = _STATUS_LABELS[status] || '💬 Aktif';
+        if (ticketId && tn) tn.textContent = ticketId;
+        if (ticketId && bar) bar.style.display = 'flex';
+        if (qi) qi.style.display = (status === 'waiting_admin' || status === 'WAITING_FOR_ADMIN') ? 'block' : 'none';
+        if (qc && queueCount !== undefined) qc.textContent = queueCount;
+    }
+
+    function showReplyNotif() {
+        var n = document.getElementById('notifReplyBanner');
+        if (!n) return;
+        n.style.display = 'flex';
+        setTimeout(function () { n.style.display = 'none'; }, 8000);
+    }
 
     function getCsrf() {
         var m = document.cookie.match(/csrftoken=([^;]+)/);
@@ -231,7 +294,14 @@
         fetch('/hubungi/messages/?since=' + lastId)
             .then(function (r) { return r.json(); })
             .then(function (data) {
-                data.forEach(appendMsg);
+                var msgs = Array.isArray(data) ? data : (data.messages || []);
+                var hadNewAdmin = false;
+                msgs.forEach(function (m) {
+                    if (m.is_admin && !m.is_ai_response) hadNewAdmin = true;
+                    appendMsg(m);
+                });
+                if (data.conv_status) updateStatusDisplay(data.conv_status, data.ticket_id, data.queue_count);
+                if (hadNewAdmin) showReplyNotif();
             })
             .catch(function () {});
     }
@@ -257,13 +327,13 @@
             if (d.error) { alert(d.error); return; }
             inp.value = '';
             inp.style.height = 'auto';
-            // New format: {user_msg, ai_msg}
             if (d.user_msg) {
                 appendMsg(d.user_msg);
                 if (d.ai_msg) appendMsg(d.ai_msg);
             } else {
-                appendMsg(d); // fallback for old format
+                appendMsg(d);
             }
+            if (d.conv_status) updateStatusDisplay(d.conv_status, d.ticket_id);
         })
         .catch(function () { btn.disabled = false; });
     }

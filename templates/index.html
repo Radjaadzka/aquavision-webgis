@@ -6,7 +6,10 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@0.9.8/dist/driver.min.css">
 <style>
-/* Driver.js tour — transparent stage prevents white box on dark sidebar */
+/* Driver.js v0.9.8 tour overrides.
+   Overlay z-index=100002, Stage=100003, HighlightedElement=100004, Popover=1000000000.
+   Containers visible during tour are elevated to 100004 via tour.js lockSidebar/lockNavbar/lockMapControls.
+   The stage #FFF background creates a "white box" on dark elements — override to transparent. */
 #driver-highlighted-element-stage { background-color: transparent !important; }
 /* Layer info button */
 .lyr-info {
@@ -67,24 +70,43 @@
 
         <div class="sidebar-scroll">
 
+            <!-- ── Sidebar Hero + Status ─────────────────────── -->
+            <div class="shb">
+                <div class="shb-top">
+                    <span class="shb-brand">AQUAVISION</span>
+                    <span class="shb-dot-status" id="shbDot" title="Status ketersediaan air saat ini"></span>
+                </div>
+                <div class="shb-sub">Platform Informasi Sumber Daya Air · Desa Wonotoro</div>
+                <div class="shb-stats-row">
+                    <span class="shb-stat">💧 <strong id="heroAir">—</strong> Sumber</span>
+                    <span class="shb-stat">🌊 <strong>28</strong> Sungai</span>
+                    <span class="shb-stat">🚰 <strong id="heroReservoir">—</strong> Tandon</span>
+                </div>
+                <div class="shb-welcome">
+                    {% if user.is_authenticated %}
+                        {% if is_admin %}Selamat datang, Admin <strong>{{ user.username }}</strong>. Kelola data AQUAVISION.{% else %}Selamat datang kembali, <strong>{{ user.username }}</strong>.{% endif %}
+                    {% else %}Jelajahi sumber daya air Desa Wonotoro secara interaktif.{% endif %}
+                </div>
+            </div>
+
             <!-- Daftar Layer -->
             <button class="menu-btn" id="btnLayer">Daftar Layer</button>
             <div id="layerPanel" class="layer-panel">
 
                 <p>Batas & Wilayah</p>
-                <label><input type="checkbox" id="chkAdminGab"> Administrasi Desa <span class="lyr-info" onclick="showLayerInfo('administrasi')">ℹ</span></label>
+                <label title="Batas administrasi wilayah dan dusun-dusun di Desa Wonotoro."><input type="checkbox" id="chkAdminGab"> Administrasi Desa <span class="lyr-info" onclick="showLayerInfo('administrasi')">ℹ</span></label>
                 <hr>
 
                 <p>Infrastruktur Air</p>
-                <label><input type="checkbox" id="chkAir">          Sumber Air <span class="lyr-info" onclick="showLayerInfo('sumber_air')">ℹ</span></label>
-                <label><input type="checkbox" id="chkReservoir">    Tandon Air <span class="lyr-info" onclick="showLayerInfo('reservoir')">ℹ</span></label>
-                <label><input type="checkbox" id="chkPipa">         Jaringan Pipa <span class="lyr-info" onclick="showLayerInfo('pipa')">ℹ</span></label>
-                <label><input type="checkbox" id="chkSungaiVektor"> Daerah Aliran Sungai <span class="lyr-info" onclick="showLayerInfo('sungai')">ℹ</span></label>
+                <label title="Lokasi mata air dan sumber air minum aktif yang melayani penduduk Desa Wonotoro."><input type="checkbox" id="chkAir">          Sumber Air <span class="lyr-info" onclick="showLayerInfo('sumber_air')">ℹ</span></label>
+                <label title="Lokasi bak penampungan dan tandon air yang mendistribusikan air ke permukiman."><input type="checkbox" id="chkReservoir">    Tandon Air <span class="lyr-info" onclick="showLayerInfo('reservoir')">ℹ</span></label>
+                <label title="Jalur jaringan pipa distribusi air dari sumber ke tandon dan permukiman."><input type="checkbox" id="chkPipa">         Jaringan Pipa <span class="lyr-info" onclick="showLayerInfo('pipa')">ℹ</span></label>
+                <label title="Jaringan sungai dan daerah aliran sungai (DAS) di wilayah Desa Wonotoro."><input type="checkbox" id="chkSungaiVektor"> Daerah Aliran Sungai <span class="lyr-info" onclick="showLayerInfo('sungai')">ℹ</span></label>
                 <hr>
 
                 <p>Analisis Hidrologi</p>
-                <label><input type="checkbox" id="chkPotensiAirTanah"> Daerah Potensi Air Tanah <small style="color:rgba(255,255,255,.25);font-size:10px;">10m×10m</small> <span class="lyr-info" onclick="showLayerInfo('potensi')">ℹ</span></label>
-                <label><input type="checkbox" id="chkDebitPuncak">     Debit Puncak Aliran <small style="color:rgba(255,255,255,.25);font-size:10px;">30m×30m</small> <span class="lyr-info" onclick="showLayerInfo('debit')">ℹ</span></label>
+                <label title="Area berpotensi menyimpan cadangan air tanah, hasil analisis AHP 5 kriteria. Resolusi: 10m × 10m."><input type="checkbox" id="chkPotensiAirTanah"> Daerah Potensi Air Tanah <small style="color:rgba(255,255,255,.25);font-size:10px;">10m×10m</small> <span class="lyr-info" onclick="showLayerInfo('potensi')">ℹ</span></label>
+                <label title="Estimasi debit aliran permukaan maksimum saat hujan, tersedia untuk 12 bulan. Resolusi: 30m × 30m."><input type="checkbox" id="chkDebitPuncak">     Debit Puncak Aliran <small style="color:rgba(255,255,255,.25);font-size:10px;">30m×30m</small> <span class="lyr-info" onclick="showLayerInfo('debit')">ℹ</span></label>
                 <div id="debitBulanPanel" style="display:none; margin:4px 0 4px 6px;">
                     <select id="selectDebitBulan" style="font-size:12px;">
                         <option value="">-- Pilih Bulan --</option>
@@ -105,10 +127,10 @@
                 <hr>
 
                 <p>Fasilitas & Penduduk</p>
-                <label><input type="checkbox" id="chkHotel">      Hotel <span class="lyr-info" onclick="showLayerInfo('fasilitas')">ℹ</span></label>
-                <label><input type="checkbox" id="chkMakan">      Tempat Makan</label>
-                <label><input type="checkbox" id="chkJasa">       Jasa</label>
-                <label><input type="checkbox" id="chkPermukiman"> Permukiman <span class="lyr-info" onclick="showLayerInfo('permukiman')">ℹ</span></label>
+                <label title="Lokasi hotel dan penginapan di kawasan wisata sekitar Bromo."><input type="checkbox" id="chkHotel">      Hotel <span class="lyr-info" onclick="showLayerInfo('fasilitas')">ℹ</span></label>
+                <label title="Lokasi restoran dan warung makan yang beroperasi di kawasan wisata."><input type="checkbox" id="chkMakan">      Tempat Makan</label>
+                <label title="Lokasi usaha jasa (transportasi, sewa, dll.) yang mendukung pariwisata."><input type="checkbox" id="chkJasa">       Jasa</label>
+                <label title="Lokasi permukiman penduduk Desa Wonotoro beserta data jumlah KK dan penduduk."><input type="checkbox" id="chkPermukiman"> Permukiman <span class="lyr-info" onclick="showLayerInfo('permukiman')">ℹ</span></label>
 
             </div><!-- /layerPanel -->
 
@@ -185,6 +207,22 @@
                 </div>
             </div>
 
+            <!-- Quick Action -->
+            <div class="card">
+                <div class="accordion-header" data-target="quickActionBody">
+                    <h3>Apa yang ingin dilakukan?</h3>
+                    <span class="accordion-arrow">▼</span>
+                </div>
+                <div class="accordion-body" id="quickActionBody">
+                    <div class="qa-grid">
+                        <button class="qa-btn" onclick="window.qaFindAir && window.qaFindAir()">📍<br>Cari Sumber Air</button>
+                        <button class="qa-btn" onclick="window.qaViewStatus && window.qaViewStatus()">📊<br>Status Air</button>
+                        <a href="/data/" style="display:contents;"><button class="qa-btn">📥<br>Unduh Data</button></a>
+                        <a href="/hubungi/" style="display:contents;"><button class="qa-btn">📞<br>Hubungi Admin</button></a>
+                    </div>
+                </div>
+            </div>
+
             <!-- Dashboard Summary -->
             <div class="card">
                 <div class="accordion-header" data-target="statsBody">
@@ -204,11 +242,12 @@
                     {% else %}
                         <!-- Guest / User: statistik objek wisata & air -->
                         <div class="stat-mini"><div class="stat-mini-icon">💧</div><div class="stat-mini-num" id="countAir">—</div><div class="stat-mini-label">Sumber Air</div></div>
+                        <div class="stat-mini"><div class="stat-mini-icon">🚰</div><div class="stat-mini-num" id="countReservoir">—</div><div class="stat-mini-label">Tandon Air</div></div>
+                        <div class="stat-mini"><div class="stat-mini-icon">🌊</div><div class="stat-mini-num" id="countSungai">28</div><div class="stat-mini-label">Jaringan Sungai</div></div>
                         <div class="stat-mini"><div class="stat-mini-icon">🏨</div><div class="stat-mini-num" id="countHotel">—</div><div class="stat-mini-label">Hotel</div></div>
                         <div class="stat-mini"><div class="stat-mini-icon">🍽️</div><div class="stat-mini-num" id="countMakan">—</div><div class="stat-mini-label">Rumah Makan</div></div>
                         <div class="stat-mini"><div class="stat-mini-icon">🛠️</div><div class="stat-mini-num" id="countJasa">—</div><div class="stat-mini-label">Jasa</div></div>
-                        <div class="stat-mini"><div class="stat-mini-icon">🏗</div><div class="stat-mini-num" id="countReservoir">—</div><div class="stat-mini-label">Tandon Air</div></div>
-                        <div class="stat-mini"><div class="stat-mini-icon">🌊</div><div class="stat-mini-num" id="countSungai">28</div><div class="stat-mini-label">Jalur Sungai</div></div>
+                        <div class="stat-mini" style="grid-column:span 3;"><div class="stat-mini-icon">👥</div><div class="stat-mini-num" id="statPenduduk">—</div><div class="stat-mini-label">Total Penduduk</div></div>
                     {% endif %}
                     </div>
                 </div>
@@ -247,6 +286,9 @@
                             <span id="statusLabel"  style="font-weight:600; font-size:13px; color:rgba(255,255,255,.8);">-</span>
                             <span id="statusPersen" style="font-size:11px; color:rgba(255,255,255,.3); margin-left:6px;">0%</span>
                         </div>
+                    </div>
+                    <div class="quick-insight" id="quickInsight">
+                        <span id="quickInsightText">Memuat data ketersediaan air...</span>
                     </div>
                 </div>
             </div>
@@ -325,6 +367,47 @@
             </div>
             {% endif %}
 
+            <!-- Tahukah Anda? -->
+            <div class="card">
+                <div class="accordion-header" data-target="dykBody">
+                    <h3>📍 Tahukah Anda?</h3>
+                    <span class="accordion-arrow open">▼</span>
+                </div>
+                <div class="accordion-body open" id="dykBody">
+                    <p class="dyk-text" id="dykText">Memuat fakta menarik...</p>
+                </div>
+            </div>
+
+            <!-- Mengapa AQUAVISION -->
+            <div class="card">
+                <div class="accordion-header" data-target="whyBody">
+                    <h3>Mengapa AQUAVISION?</h3>
+                    <span class="accordion-arrow">▼</span>
+                </div>
+                <div class="accordion-body" id="whyBody">
+                    <p style="font-size:11px;color:rgba(255,255,255,.5);line-height:1.7;margin:0;">
+                        Desa Wonotoro mengandalkan sumber mata air alami sebagai suplai air bersih utama bagi penduduk dan kawasan wisata Bromo Tengger Semeru. Tanpa data spasial yang terstruktur, perencanaan distribusi air sulit dilakukan secara efisien.<br><br>
+                        AQUAVISION hadir untuk memetakan, memantau, dan menganalisis sumber daya air Desa Wonotoro secara digital — sehingga pemangku kepentingan dapat mengambil keputusan berbasis data.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Manfaat AQUAVISION -->
+            <div class="card">
+                <div class="accordion-header" data-target="benefitBody">
+                    <h3>Manfaat AQUAVISION</h3>
+                    <span class="accordion-arrow">▼</span>
+                </div>
+                <div class="accordion-body" id="benefitBody">
+                    <ul style="font-size:11px;color:rgba(255,255,255,.5);line-height:1.8;margin:0;padding-left:14px;">
+                        <li><strong style="color:rgba(255,255,255,.7);">Pemerintah Desa</strong> — Pemantauan ketersediaan air dan perencanaan infrastruktur berbasis data spasial.</li>
+                        <li><strong style="color:rgba(255,255,255,.7);">Pengelola Wisata</strong> — Estimasi kebutuhan air fasilitas hotel, restoran, dan jasa di kawasan Bromo.</li>
+                        <li><strong style="color:rgba(255,255,255,.7);">Masyarakat</strong> — Akses transparan terhadap data ketersediaan air bersih desa.</li>
+                        <li><strong style="color:rgba(255,255,255,.7);">Peneliti &amp; Akademisi</strong> — Dataset spasial terbuka (CSV, GeoJSON, KML, SHP) untuk analisis lanjutan.</li>
+                    </ul>
+                </div>
+            </div>
+
             <!-- Panduan Dashboard -->
             <button class="menu-btn" id="btnGuide"
                 onclick="window.resetTour && window.resetTour();"
@@ -376,6 +459,13 @@
             </div>
         </div>
 
+        <!-- Empty State (visible when no layers are active) -->
+        <div id="mapEmptyState" class="map-empty-state">
+            <span class="mes-icon">🗺️</span>
+            <span class="mes-title">Mulai Eksplorasi</span>
+            <span class="mes-text">Aktifkan layer pada panel kiri untuk melihat informasi sumber daya air Desa Wonotoro.</span>
+        </div>
+
         <!-- Loading overlay -->
         <div id="mapLoading" style="
             position:absolute; inset:0;
@@ -397,6 +487,14 @@
     </main><!-- /map-container -->
 
 </div><!-- /webgis-container -->
+
+<!-- ── Dashboard Intro Card ──────────────────────────────────────── -->
+<div id="introCard" style="display:none; position:fixed; bottom:60px; right:20px; z-index:490; width:260px; max-width:calc(100vw - 40px); background:linear-gradient(135deg,rgba(9,18,34,.97) 0%,rgba(13,27,52,.97) 100%); border:1px solid rgba(59,130,246,.25); border-radius:10px; padding:16px 16px 14px; box-shadow:0 8px 32px rgba(0,0,0,.55); font-family:'Inter',sans-serif; transition:opacity .3s;">
+    <button onclick="window.closeIntroCard && window.closeIntroCard()" aria-label="Tutup" style="position:absolute;top:8px;right:10px;background:none;border:none;color:rgba(255,255,255,.3);font-size:16px;cursor:pointer;line-height:1;padding:2px 6px;">✕</button>
+    <p style="font-size:13px;font-weight:600;color:#E2E8F0;margin:0 0 8px;padding-right:20px;">📍 Selamat Datang di AQUAVISION</p>
+    <p style="font-size:11px;color:rgba(255,255,255,.5);margin:0 0 14px;line-height:1.6;">Platform informasi sumber daya air Desa Wonotoro — Sukapura, Probolinggo. Aktifkan layer, klik objek di peta, dan analisis data ketersediaan air.</p>
+    <button onclick="window.closeIntroCard && window.closeIntroCard()" style="display:block;width:100%;background:rgba(59,130,246,.18);border:1px solid rgba(59,130,246,.35);color:rgba(99,179,237,.9);border-radius:6px;padding:8px;font-size:12px;font-weight:500;cursor:pointer;">Mulai Eksplorasi →</button>
+</div>
 
 
 <!-- ================================================================
@@ -556,6 +654,10 @@
             set('countMakan',    d.makan);
             set('countJasa',     d.jasa);
             set('totalPenduduk', d.penduduk);
+            set('statPenduduk',  d.penduduk);
+            // Sync sidebar hero counts
+            set('heroAir',       d.sumber_air);
+            set('heroReservoir', d.reservoir);
         })
         .catch(function() {});
 })();
@@ -684,6 +786,109 @@ window.showLayerInfo = function(key) {
 document.getElementById('modalLayerInfo').addEventListener('click', function(e) {
     if (e.target === this) this.style.display = 'none';
 });
+
+// ── Dashboard Intro Card ────────────────────────────────────────
+(function () {
+    var INTRO_KEY = 'dashboard_intro_seen';
+    window.closeIntroCard = function () {
+        var card = document.getElementById('introCard');
+        if (!card) return;
+        localStorage.setItem(INTRO_KEY, '1');
+        card.style.opacity = '0';
+        setTimeout(function () { card.style.display = 'none'; }, 300);
+    };
+    if (!localStorage.getItem(INTRO_KEY)) {
+        var card = document.getElementById('introCard');
+        if (card) { setTimeout(function () { card.style.display = 'block'; }, 1500); }
+    }
+})();
+
+// ── Quick Insight (syncs with statusLabel via MutationObserver) ─
+(function () {
+    function getInsightText(status) {
+        var s = (status || '').toUpperCase().trim();
+        if (s === 'AMAN')    return '✅ Ketersediaan air saat ini mencukupi kebutuhan penduduk dan fasilitas wisata. Kondisi sumber aktif dalam keadaan baik.';
+        if (s === 'WASPADA') return '⚠️ Ketersediaan air mulai mendekati batas wajar. Pertimbangkan efisiensi penggunaan air untuk mencegah defisit.';
+        if (s === 'KRITIS')  return '🔴 Ketersediaan air berada di tingkat kritis. Segera tinjau kondisi sumber air dan kurangi konsumsi.';
+        return 'Memuat data ketersediaan air...';
+    }
+    function syncInsight() {
+        var sl = document.getElementById('statusLabel');
+        var ti = document.getElementById('quickInsightText');
+        var qi = document.getElementById('quickInsight');
+        if (!sl || !ti || !qi) return;
+        var s = sl.textContent.trim().toUpperCase();
+        ti.textContent = getInsightText(sl.textContent.trim());
+        qi.className = 'quick-insight' + (s === 'AMAN' ? ' qi-aman' : s === 'WASPADA' ? ' qi-waspada' : s === 'KRITIS' ? ' qi-kritis' : '');
+        // Sync hero status dot
+        var dot = document.getElementById('shbDot');
+        var sd  = document.getElementById('statusDot');
+        if (dot && sd) dot.style.background = sd.style.background;
+    }
+    var sl = document.getElementById('statusLabel');
+    if (sl && window.MutationObserver) {
+        new MutationObserver(syncInsight).observe(sl, { childList: true, subtree: true, characterData: true });
+    }
+    // Fallback: poll once after 4 s in case observer fires before content is set
+    setTimeout(syncInsight, 4000);
+})();
+
+// ── Tahukah Anda? rotating facts ───────────────────────────────
+(function () {
+    var facts = [
+        'Desa Wonotoro memiliki 28 segmen sungai yang mendukung kebutuhan air masyarakat dan pertanian di kawasan Bromo Tengger Semeru.',
+        'Data Potensi Air Tanah AQUAVISION memiliki resolusi spasial 10m × 10m — cukup presisi untuk mengidentifikasi lokasi sumber air baru.',
+        'Debit Puncak Aliran tersedia untuk 12 bulan. Ini membantu memahami variasi musiman ketersediaan air sepanjang tahun.',
+        'Zona Potensi Air Tanah dihitung menggunakan AHP (Analytical Hierarchy Process) dari 5 kriteria: tutupan lahan, lereng, tanah, curah hujan, dan geologi.',
+        'AQUAVISION menyediakan data dalam format CSV, GeoJSON, KML, dan Shapefile — bisa langsung dibuka di Excel, QGIS, atau Google Earth.',
+        'Seluruh data spasial AQUAVISION menggunakan sistem referensi koordinat WGS 84 (EPSG:4326) — standar global untuk pemetaan digital.'
+    ];
+    var idx = 0;
+    var el = document.getElementById('dykText');
+    if (el) {
+        el.textContent = facts[0];
+        setInterval(function () {
+            el.style.opacity = '0';
+            setTimeout(function () {
+                idx = (idx + 1) % facts.length;
+                el.textContent = facts[idx];
+                el.style.opacity = '1';
+            }, 300);
+        }, 12000);
+    }
+})();
+
+// ── Quick Action handlers ──────────────────────────────────────
+window.qaFindAir = function () {
+    var lp  = document.getElementById('layerPanel');
+    var btn = document.getElementById('btnLayer');
+    if (lp && lp.style.display !== 'block' && btn) btn.click();
+    var chk = document.getElementById('chkAir');
+    if (chk && !chk.checked) { chk.checked = true; chk.dispatchEvent(new Event('change')); }
+    var ss = document.querySelector('.sidebar-scroll');
+    if (ss) ss.scrollTop = 0;
+};
+window.qaViewStatus = function () {
+    var body  = document.getElementById('debitBody');
+    var arrow = document.querySelector('[data-target="debitBody"] .accordion-arrow');
+    if (body)  { body.classList.add('open'); }
+    if (arrow) { arrow.classList.add('open'); }
+    if (body)  { body.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
+};
+
+// ── Map Empty State ────────────────────────────────────────────
+(function () {
+    var cbs = document.querySelectorAll('#layerPanel input[type="checkbox"]');
+    var es  = document.getElementById('mapEmptyState');
+    function update() {
+        if (!es) return;
+        var any = Array.prototype.some.call(cbs, function (cb) { return cb.checked; });
+        es.style.opacity = any ? '0' : '1';
+        es.style.pointerEvents = 'none';
+    }
+    cbs.forEach(function (cb) { cb.addEventListener('change', update); });
+    update();
+})();
 
 </script>
 {% endblock %}

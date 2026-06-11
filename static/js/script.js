@@ -28,6 +28,11 @@ document.addEventListener("DOMContentLoaded", function () {
         { maxZoom: 19, attribution: "&copy; OpenStreetMap contributors" }
     ).addTo(map);
 
+    // Gentle welcome zoom into Desa Wonotoro on every page load.
+    setTimeout(function () {
+        map.flyTo([-7.88, 112.98], 14, { duration: 1.5, easeLinearity: 0.4 });
+    }, 1200);
+
 
     // ================================================================
     // 2. NOTIFIKASI

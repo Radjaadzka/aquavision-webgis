@@ -19,4 +19,5 @@ urlpatterns = [
     # Admin AJAX
     path('admin/conversations/',   views.hubungi_admin_list,   name='hubungi_admin_list'),
     path('admin/<int:conv_id>/',   views.hubungi_admin_thread, name='hubungi_admin_thread'),
+    path('queue/',                 views.queue_info,           name='queue_info'),
 ]

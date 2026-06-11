@@ -1004,7 +1004,7 @@ _FAQ = [
      "Layer Infrastruktur Air menampilkan lokasi sumber mata air, jaringan pipa distribusi, tandon air, permukiman, dan fasilitas wisata (hotel, restoran, jasa). Klik titik atau garis di peta untuk melihat atribut detail setiap objek."),
 
     (('neraca air', 'ketersediaan', 'kebutuhan air', 'status aman', 'status kritis', 'waspada'),
-     "Neraca Ketersediaan Air membandingkan total ketersediaan air dari sumber dengan kebutuhan harian. Status AMAN berarti pemanfaatan di bawah 50% dari ketersediaan, WASPADA berarti 50–80%, dan KRITIS berarti 80% ke atas. Data diperbarui secara berkala dari sistem AQUAVISION."),
+     "Ketersediaan Air membandingkan total ketersediaan air dari sumber dengan kebutuhan harian. Status AMAN berarti pemanfaatan di bawah 50% dari ketersediaan, WASPADA berarti 50–80%, dan KRITIS berarti 80% ke atas. Data diperbarui secara berkala dari sistem AQUAVISION."),
 
     (('simulasi', 'skenario', 'proyeksi', 'hitung kebutuhan', 'penduduk', 'hotel'),
      "Fitur Simulasi Skenario memungkinkan Anda memasukkan parameter hipotetis — jumlah penduduk, kamar hotel, kursi restoran, atau luas pertanian — untuk menghitung proyeksi kebutuhan air. Berguna untuk perencanaan pengembangan wisata dan infrastruktur."),
@@ -1016,7 +1016,7 @@ _FAQ = [
      "Untuk mengakses fitur lengkap AQUAVISION, buat akun melalui halaman Daftar. Gunakan username dan password yang Anda buat untuk masuk. Jika lupa password, hubungi admin AQUAVISION melalui pesan ini."),
 
     (('bantuan', 'faq', 'panduan', 'cara menggunakan', 'tutorial', 'petunjuk'),
-     "Pusat Bantuan AQUAVISION tersedia di menu navbar dan sidebar. Di sana terdapat FAQ lengkap dalam 6 kategori: Tentang AQUAVISION, Dashboard, Data & Layer, Neraca Air, Akun & Akses, dan Teknis. Gunakan fitur pencarian untuk menemukan jawaban dengan cepat."),
+     "Pusat Bantuan AQUAVISION tersedia di menu navbar dan sidebar. Di sana terdapat FAQ lengkap dalam 6 kategori: Tentang AQUAVISION, Dashboard, Data & Layer, Ketersediaan Air, Akun & Akses, dan Teknis. Gunakan fitur pencarian untuk menemukan jawaban dengan cepat."),
 
     (('wonotoro', 'desa', 'lokasi', 'bromo', 'probolinggo', 'sukapura'),
      "Desa Wonotoro terletak di Kecamatan Sukapura, Kabupaten Probolinggo, Jawa Timur. Desa ini berada di kawasan penyangga KSPN (Kawasan Strategis Pariwisata Nasional) Bromo Tengger Semeru, koordinat sekitar 7°53' LS dan 112°59' BT (WGS84/EPSG:4326)."),
@@ -1050,13 +1050,32 @@ def _ai_respond(message):
     return best_answer if best_score >= threshold else None
 
 
+def _generate_ticket_id():
+    """Generate sequential daily ticket ID: AQ-YYYYMMDD-NNN."""
+    today = timezone.localdate().strftime('%Y%m%d')
+    prefix = f'AQ-{today}-'
+    last = Conversation.objects.filter(ticket_id__startswith=prefix).order_by('-ticket_id').first()
+    if last and last.ticket_id:
+        try:
+            n = int(last.ticket_id.rsplit('-', 1)[-1]) + 1
+        except ValueError:
+            n = 1
+    else:
+        n = 1
+    return f'{prefix}{n:03d}'
+
+
 @login_required(login_url='/login/')
 def hubungi_view(request):
     """Halaman Hubungi Admin — user melihat dan mengirim pesan."""
     conv, _ = Conversation.objects.get_or_create(user=request.user)
+    queue_count = Conversation.objects.filter(
+        status__in=['waiting_admin', 'WAITING_FOR_ADMIN']
+    ).count()
     return render(request, 'hubungi.html', {
         'conversation': conv,
         'is_admin':     is_admin_user(request.user),
+        'queue_count':  queue_count,
     })
 
 
@@ -1077,6 +1096,10 @@ def hubungi_send(request):
         return JsonResponse({'error': 'Pesan terlalu panjang (maks 2000 karakter).'}, status=400)
 
     conv, _ = Conversation.objects.get_or_create(user=request.user)
+
+    if not conv.ticket_id:
+        conv.ticket_id = _generate_ticket_id()
+
     msg = Message.objects.create(conversation=conv, sender=request.user, content=content)
     _log_audit(request, 'CHAT', f'User message: {content[:60]}')
 
@@ -1085,12 +1108,10 @@ def hubungi_send(request):
     ai_msg_data = None
 
     if ai_answer:
-        # Confident — reply automatically, keep conv open
-        conv.status = 'open'
-        ai_sender = request.user  # borrow sender slot; is_ai_response flag distinguishes it
+        conv.status = 'ai_answered'
         ai_msg = Message.objects.create(
             conversation=conv,
-            sender=ai_sender,
+            sender=request.user,
             content=ai_answer,
             is_read=True,
             is_ai_response=True,
@@ -1104,12 +1125,15 @@ def hubungi_send(request):
             'is_ai_response':  True,
         }
     else:
-        # Not confident — escalate to admin
-        conv.status = 'WAITING_FOR_ADMIN'
+        conv.status = 'waiting_admin'
+        escalation_text = (
+            f"Pertanyaan Anda sudah kami terima ({conv.ticket_id}). "
+            "Tim Admin AQUAVISION akan segera membalas. Mohon tunggu sebentar ya! 😊"
+        )
         escalation = Message.objects.create(
             conversation=conv,
             sender=request.user,
-            content="Pertanyaan Anda telah diteruskan kepada Admin AQUAVISION. Admin akan segera membalas. 🔔",
+            content=escalation_text,
             is_read=True,
             is_ai_response=True,
         )
@@ -1132,7 +1156,12 @@ def hubungi_send(request):
         'is_admin':       False,
         'is_ai_response': False,
     }
-    return JsonResponse({'user_msg': user_msg_data, 'ai_msg': ai_msg_data})
+    return JsonResponse({
+        'user_msg':    user_msg_data,
+        'ai_msg':      ai_msg_data,
+        'ticket_id':   conv.ticket_id,
+        'conv_status': conv.status,
+    })
 
 
 @login_required(login_url='/login/')
@@ -1156,7 +1185,24 @@ def hubungi_messages(request):
         }
         for m in msgs
     ]
-    return JsonResponse(data, safe=False)
+    queue_count = Conversation.objects.filter(
+        status__in=['waiting_admin', 'WAITING_FOR_ADMIN']
+    ).count()
+    return JsonResponse({
+        'messages':    data,
+        'conv_status': conv.status,
+        'ticket_id':   conv.ticket_id,
+        'queue_count': queue_count,
+    })
+
+
+@login_required(login_url='/login/')
+def queue_info(request):
+    """Kembalikan jumlah percakapan yang sedang menunggu balasan admin."""
+    count = Conversation.objects.filter(
+        status__in=['waiting_admin', 'WAITING_FOR_ADMIN']
+    ).count()
+    return JsonResponse({'waiting': count})
 
 
 # ── Admin views ─────────────────────────────────────────────────
@@ -1222,15 +1268,12 @@ def hubungi_admin_thread(request, conv_id):
         if not content:
             return JsonResponse({'error': 'Pesan tidak boleh kosong.'}, status=400)
         msg = Message.objects.create(conversation=conv, sender=request.user, content=content, is_read=True)
-        # Admin replied — move status back to open
-        if conv.status == 'WAITING_FOR_ADMIN':
-            conv.status = 'open'
+        conv.status = 'open'
         conv.save()
-        # Notify the user
         try:
             Notification.objects.create(
                 user=conv.user,
-                message=f'Admin telah membalas pesan Anda: "{content[:80]}"',
+                message='🔔 Admin AQUAVISION telah membalas pertanyaan Anda.',
             )
         except Exception:
             pass
@@ -1244,7 +1287,10 @@ def hubungi_admin_thread(request, conv_id):
             'is_ai_response': False,
         })
 
-    # GET — tandai pesan user sebagai sudah dibaca
+    # GET — admin membuka thread; update status ke reviewing jika masih menunggu
+    if conv.status in ('waiting_admin', 'WAITING_FOR_ADMIN'):
+        conv.status = 'reviewing'
+        conv.save()
     since_id = int(request.GET.get('since', 0))
     msgs = conv.messages.filter(id__gt=since_id).select_related('sender')
     msgs.filter(is_read=False, sender=conv.user).update(is_read=True)

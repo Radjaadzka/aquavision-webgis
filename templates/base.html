@@ -145,6 +145,14 @@ document.querySelectorAll('a[href^="#"]').forEach(function(a) {
                 <p class="footer-address">Labtek IX-C, Jl. Ganesa No.10, Bandung 40132</p>
             </div>
         </div>
+        <nav class="footer-nav">
+            <a href="/" class="footer-nav-link">Dashboard</a>
+            <a href="/data/" class="footer-nav-link">Data Portal</a>
+            <a href="/bantuan/" class="footer-nav-link">Pusat Bantuan</a>
+            <a href="{% url 'login' %}" class="footer-nav-link">Login</a>
+            <a href="{% url 'register' %}" class="footer-nav-link">Daftar</a>
+            <a href="/hubungi/" class="footer-nav-link">Hubungi Admin</a>
+        </nav>
         <div class="footer-right">
             <p class="footer-caption">Capstone Design Project 2026</p>
         </div>
