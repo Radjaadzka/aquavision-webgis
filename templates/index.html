@@ -99,6 +99,36 @@
     .hero-stat strong { font-size:17px; }
     .hero-btn { flex:1; padding:10px 12px; }
 }
+
+/* Floating CTA — "Jelajahi Dashboard" (replay Guided Tour) */
+.floating-tour-btn {
+    position: fixed;
+    bottom: 24px; right: 24px;
+    z-index: 950;
+    display: flex; align-items: center; gap: 6px;
+    padding: 12px 20px;
+    background: linear-gradient(135deg, #3B82F6, #60A5FA);
+    color: #fff; border: none; border-radius: 30px;
+    font-size: 13px; font-weight: 600;
+    font-family: 'Inter', sans-serif; cursor: pointer;
+    box-shadow: 0 6px 20px rgba(59,130,246,.45);
+    transition: transform .15s ease, box-shadow .15s ease;
+    animation: ftbPulse 3s ease-in-out infinite;
+}
+.floating-tour-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 26px rgba(59,130,246,.6);
+}
+@keyframes ftbPulse {
+    0%, 100% { box-shadow: 0 6px 20px rgba(59,130,246,.45); }
+    50%      { box-shadow: 0 6px 26px rgba(59,130,246,.7); }
+}
+/* Sembunyikan CTA selama overlay Hero Dashboard masih tampil */
+#heroDashboard:not(.hero-hidden) ~ .floating-tour-btn { display: none; }
+
+@media (max-width:480px) {
+    .floating-tour-btn { padding:10px 16px; font-size:12px; bottom:16px; right:16px; }
+}
 </style>
 {% endblock %}
 
@@ -118,6 +148,17 @@
         </div>
 
         <div class="sidebar-scroll">
+
+            <!-- ── Hero Status Air (kesan pertama) ─────────────── -->
+            <div class="water-status-card" id="waterStatusCard">
+                <div class="wsc-head">
+                    <span class="wsc-icon">🌊</span>
+                    <span class="wsc-title">Status Air Desa Wonotoro</span>
+                </div>
+                <div class="wsc-badge" id="wscBadge">Memuat...</div>
+                <p class="wsc-desc" id="wscDesc">Memuat data ketersediaan air terkini...</p>
+                <div class="wsc-supply"><strong id="wscSupplyVal">—</strong> m³/hari tersedia</div>
+            </div>
 
             <!-- ── Sidebar Hero + Status ─────────────────────── -->
             <div class="shb">
@@ -442,8 +483,8 @@
         <img
             src="{% static 'images/arah_mata_angin.png' %}"
             id="northArrow"
+            class="north-arrow"
             alt="Mata angin"
-            style="position:absolute; bottom:36px; left:320px; width:68px; z-index:600; pointer-events:none; opacity:.9; transition:left .25s ease;"
         >
 
         <!-- Info bar bawah -->
@@ -505,6 +546,11 @@
             </div>
         </div>
     </div>
+
+    <!-- ── Floating CTA: jalankan Guided Tour ─────────────────────── -->
+    <button id="floatingTourBtn" class="floating-tour-btn" onclick="window.resetTour && window.resetTour();">
+        ✨ Jelajahi Dashboard
+    </button>
 
 </div><!-- /webgis-container -->
 
@@ -837,6 +883,13 @@ document.getElementById('modalLayerInfo').addEventListener('click', function(e) 
         if (s === 'KRITIS')  return '🔴 Ketersediaan air berada di tingkat kritis. Segera tinjau kondisi sumber air dan kurangi konsumsi.';
         return 'Memuat data ketersediaan air...';
     }
+    function getWscDesc(status) {
+        var s = (status || '').toUpperCase().trim();
+        if (s === 'AMAN')    return 'Ketersediaan air saat ini masih mencukupi untuk kebutuhan masyarakat dan wisata.';
+        if (s === 'WASPADA') return 'Ketersediaan air mulai mendekati batas kebutuhan masyarakat dan wisata. Disarankan menghemat penggunaan air.';
+        if (s === 'KRITIS')  return 'Ketersediaan air saat ini tidak mencukupi kebutuhan masyarakat dan wisata. Diperlukan tindakan segera.';
+        return 'Memuat data ketersediaan air terkini...';
+    }
     function syncInsight() {
         var sl = document.getElementById('statusLabel');
         var ti = document.getElementById('quickInsightText');
@@ -849,6 +902,21 @@ document.getElementById('modalLayerInfo').addEventListener('click', function(e) 
         var dot = document.getElementById('shbDot');
         var sd  = document.getElementById('statusDot');
         if (dot && sd) dot.style.background = sd.style.background;
+
+        // Sync Hero Status Air card (top of sidebar)
+        var badge  = document.getElementById('wscBadge');
+        var desc   = document.getElementById('wscDesc');
+        var supVal = document.getElementById('wscSupplyVal');
+        var supEl  = document.getElementById('debitSupply');
+        if (badge) {
+            badge.textContent = s || 'MEMUAT...';
+            badge.className = 'wsc-badge' + (s === 'AMAN' ? ' wsc-aman' : s === 'WASPADA' ? ' wsc-waspada' : s === 'KRITIS' ? ' wsc-kritis' : '');
+        }
+        if (desc) desc.textContent = getWscDesc(sl.textContent.trim());
+        if (supVal && supEl) {
+            var sv = supEl.textContent.trim();
+            if (sv && sv !== '0' && sv !== '—') supVal.textContent = sv;
+        }
     }
     var sl = document.getElementById('statusLabel');
     if (sl && window.MutationObserver) {
@@ -868,10 +936,10 @@ document.getElementById('modalLayerInfo').addEventListener('click', function(e) 
         'AQUAVISION menyediakan data dalam format CSV, GeoJSON, KML, dan Shapefile — bisa langsung dibuka di Excel, QGIS, atau Google Earth.',
         'Seluruh data spasial AQUAVISION menggunakan sistem referensi koordinat WGS 84 (EPSG:4326) — standar global untuk pemetaan digital.'
     ];
-    var idx = 0;
+    var idx = Math.floor(Math.random() * facts.length);
     var el = document.getElementById('dykText');
     if (el) {
-        el.textContent = facts[0];
+        el.textContent = facts[idx];
         setInterval(function () {
             el.style.opacity = '0';
             setTimeout(function () {

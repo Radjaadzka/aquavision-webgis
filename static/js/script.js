@@ -1225,13 +1225,12 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("btnHideSidebar")?.addEventListener("click", function () {
         document.getElementById("sidebar").classList.add("collapsed");
         document.getElementById("btnShowSidebar").classList.add("visible");
-        // On desktop only: sidebar collapses horizontally so controls need to shift left
+        // On desktop only: sidebar collapses horizontally so the search/export
+        // controls need to shift left. The compass stays fixed top-right.
         // On mobile: sidebar collapses vertically; CSS handles control positioning
         if (window.innerWidth > 768) {
-            var ctrl  = document.querySelector(".map-ctrl-topleft");
-            var arrow = document.getElementById("northArrow");
-            if (ctrl)  ctrl.style.left  = "14px";
-            if (arrow) arrow.style.left = "14px";
+            var ctrl = document.querySelector(".map-ctrl-topleft");
+            if (ctrl) ctrl.style.left = "14px";
         }
     });
 
@@ -1239,10 +1238,8 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById("sidebar").classList.remove("collapsed");
         this.classList.remove("visible");
         if (window.innerWidth > 768) {
-            var ctrl  = document.querySelector(".map-ctrl-topleft");
-            var arrow = document.getElementById("northArrow");
-            if (ctrl)  ctrl.style.left  = "320px";
-            if (arrow) arrow.style.left = "320px";
+            var ctrl = document.querySelector(".map-ctrl-topleft");
+            if (ctrl) ctrl.style.left = "320px";
         }
     });
 

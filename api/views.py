@@ -1109,6 +1109,7 @@ def hubungi_send(request):
 
     if ai_answer:
         conv.status = 'ai_answered'
+        conv.save()
         ai_msg = Message.objects.create(
             conversation=conv,
             sender=request.user,
@@ -1126,9 +1127,21 @@ def hubungi_send(request):
         }
     else:
         conv.status = 'waiting_admin'
+        conv.save()
+        # Posisi antrian = jumlah percakapan menunggu admin yang sudah
+        # mengantre selama atau lebih lama dari percakapan ini (termasuk diri sendiri).
+        queue_position = Conversation.objects.filter(
+            status__in=['waiting_admin', 'WAITING_FOR_ADMIN'],
+            updated_at__lte=conv.updated_at,
+        ).count()
         escalation_text = (
-            f"Pertanyaan Anda sudah kami terima ({conv.ticket_id}). "
-            "Tim Admin AQUAVISION akan segera membalas. Mohon tunggu sebentar ya! 😊"
+            "Saya belum memiliki informasi yang cukup untuk menjawab pertanyaan "
+            "tersebut secara akurat.\n\n"
+            "Pertanyaan Anda telah diteruskan ke Admin AQUAVISION.\n\n"
+            f"📋 Nomor Tiket: {conv.ticket_id}\n"
+            f"👥 Posisi Antrian: {queue_position}\n"
+            "⏱ Estimasi Respon: < 24 Jam\n\n"
+            "Anda akan menerima balasan segera setelah Admin merespons."
         )
         escalation = Message.objects.create(
             conversation=conv,
@@ -1145,8 +1158,6 @@ def hubungi_send(request):
             'is_admin':        True,
             'is_ai_response':  True,
         }
-
-    conv.save()
 
     user_msg_data = {
         'id':             msg.id,

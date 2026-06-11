@@ -312,6 +312,30 @@ a   { text-decoration: none; color: inherit; }
    AQUAVISION ENHANCEMENT — UX & Engagement Components
 ================================================================ */
 
+/* ── Hero Status Air Card (kesan pertama, paling atas sidebar) ── */
+.water-status-card {
+    margin: 0 0 8px;
+    padding: 14px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(59,130,246,.14), rgba(34,197,94,.08));
+    border: 1px solid rgba(255,255,255,.08);
+}
+.wsc-head { display:flex; align-items:center; gap:6px; margin-bottom:6px; }
+.wsc-icon { font-size:16px; }
+.wsc-title { font-size:12px; font-weight:600; color:rgba(255,255,255,.7); letter-spacing:.3px; }
+.wsc-badge {
+    display:inline-block; font-size:13px; font-weight:700; letter-spacing:1.5px;
+    padding:3px 12px; border-radius:20px; margin-bottom:8px;
+    background:rgba(255,255,255,.08); color:rgba(255,255,255,.6);
+    transition: background .4s, color .4s;
+}
+.wsc-aman    { background:rgba(34,197,94,.16);  color:#4ADE80; }
+.wsc-waspada { background:rgba(234,179,8,.16);  color:#FACC15; }
+.wsc-kritis  { background:rgba(239,68,68,.16);  color:#F87171; }
+.wsc-desc { font-size:11px; color:rgba(255,255,255,.45); line-height:1.6; margin:0 0 8px; }
+.wsc-supply { font-size:12px; color:rgba(255,255,255,.55); }
+.wsc-supply strong { color:#60A5FA; font-size:15px; }
+
 /* ── Sidebar Hero Block ─────────────────────────────────────── */
 .shb {
     padding: 12px 14px 11px;
@@ -416,16 +440,16 @@ a   { text-decoration: none; color: inherit; }
     height: 100%;
 }
 
-/* Mata angin */
+/* Mata angin — kanan atas, di bawah navbar */
 .north-arrow {
     position: absolute;
-    bottom: 36px;
-    left: 320px;
-    width: 68px;
-    z-index: 600;
+    top: 14px;
+    right: 14px;
+    width: 80px;
+    height: 80px;
+    z-index: 650;
     pointer-events: none;
     opacity: .9;
-    transition: left .25s ease;
 }
 
 
@@ -510,15 +534,16 @@ a   { text-decoration: none; color: inherit; }
 }
 .map-ctrl-zoom button:hover { background: rgba(59,130,246,.4) !important; }
 
-/* Basemap switcher + Legenda — kanan atas */
+/* Basemap switcher + Legenda — kanan atas (digeser ke bawah agar tidak
+   tertutup mata angin yang kini menempati pojok kanan atas) */
 .leaflet-top.leaflet-right {
-    top: 14px !important;
+    top: 104px !important;
     right: 14px !important;
     display: flex !important;
     flex-direction: column !important;
     align-items: flex-end !important;
     gap: 6px !important;
-    max-height: calc(100% - 60px) !important;
+    max-height: calc(100% - 150px) !important;
     overflow-y: auto !important;
     z-index: 400 !important;
 }
@@ -778,14 +803,14 @@ a   { text-decoration: none; color: inherit; }
 }
 .stat-mini {
     text-align: center;
-    padding: 7px 3px;
-    border-radius: 6px;
+    padding: 10px 3px;
+    border-radius: 8px;
     background: rgba(255,255,255,.03);
     border: 1px solid rgba(255,255,255,.06);
 }
-.stat-mini-icon  { font-size: 12px; }
-.stat-mini-num   { font-size: 14px; font-weight: 600; color: #60A5FA; margin: 2px 0; }
-.stat-mini-label { font-size: 10px; color: rgba(255,255,255,.3); }
+.stat-mini-icon  { font-size: 24px; line-height: 1; margin-bottom: 4px; }
+.stat-mini-num   { font-size: 16px; font-weight: 700; color: #60A5FA; margin: 2px 0; }
+.stat-mini-label { font-size: 10px; color: rgba(255,255,255,.35); }
 
 /* Debit boxes */
 .debit-info {
@@ -1540,8 +1565,12 @@ a   { text-decoration: none; color: inherit; }
     .map-ctrl-topleft #btnPrintMap {
         white-space: nowrap; flex-shrink: 0;
     }
-    /* Hide north arrow on mobile */
+    /* Hide north arrow on mobile and restore basemap switcher position */
     #northArrow { display: none !important; }
+    .leaflet-top.leaflet-right {
+        top: 14px !important;
+        max-height: calc(100% - 60px) !important;
+    }
 }
 
 /* ── Footer mobile (P1.2) ─────────────────────────────────────── */

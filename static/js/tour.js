@@ -13,17 +13,29 @@
    All containers that need to be visible during the tour must be set
    to at least 100004 so they are not covered by the overlay (100002).
 
-   RULE: #sidebar (Panel Fitur Peta) must remain visible for the
-   entire tour — never hidden, collapsed, or removed. Accordions that
-   need to be shown are opened once before the tour starts and
-   restored to their original state when the tour ends.
+   RULES:
+   - #sidebar (Panel Fitur Peta) must remain visible for the entire
+     tour — never hidden, collapsed, resized, or toggled.
+   - Steps adapt to login state: guests don't see Hubungi Admin,
+     Profil, or Logout; logged-in users don't see Login/Daftar.
+   - Targets that are missing or not visible (0x0) are skipped
+     silently — no floating tooltips, no empty steps.
+   - Accordions referenced by a step are opened only while that step
+     is active and restored to their pre-tour state afterwards.
+   - When the tour ends, the page scrolls back to the top so the user
+     is never left looking at the footer.
 */
 (function () {
-    var TOUR_KEY   = 'aquavision_dashboard_tour_completed';
-    var TOUR_Z     = '100004';   // Above Driver.js overlay (100002) and stage (100003)
+    var TOUR_KEY    = 'aquavision_dashboard_tour_completed';
+    var TOUR_Z      = '100004';   // Above Driver.js overlay (100002) and stage (100003)
     var ACCORDION_BODIES = ['statsBody', 'debitBody', 'simBody', 'chartBody'];
-    var activeDriver = null;
-    var preOpenedAccordions = [];
+
+    var activeDriver  = null;
+    var currentSteps  = [];
+    var currentAccordion = null;
+    var originalAccordionState = {};
+    var legendWasHidden = false;
+    var legendOriginalHTML = null;
 
     console.log('[AQUAVISION Tour] loaded');
 
@@ -83,10 +95,8 @@
         var nav = document.querySelector('.navbar');
         if (nav) nav.style.zIndex = '';
 
-        // Restore accordions that were closed before the tour opened them.
-        preOpenedAccordions.forEach(function (id) { closeAccordion(id); });
-        preOpenedAccordions = [];
-
+        restoreAccordions();
+        restoreLegend();
         activeDriver = null;
     }
 
@@ -108,6 +118,62 @@
         if (arrow) arrow.classList.remove('open');
     }
 
+    function captureAccordionState() {
+        originalAccordionState = {};
+        ACCORDION_BODIES.forEach(function (id) {
+            var body = document.getElementById(id);
+            originalAccordionState[id] = !!(body && body.classList.contains('open'));
+        });
+    }
+
+    function restoreAccordions() {
+        ACCORDION_BODIES.forEach(function (id) {
+            if (originalAccordionState[id]) openAccordion(id); else closeAccordion(id);
+        });
+        currentAccordion = null;
+    }
+
+    // Opens the accordion belonging to the active step (if any) and
+    // closes whichever accordion the previous step had opened — so
+    // exactly one accordion (at most) is open at any time during the
+    // tour, and everything is restored once the tour ends.
+    function setAccordionForStep(step) {
+        var target = (step && step.__accordionId) || null;
+        if (target === currentAccordion) return;
+        if (currentAccordion) closeAccordion(currentAccordion);
+        if (target) openAccordion(target);
+        currentAccordion = target;
+    }
+
+    /* ── Legenda Peta preview (hidden until a layer is active) ──────── */
+
+    function prepareLegend() {
+        var card = document.getElementById('legendCard');
+        if (!card) return;
+        legendWasHidden = (card.style.display === 'none' || getComputedStyle(card).display === 'none');
+        if (!legendWasHidden) return;
+        var items = document.getElementById('legendItems');
+        if (items) {
+            legendOriginalHTML = items.innerHTML;
+            items.innerHTML = '<div class="legend-item"><span style="font-size:11px; color:rgba(255,255,255,.45); line-height:1.6;">Legenda akan menampilkan keterangan warna dan simbol untuk setiap layer yang Anda aktifkan di peta.</span></div>';
+        }
+        card.style.display = 'block';
+    }
+
+    function restoreLegend() {
+        if (!legendWasHidden) return;
+        var card  = document.getElementById('legendCard');
+        var items = document.getElementById('legendItems');
+        if (items && legendOriginalHTML !== null) items.innerHTML = legendOriginalHTML;
+        if (window.updateLegend) {
+            window.updateLegend();
+        } else if (card) {
+            card.style.display = 'none';
+        }
+        legendWasHidden = false;
+        legendOriginalHTML = null;
+    }
+
     /* ── Driver.js stale-DOM cleanup ──────────────────────────────── */
     /* Defensive cleanup in case a previous tour was interrupted before
        Driver.js finished its own reset (cause of the empty white
@@ -123,20 +189,18 @@
             });
     }
 
-    /* ── Steps (14 total, fixed order — do not add/remove/duplicate) ─ */
+    /* ── Steps — adapt to login state ────────────────────────────────
+       Guest      (17 steps): ... Pusat Bantuan, Login, Daftar, Selesai
+       User login (18 steps): ... Hubungi Admin, Pusat Bantuan, Profil,
+                                   Logout, Selesai
+       __accordionId marks steps that should open one of
+       ACCORDION_BODIES while active (closed again once the user moves
+       on to the next step). */
 
     function buildSteps() {
-        // Step 12 dynamically targets "Hubungi Admin" when the user is
-        // logged in (link present in navbar), otherwise "Pusat Bantuan".
-        var hasHubungi = !!document.querySelector('.nav-links a[href="/hubungi/"]');
-        var contactTarget = hasHubungi
-            ? '.nav-links a[href="/hubungi/"]'
-            : '.nav-links a[href="/bantuan/"]';
-        var contactDesc = hasHubungi
-            ? 'Gunakan menu <b>Hubungi Admin</b> untuk mengirim pertanyaan ke tim AQUAVISION, atau buka <b>Pusat Bantuan</b> untuk panduan dan FAQ.'
-            : 'Buka <b>Pusat Bantuan</b> untuk panduan penggunaan dan FAQ. Setelah masuk (login), tersedia juga menu Hubungi Admin untuk mengirim pertanyaan langsung ke tim AQUAVISION.';
+        var isLoggedIn = !!document.querySelector('.nav-btn-logout');
 
-        return [
+        var steps = [
 
             // ── 1. PANEL FITUR PETA ──────────────────────────────────
             {
@@ -158,19 +222,41 @@
                 }
             },
 
-            // ── 3. RINGKASAN DATA ────────────────────────────────────
+            // ── 3. LEGENDA PETA ───────────────────────────────────────
             {
-                element: '.accordion-header[data-target="statsBody"]',
+                element: '#legendCard',
                 popover: {
-                    title:       '📊 Ringkasan Data',
-                    description: 'Ringkasan jumlah objek yang tersedia: sumber air, hotel, rumah makan, jasa, tandon air, dan jalur sungai. Data diperbarui otomatis dari sistem.',
+                    title:       '🎨 Legenda Peta',
+                    description: 'Legenda menampilkan arti warna dan simbol pada peta. Legenda akan otomatis menyesuaikan dengan layer yang sedang Anda aktifkan.',
                     position:    'right'
                 }
             },
 
-            // ── 4. KETERSEDIAAN AIR ──────────────────────────────────
+            // ── 4. PENGUKURAN JARAK ───────────────────────────────────
+            {
+                element: '#btnDistance',
+                popover: {
+                    title:       '📏 Pengukuran Jarak',
+                    description: 'Ukur jarak antar dua titik di peta — klik dua titik langsung di peta, atau masukkan koordinat secara manual.',
+                    position:    'right'
+                }
+            },
+
+            // ── 5. RINGKASAN DATA ─────────────────────────────────────
+            {
+                element: '.accordion-header[data-target="statsBody"]',
+                __accordionId: 'statsBody',
+                popover: {
+                    title:       '📊 Ringkasan Data',
+                    description: 'Ringkasan jumlah objek yang tersedia: sumber air, segmen sungai, hotel, rumah makan, jasa, dan penduduk. Data diperbarui otomatis dari sistem.',
+                    position:    'right'
+                }
+            },
+
+            // ── 6. KETERSEDIAAN AIR ───────────────────────────────────
             {
                 element: '.accordion-header[data-target="debitBody"]',
+                __accordionId: 'debitBody',
                 popover: {
                     title:       '💧 Ketersediaan Air',
                     description: 'Kondisi ketersediaan air berdasarkan analisis sistem. Status <b>AMAN</b> = kebutuhan &lt; 50% ketersediaan; <b>WASPADA</b> = 50–80%; <b>KRITIS</b> = ≥ 80%.',
@@ -178,9 +264,10 @@
                 }
             },
 
-            // ── 5. SIMULASI SKENARIO ─────────────────────────────────
+            // ── 7. SIMULASI SKENARIO ──────────────────────────────────
             {
                 element: '#simHeader',
+                __accordionId: 'simBody',
                 popover: {
                     title:       '🔢 Simulasi Skenario',
                     description: 'Simulasikan kebutuhan air berdasarkan skenario wisata. Masukkan jumlah penduduk, kamar hotel, kursi restoran, atau luas pertanian, lalu klik <b>Hitung Simulasi</b>.',
@@ -188,9 +275,10 @@
                 }
             },
 
-            // ── 6. GRAFIK KETERSEDIAAN AIR ───────────────────────────
+            // ── 8. GRAFIK KETERSEDIAAN AIR ────────────────────────────
             {
                 element: '#chartHeader',
+                __accordionId: 'chartBody',
                 popover: {
                     title:       '📈 Grafik Ketersediaan Air',
                     description: 'Visualisasi hasil analisis ketersediaan air. Nilai di atas 100% menunjukkan kondisi defisit — kapasitas sumber tidak mencukupi kebutuhan.',
@@ -198,7 +286,7 @@
                 }
             },
 
-            // ── 7. CARI LOKASI ───────────────────────────────────────
+            // ── 9. CARI LOKASI ─────────────────────────────────────────
             {
                 element: '#mapSearchInput',
                 popover: {
@@ -208,7 +296,7 @@
                 }
             },
 
-            // ── 8. EXPORT ────────────────────────────────────────────
+            // ── 10. EXPORT ─────────────────────────────────────────────
             {
                 element: '#btnPrintMap',
                 popover: {
@@ -218,8 +306,7 @@
                 }
             },
 
-            // ── 9. BERANDA ───────────────────────────────────────────
-            // getBoundingClientRect filter skips this if .nav-links is display:none on mobile.
+            // ── 11. BERANDA ────────────────────────────────────────────
             {
                 element: '.nav-links a[href="/tentang/"]',
                 popover: {
@@ -229,7 +316,7 @@
                 }
             },
 
-            // ── 10. DASHBOARD ────────────────────────────────────────
+            // ── 12. DASHBOARD ──────────────────────────────────────────
             {
                 element: '.nav-links a[href="/"]',
                 popover: {
@@ -239,7 +326,7 @@
                 }
             },
 
-            // ── 11. DATA PORTAL ──────────────────────────────────────
+            // ── 13. DATA PORTAL ────────────────────────────────────────
             {
                 element: '.nav-links a[href="/data/"]',
                 popover: {
@@ -247,39 +334,87 @@
                     description: 'Tabel lengkap seluruh dataset dengan pencarian dan paginasi. Unduh dalam format CSV, GeoJSON, KML, atau Shapefile.',
                     position:    'bottom'
                 }
-            },
-
-            // ── 12. HUBUNGI ADMIN / PUSAT BANTUAN ────────────────────
-            {
-                element: contactTarget,
-                popover: {
-                    title:       '✉️ Hubungi Admin & Pusat Bantuan',
-                    description: contactDesc,
-                    position:    'bottom'
-                }
-            },
-
-            // ── 13. LOGIN / DAFTAR ───────────────────────────────────
-            // Automatically skipped when user is already logged in (element absent from DOM).
-            {
-                element: '.nav-btn-login',
-                popover: {
-                    title:       '🔑 Login / Daftar',
-                    description: 'Masuk atau daftar untuk mengakses fitur tambahan seperti Hubungi Admin dan input data (khusus pengelola).',
-                    position:    'bottom'
-                }
-            },
-
-            // ── 14. SELESAI ──────────────────────────────────────────
-            {
-                element: '#btnGuide',
-                popover: {
-                    title:       '🎉 Panduan Selesai',
-                    description: 'Anda siap menggunakan AQUAVISION! Aktifkan layer, klik objek di peta untuk detail. Untuk mengulang panduan kapan saja, klik tombol <b>ⓘ Lihat Panduan Dashboard</b> ini.',
-                    position:    'right'
-                }
             }
         ];
+
+        if (isLoggedIn) {
+            // ── 14. HUBUNGI ADMIN ─────────────────────────────────────
+            steps.push({
+                element: '.nav-links a[href="/hubungi/"]',
+                popover: {
+                    title:       '✉️ Hubungi Admin',
+                    description: 'Punya pertanyaan? Kirim pesan ke tim AQUAVISION melalui menu ini. AI Assistant akan mencoba menjawab dulu — jika belum bisa, pertanyaan Anda diteruskan ke Admin.',
+                    position:    'bottom'
+                }
+            });
+            // ── 15. PUSAT BANTUAN ──────────────────────────────────────
+            steps.push({
+                element: '.nav-links a[href="/bantuan/"]',
+                popover: {
+                    title:       '❓ Pusat Bantuan',
+                    description: 'Kumpulan panduan dan FAQ seputar AQUAVISION — mulai dari cara membaca peta hingga mengunduh data.',
+                    position:    'bottom'
+                }
+            });
+            // ── 16. PROFIL ─────────────────────────────────────────────
+            steps.push({
+                element: '.nav-user',
+                popover: {
+                    title:       '👤 Profil',
+                    description: 'Menampilkan akun yang sedang Anda gunakan untuk mengakses AQUAVISION.',
+                    position:    'bottom'
+                }
+            });
+            // ── 17. LOGOUT ─────────────────────────────────────────────
+            steps.push({
+                element: '.nav-btn-logout',
+                popover: {
+                    title:       '🚪 Logout',
+                    description: 'Keluar dari akun Anda dengan aman setelah selesai menggunakan AQUAVISION.',
+                    position:    'bottom'
+                }
+            });
+        } else {
+            // ── 14. PUSAT BANTUAN ──────────────────────────────────────
+            steps.push({
+                element: '.nav-links a[href="/bantuan/"]',
+                popover: {
+                    title:       '❓ Pusat Bantuan',
+                    description: 'Kumpulan panduan dan FAQ seputar AQUAVISION — mulai dari cara membaca peta hingga mengunduh data.',
+                    position:    'bottom'
+                }
+            });
+            // ── 15. LOGIN ──────────────────────────────────────────────
+            steps.push({
+                element: '.nav-btn-login',
+                popover: {
+                    title:       '🔑 Login',
+                    description: 'Masuk dengan akun Anda untuk mengakses fitur tambahan seperti Hubungi Admin dan input data (khusus pengelola).',
+                    position:    'bottom'
+                }
+            });
+            // ── 16. DAFTAR ─────────────────────────────────────────────
+            steps.push({
+                element: '.nav-btn-register',
+                popover: {
+                    title:       '📝 Daftar',
+                    description: 'Belum punya akun? Daftar gratis untuk mendapatkan akses fitur tambahan AQUAVISION.',
+                    position:    'bottom'
+                }
+            });
+        }
+
+        // ── SELESAI ────────────────────────────────────────────────────
+        steps.push({
+            element: '#btnGuide',
+            popover: {
+                title:       '🎉 Panduan Selesai',
+                description: 'Anda siap menggunakan AQUAVISION! Aktifkan layer, klik objek di peta untuk detail. Untuk mengulang panduan kapan saja, klik tombol <b>✨ Jelajahi Dashboard</b> di pojok kanan bawah, atau tombol <b>ⓘ Lihat Panduan Dashboard</b> ini.',
+                position:    'right'
+            }
+        });
+
+        return steps;
     }
 
     /* ── UI Prep ──────────────────────────────────────────────────── */
@@ -289,21 +424,9 @@
         lockMapControls();
         lockNavbar();
 
-        var layerPanel = document.getElementById('layerPanel');
-        if (layerPanel) layerPanel.style.display = 'block';
-
-        // Pre-open every accordion referenced by the tour so its content
-        // is visible without hiding or collapsing the main panel.
-        // Accordions that were already open are left untouched; the rest
-        // are restored to "closed" by unlockAll() once the tour ends.
-        preOpenedAccordions = [];
-        ACCORDION_BODIES.forEach(function (id) {
-            var body = document.getElementById(id);
-            if (body && !body.classList.contains('open')) {
-                preOpenedAccordions.push(id);
-                openAccordion(id);
-            }
-        });
+        captureAccordionState();
+        currentAccordion = null;
+        prepareLegend();
     }
 
     /* ── Run ──────────────────────────────────────────────────────── */
@@ -330,11 +453,12 @@
 
             var el = document.querySelector(s.element);
             if (!el) {
-                console.error('[AQUAVISION Tour] Target not found:', s.element);
+                console.warn('[AQUAVISION Tour] Skipped — target not found:', s.element);
                 return false;
             }
 
-            // Skip elements hidden via display:none (e.g. .nav-links on mobile).
+            // Skip elements hidden via display:none (e.g. .nav-links on mobile,
+            // or nav items that don't exist for the current login state).
             var rect = el.getBoundingClientRect();
             if (rect.width === 0 && rect.height === 0) {
                 console.warn('[AQUAVISION Tour] Skipped — not visible:', s.element);
@@ -347,8 +471,11 @@
 
         if (steps.length === 0) {
             console.warn('[AQUAVISION Tour] No visible steps — aborted.');
+            unlockAll();
             return;
         }
+
+        currentSteps = steps;
 
         try {
             var d = new Driver({
@@ -365,13 +492,31 @@
                     lockSidebar();
                     lockMapControls();
                     lockNavbar();
-                    if (element) {
-                        console.log('[AQUAVISION Tour] Highlighting:', element.id || element.className || element.tagName);
+
+                    // Find which step is being highlighted (by matching its DOM node)
+                    // so the matching accordion can be opened/closed.
+                    var node = element && (element.node || (element.getNode && element.getNode()));
+                    var matched = null;
+                    if (node) {
+                        for (var i = 0; i < currentSteps.length; i++) {
+                            var step = currentSteps[i];
+                            if (step.element && document.querySelector(step.element) === node) {
+                                matched = step;
+                                break;
+                            }
+                        }
+                    }
+                    setAccordionForStep(matched);
+
+                    if (node) {
+                        console.log('[AQUAVISION Tour] Highlighting:', node.id || node.className || node.tagName);
                     }
                 },
                 onReset: function () {
                     localStorage.setItem(TOUR_KEY, 'true');
                     unlockAll();
+                    // Never leave the user scrolled down (e.g. near the footer).
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
                     console.log('[AQUAVISION Tour] tour ended / reset');
                 }
             });
