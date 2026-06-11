@@ -531,7 +531,7 @@ body { background: #07111F; }
         <div class="sq"><span class="sq-num" id="statAir" data-t="{{ jumlah_air }}">—</span><span class="sq-lbl">Sumber Air</span></div>
         <div class="sq"><span class="sq-num" id="statFasilitas" data-t="{{ jumlah_fasilitas }}">—</span><span class="sq-lbl">Fasilitas Wisata</span></div>
         <div class="sq"><span class="sq-num" id="statPermukiman" data-t="{{ jumlah_permukiman }}">—</span><span class="sq-lbl">Permukiman</span></div>
-        <div class="sq"><span class="sq-num" id="statSungai" data-t="28">—</span><span class="sq-lbl">Jaringan Sungai</span></div>
+        <div class="sq"><span class="sq-num" id="statPipa" data-t="{{ jumlah_pipa }}">—</span><span class="sq-lbl">Segmen Pipa</span></div>
       </div>
       <p class="hero-panel-footer">Data diperbarui secara berkala dari sistem basis data spasial AQUAVISION.</p>
     </div>
@@ -762,8 +762,7 @@ body { background: #07111F; }
 {% block extra_js %}
 <script>
 function cnt(el,t,d){if(!el)return;var t0=null;(function tick(ts){if(!t0)t0=ts;var p=Math.min((ts-t0)/d,1),e=1-Math.pow(1-p,4);el.textContent=Math.floor(e*t);if(p<1)requestAnimationFrame(tick);else el.textContent=t;})(performance.now());}
-['Air','Fasilitas','Permukiman'].forEach(function(k,i){var el=document.getElementById('stat'+k);if(el)cnt(el,+el.dataset.t||0,1200+i*200);});
-cnt(document.getElementById('statSungai'),28,1800);
+['Air','Fasilitas','Permukiman','Pipa'].forEach(function(k,i){var el=document.getElementById('stat'+k);if(el)cnt(el,+el.dataset.t||0,1200+i*200);});
 var obs=new IntersectionObserver(function(e){e.forEach(function(x){if(x.isIntersecting){x.target.classList.add('on');obs.unobserve(x.target);}});},{threshold:.1,rootMargin:'0px 0px -20px 0px'});
 document.querySelectorAll('.rv').forEach(function(el){obs.observe(el);});
 document.getElementById('btnFeedback')?.addEventListener('click',function(){

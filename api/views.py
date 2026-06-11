@@ -569,38 +569,25 @@ def upload_shp(request):
 # INFORMASI DEBIT — aggregate query, bukan loop Python
 # ================================================================
 
-def informasi_debit(request):
+def _compute_water_status():
+    """Neraca air mode real (tanpa simulasi) — sumber tunggal kebenaran,
+    dipakai oleh informasi_debit() dan AI Assistant (Hubungi Admin)."""
     total_debit = SumberAir.objects.aggregate(total=Sum('debit'))['total'] or 0
     supply_m3   = total_debit * 86.4
 
-    sim_hotel     = request.GET.get('hotel')
-    sim_penduduk  = request.GET.get('penduduk')
-    sim_resto     = request.GET.get('resto')
-    sim_pertanian = request.GET.get('pertanian')
+    total_domestik = Permukiman.objects.aggregate(
+        t=Sum(ExpressionWrapper(F('jumlah_penduduk') * 0.12, output_field=FloatField()))
+    )['t'] or 0
 
-    if any([sim_hotel, sim_penduduk, sim_resto, sim_pertanian]):
-        # Mode simulasi — validasi input agar tidak crash
-        demand_m3 = (
-            safe_int(sim_penduduk)  * 0.12
-            + safe_int(sim_hotel)   * 0.25
-            + safe_int(sim_resto)   * 0.025
-            + safe_int(sim_pertanian) * 86.4  # 1 L/dtk/ha × 86400 dtk = 86400 L = 86.4 m³
-        )
-    else:
-        # Mode real — satu query per tipe, bukan Python loop
-        total_domestik = Permukiman.objects.aggregate(
-            t=Sum(ExpressionWrapper(F('jumlah_penduduk') * 0.12, output_field=FloatField()))
-        )['t'] or 0
+    total_hotel = FasilitasWisata.objects.filter(jenis='hotel').aggregate(
+        t=Sum(ExpressionWrapper(F('kamar') * 0.25, output_field=FloatField()))
+    )['t'] or 0
 
-        total_hotel = FasilitasWisata.objects.filter(jenis='hotel').aggregate(
-            t=Sum(ExpressionWrapper(F('kamar') * 0.25, output_field=FloatField()))
-        )['t'] or 0
+    total_resto = FasilitasWisata.objects.filter(jenis='resto').aggregate(
+        t=Sum(ExpressionWrapper(F('kapasitas') * 0.025, output_field=FloatField()))
+    )['t'] or 0
 
-        total_resto = FasilitasWisata.objects.filter(jenis='resto').aggregate(
-            t=Sum(ExpressionWrapper(F('kapasitas') * 0.025, output_field=FloatField()))
-        )['t'] or 0
-
-        demand_m3 = total_domestik + total_hotel + total_resto
+    demand_m3 = total_domestik + total_hotel + total_resto
 
     selisih = supply_m3 - demand_m3
     persen  = (demand_m3 / supply_m3 * 100) if supply_m3 > 0 else 0
@@ -612,14 +599,54 @@ def informasi_debit(request):
     else:
         status_str = 'KRITIS'
 
-    return JsonResponse({
+    return {
         'ketersediaan_m3':    round(supply_m3,   2),
         'kebutuhan_m3':       round(demand_m3,   2),
         'selisih_m3':         round(selisih,      2),
         'pemanfaatan_persen': round(persen,        1),
         'status':             status_str,
         'total_debit_ldetik': round(total_debit,  2),
-    })
+    }
+
+
+def informasi_debit(request):
+    sim_hotel     = request.GET.get('hotel')
+    sim_penduduk  = request.GET.get('penduduk')
+    sim_resto     = request.GET.get('resto')
+    sim_pertanian = request.GET.get('pertanian')
+
+    if any([sim_hotel, sim_penduduk, sim_resto, sim_pertanian]):
+        # Mode simulasi — validasi input agar tidak crash
+        total_debit = SumberAir.objects.aggregate(total=Sum('debit'))['total'] or 0
+        supply_m3   = total_debit * 86.4
+
+        demand_m3 = (
+            safe_int(sim_penduduk)  * 0.12
+            + safe_int(sim_hotel)   * 0.25
+            + safe_int(sim_resto)   * 0.025
+            + safe_int(sim_pertanian) * 86.4  # 1 L/dtk/ha × 86400 dtk = 86400 L = 86.4 m³
+        )
+
+        selisih = supply_m3 - demand_m3
+        persen  = (demand_m3 / supply_m3 * 100) if supply_m3 > 0 else 0
+
+        if persen < 50:
+            status_str = 'AMAN'
+        elif persen < 80:
+            status_str = 'WASPADA'
+        else:
+            status_str = 'KRITIS'
+
+        return JsonResponse({
+            'ketersediaan_m3':    round(supply_m3,   2),
+            'kebutuhan_m3':       round(demand_m3,   2),
+            'selisih_m3':         round(selisih,      2),
+            'pemanfaatan_persen': round(persen,        1),
+            'status':             status_str,
+            'total_debit_ldetik': round(total_debit,  2),
+        })
+
+    return JsonResponse(_compute_water_status())
 
 
 # ================================================================
@@ -1028,26 +1055,95 @@ _FAQ = [
      "Setiap unduhan data di AQUAVISION dicatat secara otomatis. Tim pengelola dapat memantau riwayat unduhan untuk menjaga keamanan dan penggunaan data. Jika Anda memiliki pertanyaan tentang data yang pernah diunduh, silakan hubungi tim pengelola melalui menu Hubungi Admin."),
 
     (('panduan dashboard', 'tour', 'lihat panduan', 'cara mulai', 'onboarding', 'mulai dari mana'),
-     "AQUAVISION menyediakan Panduan Dashboard interaktif yang dapat diakses melalui tombol <b>ⓘ Lihat Panduan Dashboard</b> di bagian bawah panel kiri. Panduan ini akan menjelaskan semua fitur utama satu per satu. Klik tombol tersebut untuk memulai atau mengulang panduan kapan saja."),
+     "AQUAVISION menyediakan “Panduan Dashboard” interaktif yang dapat diakses melalui tombol “ⓘ Lihat Panduan Dashboard” di bagian bawah panel kiri. Panduan ini akan menjelaskan semua fitur utama satu per satu. Klik tombol tersebut untuk memulai atau mengulang panduan kapan saja."),
+
+    (('jumlah sungai', 'berapa sungai', 'jaringan sungai', 'daerah aliran sungai', 'segmen sungai', 'sungai'),
+     "AQUAVISION memetakan jaringan Daerah Aliran Sungai (DAS) di Desa Wonotoro pada layer 'Sungai'. Aktifkan layer tersebut di Dashboard untuk melihat seluruh segmen sungai secara interaktif beserta atribut tipe, kelas, dan DAS-nya."),
 ]
+
+
+def _idnum(value):
+    """Format angka dengan pemisah ribuan ala Indonesia (titik)."""
+    return f'{value:,.0f}'.replace(',', '.')
+
+
+# ── Pertanyaan dengan jawaban dinamis (data aktual sistem, bukan hardcode) ──
+_DYNAMIC_INTENTS = (
+    (('kondisi air', 'ketersediaan air saat ini', 'status air saat ini',
+      'status ketersediaan air', 'debit saat ini', 'air sekarang', 'neraca air saat ini'),
+     '_water_status'),
+    (('jumlah sumber air', 'berapa sumber air', 'jumlah mata air', 'berapa mata air',
+      'ada berapa sumber air', 'jumlah titik sumber air'),
+     '_sumber_air_count'),
+)
+
+
+def _dynamic_ai_answer(intent):
+    if intent == '_water_status':
+        info = _compute_water_status()
+        emoji = {'AMAN': '🟢', 'WASPADA': '🟡', 'KRITIS': '🔴'}.get(info['status'], '')
+        return (
+            f"Berdasarkan data sistem AQUAVISION saat ini, ketersediaan air berada pada kategori "
+            f"{emoji} {info['status']}, dengan total ketersediaan sekitar {_idnum(info['ketersediaan_m3'])} m³/hari "
+            f"dan kebutuhan sekitar {_idnum(info['kebutuhan_m3'])} m³/hari (pemanfaatan {info['pemanfaatan_persen']}%). "
+            "Detail lengkap dan grafik dapat dilihat di Dashboard pada panel Ketersediaan Air."
+        )
+    if intent == '_sumber_air_count':
+        n = SumberAir.objects.count()
+        return (
+            f"Sistem AQUAVISION saat ini mencatat {n} titik sumber air (mata air) di Desa Wonotoro. "
+            "Detail lokasi, debit, dan kondisi setiap sumber air dapat dilihat pada layer “Sumber Air” "
+            "di Dashboard atau diunduh melalui Data Portal."
+        )
+    return None
+
 
 def _ai_respond(message):
     """
-    Rule-based FAQ responder. Returns answer string if confident, else None.
-    Confidence = at least 2 keywords from a tuple match the message (case-insensitive).
+    Jawab pertanyaan berdasarkan data aktual sistem (intent dinamis) atau FAQ
+    rule-based. Kembalikan string jawaban jika yakin, atau None jika tidak tahu
+    — AI tidak boleh berhalusinasi/mengarang jawaban.
     """
     msg_lower = message.lower()
-    best_score = 0
+
+    # 1) Intent dinamis — jawaban dihitung langsung dari database/data sistem
+    for keywords, intent in _DYNAMIC_INTENTS:
+        if any(kw in msg_lower for kw in keywords):
+            return _dynamic_ai_answer(intent)
+
+    # 2) FAQ rule-based — pilih entri dengan jumlah kata kunci cocok terbanyak;
+    #    jika seri, menangkan kata kunci yang lebih spesifik (lebih panjang)
+    best_score  = 0
+    best_weight = 0
     best_answer = None
     for keywords, answer in _FAQ:
-        score = sum(1 for kw in keywords if kw in msg_lower)
-        if score > best_score:
-            best_score = score
+        matched = [kw for kw in keywords if kw in msg_lower]
+        if not matched:
+            continue
+        score  = len(matched)
+        weight = sum(len(kw) for kw in matched)
+        if score > best_score or (score == best_score and weight > best_weight):
+            best_score  = score
+            best_weight = weight
             best_answer = answer
+
     # Confident if at least 2 keywords matched, or 1 keyword in a short message (<= 5 words)
     word_count = len(msg_lower.split())
     threshold = 1 if word_count <= 5 else 2
     return best_answer if best_score >= threshold else None
+
+
+# ── Eskalasi ke Admin: hanya dilakukan setelah konfirmasi eksplisit ─────────
+_AI_UNSURE_TEXT = (
+    "Saya belum memiliki informasi yang cukup untuk menjawab pertanyaan "
+    "tersebut secara akurat."
+)
+_AI_ESCALATE_OFFER = (
+    "\n\nApakah pertanyaan ini ingin diteruskan ke Admin AQUAVISION? "
+    "Balas \"Ya\" untuk menghubungkan ke Admin, atau ajukan pertanyaan lain."
+)
+_CONFIRM_YES_WORDS = {'ya', 'iya', 'yes', 'y', 'ok', 'oke', 'okay', 'yup'}
+_CONFIRM_NO_WORDS  = {'tidak', 'tdk', 'gak', 'ga', 'nggak', 'enggak', 'no', 'n', 'jangan', 'belum'}
 
 
 def _generate_ticket_id():
@@ -1100,32 +1196,19 @@ def hubungi_send(request):
     if not conv.ticket_id:
         conv.ticket_id = _generate_ticket_id()
 
+    # Cek apakah AI sebelumnya menawarkan eskalasi ke Admin (menunggu konfirmasi)
+    last_ai_msg = conv.messages.filter(is_ai_response=True).order_by('-created_at').first()
+    awaiting_escalation = bool(last_ai_msg and _AI_UNSURE_TEXT in last_ai_msg.content)
+
     msg = Message.objects.create(conversation=conv, sender=request.user, content=content)
     _log_audit(request, 'CHAT', f'User message: {content[:60]}')
 
-    # AI attempt to answer
-    ai_answer = _ai_respond(content)
-    ai_msg_data = None
+    # Konfirmasi eskalasi hanya berlaku jika AI baru saja menawarkannya
+    words = set(re.findall(r'[a-z]+', content.lower()))
+    wants_escalation    = awaiting_escalation and bool(words & _CONFIRM_YES_WORDS)
+    declines_escalation = awaiting_escalation and not wants_escalation and bool(words & _CONFIRM_NO_WORDS)
 
-    if ai_answer:
-        conv.status = 'ai_answered'
-        conv.save()
-        ai_msg = Message.objects.create(
-            conversation=conv,
-            sender=request.user,
-            content=ai_answer,
-            is_read=True,
-            is_ai_response=True,
-        )
-        ai_msg_data = {
-            'id':              ai_msg.id,
-            'sender':          'AQUAVISION AI',
-            'content':         ai_msg.content,
-            'created_at':      timezone.localtime(ai_msg.created_at).strftime('%d %b %Y, %H:%M'),
-            'is_admin':        True,
-            'is_ai_response':  True,
-        }
-    else:
+    if wants_escalation:
         conv.status = 'waiting_admin'
         conv.save()
         # Posisi antrian = jumlah percakapan menunggu admin yang sudah
@@ -1134,30 +1217,41 @@ def hubungi_send(request):
             status__in=['waiting_admin', 'WAITING_FOR_ADMIN'],
             updated_at__lte=conv.updated_at,
         ).count()
-        escalation_text = (
-            "Saya belum memiliki informasi yang cukup untuk menjawab pertanyaan "
-            "tersebut secara akurat.\n\n"
-            "Pertanyaan Anda telah diteruskan ke Admin AQUAVISION.\n\n"
+        reply_text = (
+            "Baik, pertanyaan Anda telah diteruskan ke Admin AQUAVISION.\n\n"
             f"📋 Nomor Tiket: {conv.ticket_id}\n"
             f"👥 Posisi Antrian: {queue_position}\n"
             "⏱ Estimasi Respon: < 24 Jam\n\n"
             "Anda akan menerima balasan segera setelah Admin merespons."
         )
-        escalation = Message.objects.create(
-            conversation=conv,
-            sender=request.user,
-            content=escalation_text,
-            is_read=True,
-            is_ai_response=True,
+    elif declines_escalation:
+        conv.status = 'ai_answered'
+        conv.save()
+        reply_text = (
+            "Baik, tidak masalah. Jika ada pertanyaan lain seputar AQUAVISION, "
+            "silakan tanyakan kapan saja 😊"
         )
-        ai_msg_data = {
-            'id':              escalation.id,
-            'sender':          'AQUAVISION AI',
-            'content':         escalation.content,
-            'created_at':      timezone.localtime(escalation.created_at).strftime('%d %b %Y, %H:%M'),
-            'is_admin':        True,
-            'is_ai_response':  True,
-        }
+    else:
+        ai_answer = _ai_respond(content)
+        conv.status = 'ai_answered'
+        conv.save()
+        reply_text = ai_answer if ai_answer else (_AI_UNSURE_TEXT + _AI_ESCALATE_OFFER)
+
+    ai_msg = Message.objects.create(
+        conversation=conv,
+        sender=request.user,
+        content=reply_text,
+        is_read=True,
+        is_ai_response=True,
+    )
+    ai_msg_data = {
+        'id':              ai_msg.id,
+        'sender':          'AQUAVISION AI',
+        'content':         ai_msg.content,
+        'created_at':      timezone.localtime(ai_msg.created_at).strftime('%d %b %Y, %H:%M'),
+        'is_admin':        True,
+        'is_ai_response':  True,
+    }
 
     user_msg_data = {
         'id':             msg.id,

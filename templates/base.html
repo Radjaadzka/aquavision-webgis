@@ -44,12 +44,12 @@ document.querySelectorAll('a[href^="#"]').forEach(function(a) {
 
         <!-- CENTER: Nav Links -->
         <div class="nav-links">
-            <a href="/tentang/" class="nav-link {% if request.resolver_match.url_name == 'landing' %}active{% endif %}">Beranda</a>
             <a href="/" class="nav-link {% if request.resolver_match.url_name == 'map' %}active{% endif %}">Dashboard</a>
             <a href="/data/" class="nav-link {% if request.resolver_match.url_name == 'data_list' or request.resolver_match.url_name == 'dataset_detail' %}active{% endif %}">Data Portal</a>
             {% if user.is_authenticated %}
             <a href="/hubungi/" class="nav-link {% if request.resolver_match.url_name == 'hubungi' %}active{% endif %}">Hubungi Admin</a>
             {% endif %}
+            <a href="/tentang/" class="nav-link {% if request.resolver_match.url_name == 'landing' %}active{% endif %}">Tentang AQUAVISION</a>
             <a href="/bantuan/" class="nav-link {% if request.resolver_match.url_name == 'bantuan' %}active{% endif %}">Pusat Bantuan</a>
         </div>
 
@@ -89,27 +89,27 @@ document.querySelectorAll('a[href^="#"]').forEach(function(a) {
     </div>
 
     <nav class="nav-drawer-links">
-        <a href="/tentang/" class="nav-drawer-link {% if request.resolver_match.url_name == 'landing' %}active{% endif %}">
-            <span class="nav-drawer-link-icon">🏠</span> Beranda
-        </a>
-        <a href="/tentang/#tim" class="nav-drawer-link" id="navLinkTim">
-            <span class="nav-drawer-link-icon">👥</span> Tentang Kami
-        </a>
         <a href="/" class="nav-drawer-link {% if request.resolver_match.url_name == 'map' %}active{% endif %}">
             <span class="nav-drawer-link-icon">🗺️</span> Dashboard
         </a>
         <a href="/data/" class="nav-drawer-link {% if request.resolver_match.url_name == 'data_list' or request.resolver_match.url_name == 'dataset_detail' %}active{% endif %}">
             <span class="nav-drawer-link-icon">📊</span> Data Portal
         </a>
-        <a href="/bantuan/" class="nav-drawer-link {% if request.resolver_match.url_name == 'bantuan' %}active{% endif %}">
-            <span class="nav-drawer-link-icon">❓</span> Pusat Bantuan
-        </a>
-        <div class="nav-drawer-divider"></div>
         {% if user.is_authenticated %}
         <a href="/hubungi/" class="nav-drawer-link {% if request.resolver_match.url_name == 'hubungi' %}active{% endif %}">
             <span class="nav-drawer-link-icon">✉️</span> Hubungi Admin
         </a>
         {% endif %}
+        <div class="nav-drawer-divider"></div>
+        <a href="/tentang/" class="nav-drawer-link {% if request.resolver_match.url_name == 'landing' %}active{% endif %}">
+            <span class="nav-drawer-link-icon">ℹ️</span> Tentang AQUAVISION
+        </a>
+        <a href="/tentang/#tim" class="nav-drawer-link" id="navLinkTim">
+            <span class="nav-drawer-link-icon">👥</span> Tentang Kami
+        </a>
+        <a href="/bantuan/" class="nav-drawer-link {% if request.resolver_match.url_name == 'bantuan' %}active{% endif %}">
+            <span class="nav-drawer-link-icon">❓</span> Pusat Bantuan
+        </a>
     </nav>
 
     <div class="nav-drawer-auth">

@@ -164,6 +164,41 @@
     font-size: 13px; color: #065F46;
     display: none; align-items: center; gap: 8px;
 }
+
+/* Pertanyaan Populer (quick questions) */
+.quick-questions {
+    display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+    padding: 12px 16px; border-top: 1px solid #E2E8F0; background: #FAFAFA;
+}
+.qq-label {
+    font-size: 12px; font-weight: 600; color: #64748B; margin-right: 2px;
+}
+.qq-btn {
+    font-size: 12.5px; padding: 6px 12px; border-radius: 20px;
+    border: 1px solid #BFDBFE; background: #EFF6FF; color: #1D4ED8;
+    cursor: pointer; transition: all .15s; font-family: 'Inter', sans-serif;
+    white-space: nowrap;
+}
+.qq-btn:hover { background: #DBEAFE; border-color: #93C5FD; }
+.qq-btn:disabled { opacity: .5; cursor: not-allowed; }
+
+/* Konfirmasi eskalasi ke Admin (Ya/Tidak) */
+.confirm-btns { display: flex; gap: 8px; flex-wrap: wrap; padding-top: 4px; }
+.confirm-btn {
+    font-size: 12.5px; padding: 7px 14px; border-radius: 20px;
+    border: 1px solid #E2E8F0; background: white; color: #0F172A;
+    cursor: pointer; transition: all .15s; font-family: 'Inter', sans-serif;
+}
+.confirm-btn.confirm-yes { border-color: #16A34A; color: #15803D; }
+.confirm-btn.confirm-yes:hover { background: rgba(22,163,74,.08); }
+.confirm-btn.confirm-no { border-color: #CBD5E1; color: #475569; }
+.confirm-btn.confirm-no:hover { background: #F1F5F9; }
+
+@media (max-width: 480px) {
+    .quick-questions { padding: 10px 12px; gap: 6px; }
+    .qq-label { width: 100%; margin-bottom: 2px; }
+    .qq-btn, .confirm-btn { font-size: 12px; padding: 6px 10px; }
+}
 </style>
 {% endblock %}
 
@@ -213,6 +248,14 @@
                 </div>
             </div>
         </div>
+        <div class="quick-questions" id="quickQuestions">
+            <span class="qq-label">💬 Pertanyaan Populer:</span>
+            <button type="button" class="qq-btn" data-q="Bagaimana kondisi air saat ini?">Kondisi air saat ini</button>
+            <button type="button" class="qq-btn" data-q="Berapa jumlah sungai di Wonotoro?">Berapa jumlah sungai?</button>
+            <button type="button" class="qq-btn" data-q="Apa itu potensi air tanah?">Apa itu potensi air tanah?</button>
+            <button type="button" class="qq-btn" data-q="Bagaimana cara download data?">Bagaimana cara download data?</button>
+            <button type="button" class="qq-btn" data-q="Apa fungsi dashboard?">Apa fungsi dashboard?</button>
+        </div>
         <div class="chat-input-area">
             <textarea id="msgInput" placeholder="Tulis pesan Anda..." rows="1"></textarea>
             <button class="chat-send-btn" id="btnSend">Kirim</button>
@@ -234,6 +277,9 @@
         'closed':            '✅ Selesai',
         'open':              '💬 Aktif',
     };
+
+    // Harus sama persis dengan _AI_UNSURE_TEXT di api/views.py
+    var AI_UNSURE_MARKER = "Saya belum memiliki informasi yang cukup untuk menjawab pertanyaan tersebut secara akurat.";
 
     function updateStatusDisplay(status, ticketId, queueCount) {
         var badge = document.getElementById('statusSbadge');
@@ -293,6 +339,36 @@
         if (m.id > lastId) lastId = m.id;
     }
 
+    // Tampilkan tombol konfirmasi Ya/Tidak hanya jika pesan AI TERAKHIR
+    // menawarkan eskalasi ke Admin (mencegah tombol "nyangkut" dari riwayat lama)
+    function maybeShowConfirm(m) {
+        var old = document.getElementById('confirmRow');
+        if (old) old.remove();
+
+        if (!m || !m.is_ai_response || m.content.indexOf(AI_UNSURE_MARKER) === -1) return;
+
+        var box = document.getElementById('chatMessages');
+        var confirmRow = document.createElement('div');
+        confirmRow.id = 'confirmRow';
+        confirmRow.className = 'msg-row other';
+        confirmRow.innerHTML =
+            '<div class="msg-avatar ai-av" style="visibility:hidden;">🤖</div>' +
+            '<div class="confirm-btns">' +
+                '<button type="button" class="confirm-btn confirm-yes">Ya, hubungkan ke Admin</button>' +
+                '<button type="button" class="confirm-btn confirm-no">Tidak, terima kasih</button>' +
+            '</div>';
+        box.appendChild(confirmRow);
+        confirmRow.querySelector('.confirm-yes').addEventListener('click', function () {
+            confirmRow.remove();
+            sendMsg('Ya');
+        });
+        confirmRow.querySelector('.confirm-no').addEventListener('click', function () {
+            confirmRow.remove();
+            sendMsg('Tidak');
+        });
+        box.scrollTop = box.scrollHeight;
+    }
+
     function loadMessages() {
         fetch('/hubungi/messages/?since=' + lastId)
             .then(function (r) { return r.json(); })
@@ -303,19 +379,24 @@
                     if (m.is_admin && !m.is_ai_response) hadNewAdmin = true;
                     appendMsg(m);
                 });
+                if (msgs.length > 0) maybeShowConfirm(msgs[msgs.length - 1]);
                 if (data.conv_status) updateStatusDisplay(data.conv_status, data.ticket_id, data.queue_count);
                 if (hadNewAdmin) showReplyNotif();
             })
             .catch(function () {});
     }
 
-    function sendMsg() {
+    function setControlsDisabled(disabled) {
+        document.getElementById('btnSend').disabled = disabled;
+        document.querySelectorAll('.qq-btn').forEach(function (b) { b.disabled = disabled; });
+    }
+
+    function sendMsg(presetText) {
         var inp  = document.getElementById('msgInput');
-        var btn  = document.getElementById('btnSend');
-        var text = inp.value.trim();
+        var text = (presetText !== undefined) ? presetText : inp.value.trim();
         if (!text) return;
 
-        btn.disabled = true;
+        setControlsDisabled(true);
         fetch('/hubungi/send/', {
             method: 'POST',
             headers: {
@@ -326,19 +407,24 @@
         })
         .then(function (r) { return r.json(); })
         .then(function (d) {
-            btn.disabled = false;
+            setControlsDisabled(false);
             if (d.error) { alert(d.error); return; }
-            inp.value = '';
-            inp.style.height = 'auto';
+            if (presetText === undefined) {
+                inp.value = '';
+                inp.style.height = 'auto';
+            }
             if (d.user_msg) {
                 appendMsg(d.user_msg);
-                if (d.ai_msg) appendMsg(d.ai_msg);
+                if (d.ai_msg) {
+                    appendMsg(d.ai_msg);
+                    maybeShowConfirm(d.ai_msg);
+                }
             } else {
                 appendMsg(d);
             }
             if (d.conv_status) updateStatusDisplay(d.conv_status, d.ticket_id);
         })
-        .catch(function () { btn.disabled = false; });
+        .catch(function () { setControlsDisabled(false); });
     }
 
     // Auto-resize textarea
@@ -350,7 +436,12 @@
     inp.addEventListener('keydown', function (e) {
         if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMsg(); }
     });
-    document.getElementById('btnSend').addEventListener('click', sendMsg);
+    document.getElementById('btnSend').addEventListener('click', function () { sendMsg(); });
+
+    // Tombol Pertanyaan Populer — kirim langsung pertanyaan yang sudah disiapkan
+    document.querySelectorAll('.qq-btn').forEach(function (b) {
+        b.addEventListener('click', function () { sendMsg(b.getAttribute('data-q')); });
+    });
 
     // Initial load + polling every 5 s
     loadMessages();

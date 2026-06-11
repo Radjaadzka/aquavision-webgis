@@ -306,12 +306,12 @@
                 }
             },
 
-            // ── 11. BERANDA ────────────────────────────────────────────
+            // ── 11. TENTANG AQUAVISION ───────────────────────────────────
             {
                 element: '.nav-links a[href="/tentang/"]',
                 popover: {
-                    title:       '🏠 Beranda',
-                    description: 'Menu Beranda berisi informasi umum AQUAVISION, latar belakang sistem, dan gambaran fitur utama.',
+                    title:       '🏠 Tentang AQUAVISION',
+                    description: 'Menu Tentang AQUAVISION berisi informasi umum AQUAVISION, latar belakang sistem, dan gambaran fitur utama.',
                     position:    'bottom'
                 }
             },

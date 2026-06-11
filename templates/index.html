@@ -169,7 +169,7 @@
                 <div class="shb-sub">Platform Informasi Sumber Daya Air · Desa Wonotoro</div>
                 <div class="shb-stats-row">
                     <span class="shb-stat">💧 <strong id="heroAir">—</strong> Sumber</span>
-                    <span class="shb-stat">🌊 <strong>28</strong> Sungai</span>
+                    <span class="shb-stat">🔧 <strong id="heroPipa">—</strong> Pipa</span>
                     <span class="shb-stat">🚰 <strong id="heroReservoir">—</strong> Tandon</span>
                 </div>
                 <div class="shb-welcome">
@@ -317,7 +317,7 @@
                         <!-- Guest / User: statistik objek wisata & air -->
                         <div class="stat-mini"><div class="stat-mini-icon">💧</div><div class="stat-mini-num" id="countAir">—</div><div class="stat-mini-label">Sumber Air</div></div>
                         <div class="stat-mini"><div class="stat-mini-icon">🚰</div><div class="stat-mini-num" id="countReservoir">—</div><div class="stat-mini-label">Tandon Air</div></div>
-                        <div class="stat-mini"><div class="stat-mini-icon">🌊</div><div class="stat-mini-num" id="countSungai">28</div><div class="stat-mini-label">Jaringan Sungai</div></div>
+                        <div class="stat-mini"><div class="stat-mini-icon">🔧</div><div class="stat-mini-num" id="countPipa">—</div><div class="stat-mini-label">Segmen Pipa</div></div>
                         <div class="stat-mini"><div class="stat-mini-icon">🏨</div><div class="stat-mini-num" id="countHotel">—</div><div class="stat-mini-label">Hotel</div></div>
                         <div class="stat-mini"><div class="stat-mini-icon">🍽️</div><div class="stat-mini-num" id="countMakan">—</div><div class="stat-mini-label">Rumah Makan</div></div>
                         <div class="stat-mini"><div class="stat-mini-icon">🛠️</div><div class="stat-mini-num" id="countJasa">—</div><div class="stat-mini-label">Jasa</div></div>
@@ -537,7 +537,7 @@
             <p class="hero-card-sub">Platform Informasi Sumber Daya Air Desa Wonotoro</p>
             <div class="hero-stats">
                 <div class="hero-stat"><strong id="heroStatAir">—</strong><span>Sumber Air</span></div>
-                <div class="hero-stat"><strong>28</strong><span>Jaringan Sungai</span></div>
+                <div class="hero-stat"><strong id="heroStatPipa">—</strong><span>Segmen Pipa</span></div>
                 <div class="hero-stat"><strong id="heroStatKetersediaan">—</strong><span>m³/hari Ketersediaan Air</span></div>
             </div>
             <div class="hero-actions">
@@ -705,6 +705,7 @@
             set('statDataset',   d.dataset_count || 8);
             set('countAir',      d.sumber_air);
             set('countReservoir', d.reservoir);
+            set('countPipa',     d.pipa);
             set('statConv',      d.conversation_count);
             set('statDl',        d.download_count);
             // hidden legacy elements kept for script.js GeoJSON callbacks
@@ -716,8 +717,10 @@
             // Sync sidebar hero counts
             set('heroAir',       d.sumber_air);
             set('heroReservoir', d.reservoir);
+            set('heroPipa',      d.pipa);
             // Sync Hero Dashboard stats
             set('heroStatAir',   d.sumber_air);
+            set('heroStatPipa',  d.pipa);
         })
         .catch(function() {});
 })();
@@ -929,7 +932,7 @@ document.getElementById('modalLayerInfo').addEventListener('click', function(e) 
 // ── Tahukah Anda? rotating facts ───────────────────────────────
 (function () {
     var facts = [
-        'Desa Wonotoro memiliki 28 segmen sungai yang mendukung kebutuhan air masyarakat dan pertanian di kawasan Bromo Tengger Semeru.',
+        'Layer Daerah Aliran Sungai (DAS) memetakan jaringan sungai di Desa Wonotoro yang mendukung kebutuhan air masyarakat dan pertanian di kawasan Bromo Tengger Semeru.',
         'Data Potensi Air Tanah AQUAVISION memiliki resolusi spasial 10m × 10m — cukup presisi untuk mengidentifikasi lokasi sumber air baru.',
         'Debit Puncak Aliran tersedia untuk 12 bulan. Ini membantu memahami variasi musiman ketersediaan air sepanjang tahun.',
         'Zona Potensi Air Tanah dihitung menggunakan AHP (Analytical Hierarchy Process) dari 5 kriteria: tutupan lahan, lereng, tanah, curah hujan, dan geologi.',

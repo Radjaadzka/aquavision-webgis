@@ -21,11 +21,12 @@ from api.views import is_admin_user, audit_log_page, download_log_page
 
 def landing(request):
     """Landing page — data counter dari DB, bukan fetch JS."""
-    from api.models import SumberAir, FasilitasWisata, Permukiman
+    from api.models import SumberAir, FasilitasWisata, Permukiman, JaringanPipa
     return render(request, 'landing.html', {
         'jumlah_air':        SumberAir.objects.count(),
         'jumlah_fasilitas':  FasilitasWisata.objects.count(),
         'jumlah_permukiman': Permukiman.objects.count(),
+        'jumlah_pipa':       JaringanPipa.objects.count(),
     })
 
 
