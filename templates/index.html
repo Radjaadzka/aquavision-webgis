@@ -390,8 +390,8 @@
                 <hr>
 
                 <p>Analisis Hidrologi</p>
-                <label title="Area berpotensi menyimpan cadangan air tanah, hasil analisis AHP 5 kriteria. Resolusi: 10m × 10m."><input type="checkbox" id="chkPotensiAirTanah"> Daerah Potensi Air Tanah <small style="color:rgba(255,255,255,.25);font-size:10px;">10m×10m</small> <span class="lyr-info" onclick="showLayerInfo('potensi')">ℹ</span></label>
-                <label title="Estimasi debit aliran permukaan maksimum saat hujan, tersedia untuk 12 bulan. Resolusi: 30m × 30m."><input type="checkbox" id="chkDebitPuncak">     Debit Puncak Aliran <small style="color:rgba(255,255,255,.25);font-size:10px;">30m×30m</small> <span class="lyr-info" onclick="showLayerInfo('debit')">ℹ</span></label>
+                <label title="Area berpotensi menyimpan cadangan air tanah, hasil analisis AHP 5 kriteria. Resolusi Spasial: 30m × 30m."><input type="checkbox" id="chkPotensiAirTanah"> Daerah Potensi Air Tanah <small style="color:rgba(255,255,255,.25);font-size:10px;">30m×30m</small> <span class="lyr-info" onclick="showLayerInfo('potensi')">ℹ</span></label>
+                <label title="Estimasi debit puncak aliran permukaan bulanan, tersedia untuk 12 bulan. Resolusi Spasial: 10m × 10m."><input type="checkbox" id="chkDebitPuncak">     Debit Puncak Aliran <small style="color:rgba(255,255,255,.25);font-size:10px;">10m×10m</small> <span class="lyr-info" onclick="showLayerInfo('debit')">ℹ</span></label>
                 <div id="debitBulanPanel" style="display:none; margin:4px 0 4px 6px;">
                     <select id="selectDebitBulan" style="font-size:12px;">
                         <option value="">-- Pilih Bulan --</option>
@@ -1129,15 +1129,15 @@ LEGEND_DEFS.forEach(function(d) {
 
 // ── Layer Info Modal ───────────────────────────────────────────
 var LAYER_META = {
-    administrasi: { nama:'Administrasi Desa', deskripsi:'Batas administrasi desa-desa di sekitar Desa Wonotoro, Kecamatan Sukapura.', metode:'Digitasi dari peta RBI skala 1:50.000', resolusi:'Poligon vektor', tahun:'2024', sumber:'BIG (Badan Informasi Geospasial)', format:'GeoJSON / Shapefile' },
-    sumber_air:   { nama:'Sumber Air', deskripsi:'Titik sumber mata air di Desa Wonotoro beserta debit dan kondisi fisik.', metode:'Survey lapangan GPS RTK', resolusi:'Titik (Point)', tahun:'2024', sumber:'Survey Primer Tim AQUAVISION', format:'GeoJSON / CSV / Shapefile' },
-    reservoir:    { nama:'Tandon Air', deskripsi:'Lokasi dan kapasitas tandon distribusi air di Desa Wonotoro.', metode:'Survey lapangan GPS', resolusi:'Titik (Point)', tahun:'2024', sumber:'Survey Primer Tim AQUAVISION', format:'GeoJSON / CSV / Shapefile' },
-    pipa:         { nama:'Jaringan Pipa', deskripsi:'Jaringan pipa distribusi air dari sumber ke permukiman dan fasilitas wisata.', metode:'Digitasi dari survey lapangan', resolusi:'Garis (LineString)', tahun:'2024', sumber:'Survey Primer Tim AQUAVISION', format:'GeoJSON / Shapefile' },
-    sungai:       { nama:'Daerah Aliran Sungai', deskripsi:'Jaringan sungai dan aliran permukaan di wilayah studi Desa Wonotoro.', metode:'Ekstraksi dari DEM SRTM 30m', resolusi:'Garis (LineString)', tahun:'2023', sumber:'SRTM / BIG', format:'GeoJSON / Shapefile' },
-    potensi:      { nama:'Daerah Potensi Air Tanah', deskripsi:'Zonasi potensi air tanah berdasarkan analisis multi-kriteria di Desa Wonotoro.', metode:'AHP (Analytical Hierarchy Process) — 5 kriteria: tutupan lahan, kemiringan lereng, jenis tanah, curah hujan, geologi.', resolusi:'10m × 10m (Raster GeoTIFF)', tahun:'2024', sumber:'Analisis GIS AQUAVISION — BIG, BMKG, PVMBG', format:'GeoTIFF / GeoJSON' },
-    debit:        { nama:'Debit Puncak Aliran', deskripsi:'Peta debit puncak aliran permukaan bulanan di Desa Wonotoro (12 bulan).', metode:'Metode Rasional: Q = 0.278 × C × I × A — koefisien aliran, intensitas hujan BMKG, luas DAS dari DEM.', resolusi:'30m × 30m (Raster GeoTIFF)', tahun:'2024', sumber:'Analisis GIS AQUAVISION — BMKG Probolinggo 2014–2023', format:'GeoTIFF (12 file bulanan)' },
-    fasilitas:    { nama:'Fasilitas Wisata', deskripsi:'Lokasi hotel, restoran, homestay, dan jasa di kawasan wisata Desa Wonotoro.', metode:'Survey lapangan GPS + validasi Google Maps', resolusi:'Titik (Point)', tahun:'2024', sumber:'Survey Primer Tim AQUAVISION', format:'GeoJSON / CSV / Shapefile' },
-    permukiman:   { nama:'Permukiman', deskripsi:'Lokasi permukiman penduduk dan data demografi per dusun di Desa Wonotoro.', metode:'Survey lapangan GPS + data monografi desa', resolusi:'Titik (Point)', tahun:'2024', sumber:'Data Monografi Desa Wonotoro + Survey Primer', format:'GeoJSON / CSV / Shapefile' },
+    administrasi: { nama:'Administrasi Desa',       deskripsi:'Batas administrasi desa-desa di sekitar Desa Wonotoro, Kecamatan Sukapura.',                                                                                                                         metode:'Digitasi dari peta RBI skala 1:50.000',                                                                                     resolusi:'Poligon vektor',              sumber:'BIG (Badan Informasi Geospasial)',                       format:'GeoJSON / Shapefile' },
+    sumber_air:   { nama:'Sumber Air',               deskripsi:'Titik sumber mata air di Desa Wonotoro beserta debit dan kondisi fisik.',                                                                                                                              metode:'Survey lapangan GPS RTK',                                                                                                   resolusi:'Titik (Point)',               sumber:'Survey Primer Tim AQUAVISION',                          format:'GeoJSON / CSV / Shapefile' },
+    reservoir:    { nama:'Tandon Air',               deskripsi:'Lokasi dan kapasitas tandon distribusi air di Desa Wonotoro.',                                                                                                                                         metode:'Survey lapangan GPS',                                                                                                       resolusi:'Titik (Point)',               sumber:'Survey Primer Tim AQUAVISION',                          format:'GeoJSON / CSV / Shapefile' },
+    pipa:         { nama:'Jaringan Pipa',            deskripsi:'Jaringan pipa distribusi air dari sumber ke permukiman dan fasilitas wisata.',                                                                                                                         metode:'Digitasi dari survey lapangan',                                                                                             resolusi:'Garis (LineString)',          sumber:'Survey Primer Tim AQUAVISION',                          format:'GeoJSON / Shapefile' },
+    sungai:       { nama:'Daerah Aliran Sungai',    deskripsi:'Jaringan sungai dan aliran permukaan di wilayah studi Desa Wonotoro.',                                                                                                                                  metode:'Ekstraksi dari DEM SRTM 30m',                                                                                               resolusi:'Garis (LineString)',          sumber:'SRTM / BIG',                                            format:'GeoJSON / Shapefile' },
+    potensi:      { nama:'Daerah Potensi Air Tanah', deskripsi:'Zonasi potensi air tanah berdasarkan analisis multi-kriteria di Desa Wonotoro.',                                                                                                                      metode:'AHP (Analytical Hierarchy Process) — 5 kriteria: tutupan lahan, kemiringan lereng, jenis tanah, curah hujan, geologi.',    resolusi:'30m × 30m (Raster GeoTIFF)', sumber:'Analisis GIS AQUAVISION — BIG, BMKG, PVMBG',            format:'GeoTIFF / GeoJSON' },
+    debit:        { nama:'Debit Puncak Aliran',      deskripsi:'Peta debit puncak aliran permukaan bulanan di Desa Wonotoro.',                                                                                                                                         metode:'Metode Rasional: Q = 0.278 × C × I × A — koefisien aliran, intensitas hujan BMKG, luas DAS dari DEM.',                    resolusi:'10m × 10m (Raster GeoTIFF)', sumber:'Analisis GIS AQUAVISION — BMKG Probolinggo 2014–2023', format:'GeoTIFF (12 file bulanan)' },
+    fasilitas:    { nama:'Fasilitas Wisata',         deskripsi:'Lokasi hotel, restoran, homestay, dan jasa di kawasan wisata Desa Wonotoro.',                                                                                                                          metode:'Survey lapangan GPS + validasi Google Maps',                                                                                resolusi:'Titik (Point)',               sumber:'Survey Primer Tim AQUAVISION',                          format:'GeoJSON / CSV / Shapefile' },
+    permukiman:   { nama:'Permukiman',               deskripsi:'Lokasi permukiman penduduk dan data demografi per dusun di Desa Wonotoro.',                                                                                                                            metode:'Survey lapangan GPS + data monografi desa',                                                                                 resolusi:'Titik (Point)',               sumber:'Data Monografi Desa Wonotoro + Survey Primer',          format:'GeoJSON / CSV / Shapefile' },
 };
 
 window.showLayerInfo = function(key) {
@@ -1147,11 +1147,11 @@ window.showLayerInfo = function(key) {
     document.getElementById('liBody').innerHTML = [
         ['Deskripsi', meta.deskripsi],
         ['Metode',    meta.metode],
-        ['Resolusi',  meta.resolusi],
-        ['Tahun',     meta.tahun],
+        ['Resolusi Spasial', meta.resolusi],
         ['Sumber',    meta.sumber],
         ['Format',    meta.format],
-    ].map(function(r) {
+    ].filter(function(r){ return r[1] !== undefined && r[1] !== null && r[1] !== ''; })
+    .map(function(r) {
         return '<div class="lyrinfo-row"><span class="lyrinfo-label">' + r[0] + '</span><span class="lyrinfo-val">' + r[1] + '</span></div>';
     }).join('');
     document.getElementById('modalLayerInfo').style.display = 'flex';
@@ -1244,7 +1244,7 @@ document.getElementById('modalLayerInfo').addEventListener('click', function(e) 
 (function () {
     var facts = [
         'Layer Daerah Aliran Sungai (DAS) memetakan jaringan sungai di Desa Wonotoro yang mendukung kebutuhan air masyarakat dan pertanian di kawasan Bromo Tengger Semeru.',
-        'Data Potensi Air Tanah AQUAVISION memiliki resolusi spasial 10m × 10m — cukup presisi untuk mengidentifikasi lokasi sumber air baru.',
+        'Data Potensi Air Tanah AQUAVISION memiliki resolusi spasial 30m × 30m, memetakan zonasi potensi dari kategori Sangat Rendah hingga Sangat Tinggi.',
         'Debit Puncak Aliran tersedia untuk 12 bulan. Ini membantu memahami variasi musiman ketersediaan air sepanjang tahun.',
         'Zona Potensi Air Tanah dihitung menggunakan AHP (Analytical Hierarchy Process) dari 5 kriteria: tutupan lahan, lereng, tanah, curah hujan, dan geologi.',
         'AQUAVISION menyediakan data dalam format CSV, GeoJSON, KML, dan Shapefile — bisa langsung dibuka di Excel, QGIS, atau Google Earth.',
