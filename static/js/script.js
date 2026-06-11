@@ -350,44 +350,8 @@ document.addEventListener("DOMContentLoaded", function () {
                             opacity:     1
                         };
                     },
-                    onEachFeature: function (f, l) {
-                        l.on("click", function (ev) {
-                            var bulanLabel = BULAN_LABEL[BULAN.indexOf(kode)];
-                            var lat = ev.latlng.lat;
-                            var lng = ev.latlng.lng;
-                            var actualVal = getDebitRasterValue(lat, lng);
-                            var content;
-
-                            if (actualVal !== null) {
-                                var dKelas =
-                                    actualVal <= 5  ? 1 : actualVal <= 10 ? 2 : actualVal <= 15 ? 3 :
-                                    actualVal <= 21 ? 4 : actualVal <= 26 ? 5 : actualVal <= 31 ? 6 :
-                                    actualVal <= 36 ? 7 : 8;
-                                var warna = getDebitColor(dKelas);
-                                content =
-                                    '<div style="font-family:\'Inter\',sans-serif;padding:2px 0;min-width:160px;">' +
-                                        '<div style="font-weight:700;font-size:13px;color:' + warna + ';margin-bottom:8px;border-bottom:1px solid rgba(0,0,0,.08);padding-bottom:6px;">🌊 Debit Puncak — ' + bulanLabel + '</div>' +
-                                        '<div style="font-size:22px;font-weight:700;color:' + warna + ';letter-spacing:-.3px;">' + actualVal.toFixed(2) + ' <span style="font-size:13px;font-weight:400;color:#666;">m³/s</span></div>' +
-                                    '</div>';
-                            } else {
-                                // TIFF belum dimuat — tampilkan estimasi tanpa kelas
-                                var kelas = f.properties.DN || f.properties.dn || f.properties.VALUE || 1;
-                                var warna = getDebitColor(Math.max(1, Math.min(8, Math.round(kelas))));
-                                var ranges = ["0–5","5–10","10–15","15–21","21–26","26–31","31–36",">36"];
-                                var rangeStr = ranges[Math.max(0, Math.min(7, Math.round(kelas) - 1))];
-                                content =
-                                    '<div style="font-family:\'Inter\',sans-serif;padding:2px 0;min-width:160px;">' +
-                                        '<div style="font-weight:700;font-size:13px;color:' + warna + ';margin-bottom:8px;border-bottom:1px solid rgba(0,0,0,.08);padding-bottom:6px;">🌊 Debit Puncak — ' + bulanLabel + '</div>' +
-                                        '<div style="font-size:22px;font-weight:700;color:' + warna + ';letter-spacing:-.3px;">~' + rangeStr + ' <span style="font-size:13px;font-weight:400;color:#666;">m³/s</span></div>' +
-                                        '<div style="font-size:10px;color:#aaa;margin-top:6px;">Data piksel sedang dimuat…</div>' +
-                                    '</div>';
-                            }
-
-                            L.popup({ maxWidth: 240 }).setLatLng(ev.latlng).setContent(content).openOn(map);
-                            ev.originalEvent.stopPropagation();
-                            L.DomEvent.stopPropagation(ev);
-                        });
-                    }
+                    // No per-feature click handler — all clicks route to map.on("click")
+                    // which shows a unified popup: coordinates + UTM + debit value.
                 });
                 // Add immediately if this month is still the active one
                 if (activeDebitBulan === kode) {
@@ -655,23 +619,13 @@ document.addEventListener("DOMContentLoaded", function () {
             .catch(function () { console.warn("BatasDesa layer gagal dimuat."); });
     }
 
-    // Sungai
+    // Sungai / DAS — visualisasi wilayah hidrologi saja, tanpa popup/tooltip.
+    // Klik pada layer ini diteruskan ke map.on("click") untuk popup koordinat.
     fetch("/static/data/Sungai.geojson")
         .then(function (r) { return r.json(); })
         .then(function (data) {
             sungaiVektorLayer = L.geoJSON(data, {
-                style: { color: "#2980b9", weight: 2, opacity: 0.85 },
-                onEachFeature: function (f, l) {
-                    var p    = f.properties;
-                    var nama = p.nama || "Sungai";
-                    l.bindTooltip(nama, { sticky: true });
-                    l.bindPopup(
-                        "<b>" + nama + "</b><br>" +
-                        (p.tipe  ? "Tipe: "  + p.tipe  + "<br>" : "") +
-                        (p.kelas ? "Kelas: " + p.kelas + "<br>" : "") +
-                        (p.das   ? "DAS: "   + p.das   : "")
-                    );
-                }
+                style: { color: "#2980b9", weight: 2, opacity: 0.85 }
             });
         })
         .catch(function (err) { console.log("Sungai error:", err); });
@@ -1149,21 +1103,29 @@ document.addEventListener("DOMContentLoaded", function () {
         var northing = k0 * (M + N * Math.tan(latR) * (A * A / 2 + (5 - T + 9 * C + 4 * C * C) * A * A * A * A / 24));
         if (lat < 0) northing += 10000000;
 
-        // P0.4: include debit raster value in click popup (works on desktop + mobile)
+        // Debit Puncak section — always shown when a month is active
         var debitHtml = "";
         var debitVal  = getDebitRasterValue(lat, lng);
-        if (debitVal !== null && activeDebitBulan) {
+        if (activeDebitBulan) {
             var dLabel = BULAN_LABEL[BULAN.indexOf(activeDebitBulan)];
-            var dKelas =
-                debitVal <= 5  ? 1 : debitVal <= 10 ? 2 : debitVal <= 15 ? 3 :
-                debitVal <= 21 ? 4 : debitVal <= 26 ? 5 : debitVal <= 31 ? 6 :
-                debitVal <= 36 ? 7 : 8;
-            var dWarna = getDebitColor(dKelas);
-            debitHtml =
-                '<div style="margin-top:6px;padding-top:6px;border-top:1px solid #eee;">' +
-                    '<div style="font-weight:600;color:' + dWarna + ';font-size:11px;margin-bottom:4px;">🌊 Debit Puncak — ' + dLabel + "</div>" +
-                    '<div><b>Nilai:</b> <span style="color:' + dWarna + ';font-weight:600;">' + debitVal.toFixed(2) + " m³/s</span></div>" +
-                "</div>";
+            if (debitVal !== null) {
+                var dKelas =
+                    debitVal <= 5  ? 1 : debitVal <= 10 ? 2 : debitVal <= 15 ? 3 :
+                    debitVal <= 21 ? 4 : debitVal <= 26 ? 5 : debitVal <= 31 ? 6 :
+                    debitVal <= 36 ? 7 : 8;
+                var dWarna = getDebitColor(dKelas);
+                debitHtml =
+                    '<div style="margin-top:6px;padding-top:6px;border-top:1px solid #eee;">' +
+                        '<div style="font-weight:600;color:' + dWarna + ';font-size:11px;margin-bottom:4px;">🌊 Debit Puncak — ' + dLabel + '</div>' +
+                        '<div><b>Nilai:</b> <span style="color:' + dWarna + ';font-weight:600;">' + debitVal.toFixed(2) + ' m³/s</span></div>' +
+                    '</div>';
+            } else {
+                debitHtml =
+                    '<div style="margin-top:6px;padding-top:6px;border-top:1px solid #eee;">' +
+                        '<div style="font-weight:600;color:#60A5FA;font-size:11px;margin-bottom:4px;">🌊 Debit Puncak — ' + dLabel + '</div>' +
+                        '<div style="font-size:11px;color:#999;">Memuat nilai piksel...</div>' +
+                    '</div>';
+            }
         }
 
         L.popup().setLatLng(e.latlng).setContent(

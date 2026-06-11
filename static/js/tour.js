@@ -190,10 +190,11 @@
     }
 
     /* ── Steps — adapt to login state ────────────────────────────────
-       Guest      (11 steps): Panel Peta → Layer → Legenda → Cari →
-                               Export → Tentang → Data Portal →
-                               Bantuan → Login → Daftar → Selesai
-       User login (12 steps): + Hubungi Admin, Profil, Logout (no Login/Daftar)
+       Guest      (9 steps):  Panel Peta → Cari → Export → Tentang →
+                               Data Portal → Bantuan → Login → Daftar → Selesai
+       User login (10 steps): Panel Peta → Cari → Export → Tentang →
+                               Data Portal → Hubungi Admin → Bantuan →
+                               Profil → Logout → Selesai
        Targets that are missing/invisible are skipped automatically. */
 
     function buildSteps() {
@@ -206,32 +207,12 @@
                 element: '#sidebar',
                 popover: {
                     title:       '🗂️ Panel Fitur Peta',
-                    description: 'Panel ini adalah tempat utama untuk menggunakan semua fitur AQUAVISION — mengaktifkan layer peta, melihat legenda, mencari lokasi, dan mengakses analisis data sumber daya air.',
+                    description: 'Panel ini digunakan untuk mengakses seluruh fitur utama AQUAVISION seperti menampilkan layer peta, membaca informasi spasial, mencari lokasi, dan melakukan analisis sederhana.',
                     position:    'right'
                 }
             },
 
-            // ── 2. DAFTAR LAYER ──────────────────────────────────────
-            {
-                element: '#btnLayer',
-                popover: {
-                    title:       '🗺️ Tampilkan Data di Peta',
-                    description: 'Klik tombol ini untuk memilih data apa yang ingin ditampilkan di peta — misalnya lokasi sumber air, jaringan pipa, potensi air tanah, atau debit aliran sungai.',
-                    position:    'right'
-                }
-            },
-
-            // ── 3. LEGENDA PETA ───────────────────────────────────────
-            {
-                element: '#legendCard',
-                popover: {
-                    title:       '🎨 Keterangan Warna Peta',
-                    description: 'Bagian ini menjelaskan arti setiap warna dan simbol yang muncul di peta. Keterangan akan berubah sesuai data yang sedang ditampilkan.',
-                    position:    'right'
-                }
-            },
-
-            // ── 4. CARI LOKASI ─────────────────────────────────────────
+            // ── 2. CARI LOKASI ────────────────────────────────────────
             {
                 element: '#mapSearchInput',
                 popover: {
@@ -241,7 +222,7 @@
                 }
             },
 
-            // ── 5. EXPORT ─────────────────────────────────────────────
+            // ── 3. EXPORT ─────────────────────────────────────────────
             {
                 element: '#btnPrintMap',
                 popover: {
@@ -251,88 +232,88 @@
                 }
             },
 
-            // ── 6. TENTANG AQUAVISION ─────────────────────────────────
+            // ── 4. TENTANG AQUAVISION ─────────────────────────────────
             {
                 element: '.nav-links a[href="/tentang/"]',
                 popover: {
                     title:       'ℹ️ Tentang AQUAVISION',
-                    description: 'Pelajari lebih lanjut tentang AQUAVISION — apa itu, untuk siapa, dan bagaimana platform ini membantu pengelolaan sumber daya air Desa Wonotoro.',
+                    description: 'Lihat informasi mengenai sistem AQUAVISION — fitur-fitur yang tersedia, tujuan pembuatannya, dan pihak-pihak yang terlibat.',
                     position:    'bottom'
                 }
             },
 
-            // ── 7. DATA PORTAL ────────────────────────────────────────
+            // ── 5. DATA PORTAL ────────────────────────────────────────
             {
                 element: '.nav-links a[href="/data/"]',
                 popover: {
-                    title:       '📊 Unduh Data',
-                    description: 'Lihat dan unduh semua data yang tersedia dalam sistem — dalam format spreadsheet, peta digital, atau file GIS untuk keperluan analisis lanjutan.',
+                    title:       '📊 Data Portal',
+                    description: 'Unduh data sumber daya air dalam berbagai format — CSV, GeoJSON, KML, dan Shapefile untuk keperluan analisis lanjutan.',
                     position:    'bottom'
                 }
             }
         ];
 
         if (isLoggedIn) {
-            // ── 8. HUBUNGI ADMIN ──────────────────────────────────────
+            // ── 6. HUBUNGI ADMIN ──────────────────────────────────────
             steps.push({
                 element: '.nav-links a[href="/hubungi/"]',
                 popover: {
-                    title:       '✉️ Tanya atau Hubungi Tim',
-                    description: 'Ada pertanyaan tentang data atau sistem? Kirim pesan langsung ke tim AQUAVISION. Pertanyaan umum dijawab otomatis, pertanyaan khusus akan diteruskan ke admin.',
+                    title:       '✉️ Hubungi Admin',
+                    description: 'Sampaikan masukan atau pertanyaan kepada pengelola sistem AQUAVISION.',
                     position:    'bottom'
                 }
             });
-            // ── 9. PUSAT BANTUAN ──────────────────────────────────────
+            // ── 7. PUSAT BANTUAN ──────────────────────────────────────
             steps.push({
                 element: '.nav-links a[href="/bantuan/"]',
                 popover: {
-                    title:       '❓ Panduan Penggunaan',
-                    description: 'Kumpulan panduan singkat dan jawaban atas pertanyaan yang sering ditanyakan — cara membaca peta, cara mengunduh data, dan lainnya.',
+                    title:       '❓ Pusat Bantuan',
+                    description: 'Akses panduan penggunaan sistem, cara membaca peta, dan cara mengunduh data.',
                     position:    'bottom'
                 }
             });
-            // ── 10. PROFIL ────────────────────────────────────────────
+            // ── 8. PROFIL ─────────────────────────────────────────────
             steps.push({
                 element: '.nav-user',
                 popover: {
-                    title:       '👤 Akun Anda',
-                    description: 'Ini adalah akun yang sedang Anda gunakan untuk masuk ke AQUAVISION.',
+                    title:       '👤 Profil',
+                    description: 'Lihat informasi akun yang sedang Anda gunakan untuk masuk ke sistem.',
                     position:    'bottom'
                 }
             });
-            // ── 11. LOGOUT ────────────────────────────────────────────
+            // ── 9. LOGOUT ─────────────────────────────────────────────
             steps.push({
                 element: '.nav-btn-logout',
                 popover: {
-                    title:       '🚪 Keluar',
-                    description: 'Klik di sini untuk keluar dari akun Anda dengan aman setelah selesai menggunakan AQUAVISION.',
+                    title:       '🚪 Logout',
+                    description: 'Keluar dari sistem AQUAVISION dengan aman setelah selesai menggunakan platform.',
                     position:    'bottom'
                 }
             });
         } else {
-            // ── 8. PUSAT BANTUAN ──────────────────────────────────────
+            // ── 6. PUSAT BANTUAN ──────────────────────────────────────
             steps.push({
                 element: '.nav-links a[href="/bantuan/"]',
                 popover: {
-                    title:       '❓ Panduan Penggunaan',
-                    description: 'Kumpulan panduan singkat dan jawaban atas pertanyaan yang sering ditanyakan — cara membaca peta, cara mengunduh data, dan lainnya.',
+                    title:       '❓ Pusat Bantuan',
+                    description: 'Akses panduan penggunaan sistem, cara membaca peta, dan cara mengunduh data.',
                     position:    'bottom'
                 }
             });
-            // ── 9. LOGIN ──────────────────────────────────────────────
+            // ── 7. LOGIN ──────────────────────────────────────────────
             steps.push({
                 element: '.nav-btn-login',
                 popover: {
-                    title:       '🔑 Masuk ke Sistem',
-                    description: 'Masuk dengan akun Anda untuk mengakses fitur lengkap AQUAVISION, termasuk kirim pertanyaan ke admin.',
+                    title:       '🔑 Login',
+                    description: 'Masuk dengan akun Anda untuk mengakses fitur lengkap AQUAVISION, termasuk mengirim pertanyaan ke admin.',
                     position:    'bottom'
                 }
             });
-            // ── 10. DAFTAR ────────────────────────────────────────────
+            // ── 8. DAFTAR ────────────────────────────────────────────
             steps.push({
                 element: '.nav-btn-register',
                 popover: {
-                    title:       '📝 Buat Akun Baru',
+                    title:       '📝 Daftar',
                     description: 'Belum punya akun? Daftar gratis untuk mengakses semua fitur AQUAVISION.',
                     position:    'bottom'
                 }
@@ -345,7 +326,7 @@
             popover: {
                 title:       '🎉 Siap Menjelajah!',
                 description: 'Panduan selesai. Sekarang Anda bisa mulai menjelajahi data sumber daya air Desa Wonotoro. Untuk mengulang panduan ini kapan saja, klik tombol <b>ⓘ Lihat Panduan Dashboard</b> ini.',
-                position:    'right'
+                position:    'top'
             }
         });
 

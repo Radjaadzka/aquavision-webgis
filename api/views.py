@@ -978,14 +978,23 @@ def feedback_submit(request):
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     try:
-        data  = json.loads(request.body)
-        nama  = str(data.get('nama',  '')).strip()[:100]
-        pesan = str(data.get('pesan', '')).strip()[:1000]
+        data   = json.loads(request.body)
+        nama   = str(data.get('nama',  '')).strip()[:100]
+        pesan  = str(data.get('pesan', '')).strip()[:1000]
+        rating = data.get('rating', None)
 
         if not nama or not pesan:
             return JsonResponse({'error': 'Nama dan pesan wajib diisi'}, status=400)
 
-        Feedback.objects.create(nama=nama, pesan=pesan)
+        if rating is not None:
+            try:
+                rating = int(rating)
+                if rating < 1 or rating > 5:
+                    rating = None
+            except (ValueError, TypeError):
+                rating = None
+
+        Feedback.objects.create(nama=nama, pesan=pesan, rating=rating)
         return JsonResponse({'message': 'Terima kasih atas masukan Anda!'}, status=201)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=400)
@@ -993,11 +1002,12 @@ def feedback_submit(request):
 
 def feedback_list(request):
     """Kembalikan 10 feedback terbaru."""
-    feedbacks = Feedback.objects.order_by('-tanggal')[:10].values('nama', 'pesan', 'tanggal')
+    feedbacks = Feedback.objects.order_by('-tanggal')[:10].values('nama', 'pesan', 'rating', 'tanggal')
     data = [
         {
             'nama':    f['nama'],
             'pesan':   f['pesan'],
+            'rating':  f['rating'],
             'tanggal': timezone.localtime(f['tanggal']).strftime('%d %b %Y') if f['tanggal'] else '-',
         }
         for f in feedbacks

@@ -377,6 +377,18 @@ body { background: #07111F; }
 .fb-btn:hover { background: #0E2238; }
 .fb-btn:disabled { opacity: .4; cursor: not-allowed; }
 
+/* Star rating */
+.star-row { display: flex; gap: 6px; margin-bottom: 14px; }
+.star-btn {
+  background: none; border: none; cursor: pointer;
+  font-size: 28px; line-height: 1; padding: 0;
+  color: #D1D5DB; transition: color .15s, transform .1s;
+  -webkit-tap-highlight-color: transparent;
+}
+.star-btn:hover, .star-btn.active { color: #F59E0B; }
+.star-btn:hover { transform: scale(1.15); }
+.star-hint { font-size: 12px; color: #94A3B8; margin-left: 8px; align-self: center; }
+
 /* ── TIM ──────────────────────────────────────────────── */
 /* P1.1: Profile cards */
 .team-grid {
@@ -667,6 +679,17 @@ body { background: #07111F; }
   <div class="fb-wrap rv d3">
     <label class="fb-lbl">Nama</label>
     <input type="text" class="fb-in" id="feedbackNama" placeholder="Nama Anda">
+    <label class="fb-lbl">Rating Pengalaman</label>
+    <div style="display:flex;align-items:center;margin-bottom:14px;">
+      <div class="star-row" id="starRow">
+        <button type="button" class="star-btn" data-val="1" title="1 — Sangat Buruk">★</button>
+        <button type="button" class="star-btn" data-val="2" title="2 — Buruk">★</button>
+        <button type="button" class="star-btn" data-val="3" title="3 — Cukup">★</button>
+        <button type="button" class="star-btn" data-val="4" title="4 — Baik">★</button>
+        <button type="button" class="star-btn" data-val="5" title="5 — Sangat Baik">★</button>
+      </div>
+      <span class="star-hint" id="starHint">Pilih bintang</span>
+    </div>
     <label class="fb-lbl">Pesan</label>
     <textarea class="fb-in" id="feedbackPesan" rows="4" placeholder="Tulis masukan atau saran Anda..."></textarea>
     <button id="btnFeedback" class="fb-btn">Kirim Masukan</button>
@@ -765,15 +788,42 @@ function cnt(el,t,d){if(!el)return;var t0=null;(function tick(ts){if(!t0)t0=ts;v
 ['Air','Fasilitas','Permukiman','Pipa'].forEach(function(k,i){var el=document.getElementById('stat'+k);if(el)cnt(el,+el.dataset.t||0,1200+i*200);});
 var obs=new IntersectionObserver(function(e){e.forEach(function(x){if(x.isIntersecting){x.target.classList.add('on');obs.unobserve(x.target);}});},{threshold:.1,rootMargin:'0px 0px -20px 0px'});
 document.querySelectorAll('.rv').forEach(function(el){obs.observe(el);});
+// ── Star rating ────────────────────────────────────────────────
+var selectedRating = 0;
+var STAR_LABELS = ['','Sangat Buruk','Buruk','Cukup','Baik','Sangat Baik'];
+document.querySelectorAll('#starRow .star-btn').forEach(function(btn){
+  btn.addEventListener('click',function(){
+    selectedRating = +this.dataset.val;
+    document.querySelectorAll('#starRow .star-btn').forEach(function(b){
+      b.classList.toggle('active', +b.dataset.val <= selectedRating);
+    });
+    document.getElementById('starHint').textContent = selectedRating + ' — ' + STAR_LABELS[selectedRating];
+  });
+  btn.addEventListener('mouseenter',function(){
+    var v = +this.dataset.val;
+    document.querySelectorAll('#starRow .star-btn').forEach(function(b){
+      b.style.color = +b.dataset.val <= v ? '#F59E0B' : '';
+    });
+  });
+  btn.addEventListener('mouseleave',function(){
+    document.querySelectorAll('#starRow .star-btn').forEach(function(b){
+      b.style.color = '';
+    });
+  });
+});
+
 document.getElementById('btnFeedback')?.addEventListener('click',function(){
   var nama=document.getElementById('feedbackNama').value.trim(),pesan=document.getElementById('feedbackPesan').value.trim(),st=document.getElementById('feedbackStatus');
   if(!nama||!pesan){st.innerHTML='<span style="color:#DC2626;">⚠️ Nama dan pesan wajib diisi.</span>';return;}
   this.disabled=true;this.textContent='Mengirim...';var btn=this;
-  fetch('/api/feedback/',{method:'POST',headers:{'Content-Type':'application/json','X-CSRFToken':(document.cookie.match(/csrftoken=([^;]+)/)||['',''])[1]},body:JSON.stringify({nama,pesan})})
-  .then(r=>r.json()).then(d=>{btn.disabled=false;btn.textContent='Kirim Masukan';if(d.message){st.innerHTML='<span style="color:#16A34A;">✅ '+d.message+'</span>';document.getElementById('feedbackNama').value='';document.getElementById('feedbackPesan').value='';loadFb();}else st.innerHTML='<span style="color:#DC2626;">'+(d.error||'Gagal.')+'</span>';})
+  var payload = {nama:nama, pesan:pesan};
+  if(selectedRating >= 1 && selectedRating <= 5) payload.rating = selectedRating;
+  fetch('/api/feedback/',{method:'POST',headers:{'Content-Type':'application/json','X-CSRFToken':(document.cookie.match(/csrftoken=([^;]+)/)||['',''])[1]},body:JSON.stringify(payload)})
+  .then(r=>r.json()).then(d=>{btn.disabled=false;btn.textContent='Kirim Masukan';if(d.message){st.innerHTML='<span style="color:#16A34A;">✅ '+d.message+'</span>';document.getElementById('feedbackNama').value='';document.getElementById('feedbackPesan').value='';selectedRating=0;document.querySelectorAll('#starRow .star-btn').forEach(function(b){b.classList.remove('active');});document.getElementById('starHint').textContent='Pilih bintang';loadFb();}else st.innerHTML='<span style="color:#DC2626;">'+(d.error||'Gagal.')+'</span>';})
   .catch(()=>{btn.disabled=false;btn.textContent='Kirim Masukan';st.innerHTML='<span style="color:#DC2626;">Gagal.</span>';});
 });
-function loadFb(){fetch('/api/feedback/list/').then(r=>r.json()).then(data=>{var c=document.getElementById('feedbackList');if(!c||!data.length)return;var h='<p style="font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#94A3B8;margin-bottom:12px;">Masukan Terbaru</p>';data.forEach(f=>{h+='<div style="background:white;padding:14px 18px;border-radius:10px;margin-bottom:8px;border:1px solid #E2E8F0;border-left:2px solid #3B82F6;"><div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;margin-bottom:6px;"><span style="font-weight:600;font-size:13px;color:#0F172A;">'+f.nama+'</span><span style="font-size:11px;color:#94A3B8;background:#F1F5F9;padding:2px 8px;border-radius:4px;">'+f.tanggal+'</span></div><p style="font-size:13px;color:#64748B;line-height:1.7;font-weight:300;">'+f.pesan+'</p></div>';});c.innerHTML=h;}).catch(()=>{});}
+function starsHtml(r){if(!r)return '';var s='';for(var i=1;i<=5;i++){s+='<span style="color:'+(i<=r?'#F59E0B':'#D1D5DB')+';font-size:14px;">★</span>';}return '<span style="display:inline-flex;gap:1px;margin-left:4px;">'+s+'</span>';}
+function loadFb(){fetch('/api/feedback/list/').then(r=>r.json()).then(data=>{var c=document.getElementById('feedbackList');if(!c||!data.length)return;var h='<p style="font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#94A3B8;margin-bottom:12px;">Masukan Terbaru</p>';data.forEach(f=>{h+='<div style="background:white;padding:14px 18px;border-radius:10px;margin-bottom:8px;border:1px solid #E2E8F0;border-left:2px solid #3B82F6;"><div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;margin-bottom:6px;"><span style="font-weight:600;font-size:13px;color:#0F172A;">'+f.nama+starsHtml(f.rating)+'</span><span style="font-size:11px;color:#94A3B8;background:#F1F5F9;padding:2px 8px;border-radius:4px;">'+f.tanggal+'</span></div><p style="font-size:13px;color:#64748B;line-height:1.7;font-weight:300;">'+f.pesan+'</p></div>';});c.innerHTML=h;}).catch(()=>{});}
 loadFb();
 </script>
 {% endblock %}

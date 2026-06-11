@@ -168,6 +168,7 @@ class Feedback(models.Model):
     """Masukan dari pengunjung landing page."""
     nama    = models.CharField(max_length=100)
     pesan   = models.TextField(max_length=1000)
+    rating  = models.IntegerField(null=True, blank=True)  # 1–5 bintang
     tanggal = models.DateTimeField(default=timezone.now)
 
     class Meta:
