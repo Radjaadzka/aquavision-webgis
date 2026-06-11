@@ -1047,18 +1047,41 @@ if (document.getElementById('hDot-database')) {
 })();
 
 // ── Legend Dinamis ─────────────────────────────────────────────
+// SVG paths harus identik dengan yang dipakai di makeSvgMarker() script.js
 var LEGEND_DEFS = [
-    { id:'chkAdminGab',       color:'rgba(148,163,184,.6)',  type:'line',   label:'Administrasi Desa' },
-    { id:'chkAir',            color:'#3B82F6',               type:'circle', label:'Sumber Air' },
-    { id:'chkReservoir',      color:'#06B6D4',               type:'circle', label:'Tandon Air' },
-    { id:'chkPipa',           color:'#F59E0B',               type:'line',   label:'Jaringan Pipa' },
-    { id:'chkSungaiVektor',   color:'#60A5FA',               type:'line',   label:'Daerah Aliran Sungai' },
-    { id:'chkPotensiAirTanah',color:'linear-gradient(90deg,#166534,#4ADE80)', type:'gradient', label:'Potensi Air Tanah' },
-    { id:'chkDebitPuncak',    color:'linear-gradient(90deg,#1E3A5F,#60A5FA)', type:'gradient', label:'Debit Puncak Aliran' },
-    { id:'chkHotel',          color:'#F97316',               type:'circle', label:'Hotel' },
-    { id:'chkMakan',          color:'#EAB308',               type:'circle', label:'Tempat Makan' },
-    { id:'chkJasa',           color:'#8B5CF6',               type:'circle', label:'Jasa' },
-    { id:'chkPermukiman',     color:'#A78BFA',               type:'circle', label:'Permukiman' },
+    // Batas & Wilayah
+    { id:'chkAdminGab',       type:'line',    color:'rgba(231,76,60,.75)', label:'Administrasi Desa',    sublabel:'Batas wilayah' },
+    { id:'chkSungaiVektor',   type:'line',    color:'#2980b9',             label:'Daerah Aliran Sungai', sublabel:'Wilayah hidrologi' },
+    // Infrastruktur Air
+    { id:'chkAir',       type:'svgmark', bg:'#2563EB',
+      svg:'<path d="M12 3.5C9.5 7 7 11 7 14.5a5 5 0 0010 0C17 11 14.5 7 12 3.5z"/>',
+      label:'Sumber Air', sublabel:'Mata air / spring' },
+    { id:'chkReservoir', type:'svgmark', bg:'#0891B2',
+      svg:'<path d="M6 10c0-1.1 2.7-2 6-2s6 .9 6 2v8c0 1.1-2.7 2-6 2s-6-.9-6-2v-8z"/><path d="M6 10c0 1.1 2.7 2 6 2s6-.9 6-2" stroke="rgba(255,255,255,.5)" stroke-width="1.2" fill="none"/>',
+      label:'Tandon Air', sublabel:'Bak penampungan' },
+    { id:'chkPipa',      type:'line',    color:'#F59E0B', label:'Jaringan Pipa', sublabel:'Distribusi air' },
+    // Analisis Hidrologi
+    { id:'chkPotensiAirTanah', type:'gradient',
+      colors:['#e74c3c','#e67e22','#f1c40f','#27ae60'],
+      rangeMin:'Rendah', rangeMax:'S.Tinggi',
+      label:'Potensi Air Tanah' },
+    { id:'chkDebitPuncak', type:'gradient',
+      colors:['#c7e9ff','#5fb5de','#1a7fad','#022d4d'],
+      rangeMin:'Rendah', rangeMax:'Tinggi',
+      label:'Debit Puncak Aliran' },
+    // Fasilitas & Penduduk
+    { id:'chkHotel',  type:'svgmark', bg:'#EA580C',
+      svg:'<path d="M12 3L4 8v13h16V8L12 3zm-3 13H7v-5h2v5zm3 0h-2v-5h2v5zm3 0h-2v-5h2v5zm0-7H8V8h8v2z"/>',
+      label:'Hotel' },
+    { id:'chkMakan',  type:'svgmark', bg:'#CA8A04',
+      svg:'<path d="M11 9H9V2H7v7H5V2H3v7c0 2.1 1.7 3.8 3.8 4V21h2.5v-8C11.3 12.8 13 11.1 13 9V2h-2v7zm5-3v8h2.5v8H21V2c-2.8 0-5 2.2-5 4z"/>',
+      label:'Tempat Makan' },
+    { id:'chkJasa',   type:'svgmark', bg:'#7C3AED',
+      svg:'<path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z"/>',
+      label:'Jasa' },
+    { id:'chkPermukiman', type:'svgmark', bg:'#8e44ad',
+      svg:'<path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>',
+      label:'Permukiman', sublabel:'Kawasan hunian' },
 ];
 
 function updateLegend() {
@@ -1072,15 +1095,30 @@ function updateLegend() {
     if (active.length === 0) { card.style.display = 'none'; return; }
     card.style.display = '';
     container.innerHTML = active.map(function(d) {
-        var swatchStyle;
-        if (d.type === 'gradient') {
-            swatchStyle = 'background:' + d.color + '; width:28px; height:10px; border-radius:3px;';
+        var swatch;
+        if (d.type === 'svgmark') {
+            // Mini marker icon — identik dengan simbol di peta
+            swatch = '<div style="width:18px;height:18px;background:' + d.bg +
+                     ';border-radius:50%;display:flex;align-items:center;justify-content:center;' +
+                     'border:1.5px solid rgba(255,255,255,.8);box-shadow:0 1px 3px rgba(0,0,0,.3);flex-shrink:0;">' +
+                     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="10" height="10" fill="white">' +
+                     d.svg + '</svg></div>';
+        } else if (d.type === 'gradient') {
+            var grad = 'linear-gradient(90deg,' + d.colors.join(',') + ')';
+            swatch = '<div style="flex-shrink:0;">' +
+                     '<div style="background:' + grad + ';width:32px;height:9px;border-radius:3px;margin-bottom:1px;"></div>' +
+                     '<div style="display:flex;justify-content:space-between;font-size:8px;' +
+                     'color:rgba(255,255,255,.4);width:32px;line-height:1;">' +
+                     '<span>' + d.rangeMin + '</span><span>' + d.rangeMax + '</span></div></div>';
         } else if (d.type === 'line') {
-            swatchStyle = 'background:' + d.color + '; width:20px; height:3px; border-radius:2px; margin:5px 0;';
+            swatch = '<span style="background:' + d.color + ';width:22px;height:3px;border-radius:2px;' +
+                     'flex-shrink:0;display:inline-block;margin:5px 0;"></span>';
         } else {
-            swatchStyle = 'background:' + d.color + '; width:12px; height:12px; border-radius:50%;';
+            swatch = '<span style="background:' + d.color + ';width:12px;height:12px;border-radius:50%;' +
+                     'flex-shrink:0;display:inline-block;"></span>';
         }
-        return '<div class="legend-item"><span style="' + swatchStyle + ' flex-shrink:0;"></span><span>' + d.label + '</span></div>';
+        return '<div class="legend-item">' + swatch +
+               '<span style="margin-left:2px;">' + d.label + '</span></div>';
     }).join('');
 }
 

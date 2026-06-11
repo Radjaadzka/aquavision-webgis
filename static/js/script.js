@@ -407,11 +407,85 @@ document.addEventListener("DOMContentLoaded", function () {
     // 11. ICONS
     // ================================================================
 
-    var iconAir       = L.icon({ iconUrl: "https://cdn-icons-png.flaticon.com/512/728/728093.png",   iconSize: [28, 28] });
-    var iconHotel     = L.icon({ iconUrl: "https://cdn-icons-png.flaticon.com/512/139/139899.png",   iconSize: [28, 28] });
-    var iconMakan     = L.icon({ iconUrl: "https://cdn-icons-png.flaticon.com/512/1046/1046784.png", iconSize: [28, 28] });
-    var iconReservoir = L.icon({ iconUrl: "https://cdn-icons-png.flaticon.com/512/2038/2038152.png", iconSize: [28, 28] });
-    var iconJasa      = L.icon({ iconUrl: "https://cdn-icons-png.flaticon.com/512/3067/3067451.png", iconSize: [26, 26] });
+    // ── SVG Marker Factory — no CDN dependency, icons sesuai objek ───
+    function makeSvgMarker(svgPaths, bg, size) {
+        size = size || 30;
+        var inner = Math.round(size * 0.55);
+        return L.divIcon({
+            html: '<div style="width:' + size + 'px;height:' + size + 'px;background:' + bg +
+                  ';border-radius:50%;display:flex;align-items:center;justify-content:center;' +
+                  'border:2px solid rgba(255,255,255,.85);box-shadow:0 2px 6px rgba(0,0,0,.4);">' +
+                  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" ' +
+                  'width="' + inner + '" height="' + inner + '" fill="white">' +
+                  svgPaths + '</svg></div>',
+            iconSize:    [size, size],
+            iconAnchor:  [size / 2, size / 2],
+            popupAnchor: [0, -(size / 2 + 4)],
+            className:   ''
+        });
+    }
+
+    // Sumber Air — tetes air / mata air
+    var iconAir = makeSvgMarker(
+        '<path d="M12 3.5C9.5 7 7 11 7 14.5a5 5 0 0010 0C17 11 14.5 7 12 3.5z"/>',
+        '#2563EB'
+    );
+
+    // Tandon Air — tangki penyimpan air (silinder dengan permukaan air)
+    var iconReservoir = makeSvgMarker(
+        '<path d="M6 10c0-1.1 2.7-2 6-2s6 .9 6 2v8c0 1.1-2.7 2-6 2s-6-.9-6-2v-8z"/>' +
+        '<path d="M6 10c0 1.1 2.7 2 6 2s6-.9 6-2" stroke="rgba(255,255,255,.5)" stroke-width="1.2" fill="none"/>' +
+        '<path d="M7.5 14h9" stroke="rgba(255,255,255,.45)" stroke-width="1" fill="none"/>',
+        '#0891B2'
+    );
+
+    // Hotel — gedung penginapan
+    var iconHotel = makeSvgMarker(
+        '<path d="M12 3L4 8v13h16V8L12 3zm-3 13H7v-5h2v5zm3 0h-2v-5h2v5zm3 0h-2v-5h2v5zm0-7H8V8h8v2z"/>',
+        '#EA580C'
+    );
+
+    // Tempat Makan — garpu & pisau
+    var iconMakan = makeSvgMarker(
+        '<path d="M11 9H9V2H7v7H5V2H3v7c0 2.1 1.7 3.8 3.8 4V21h2.5v-8C11.3 12.8 13 11.1 13 9V2h-2v7zm5-3v8h2.5v8H21V2c-2.8 0-5 2.2-5 4z"/>',
+        '#CA8A04'
+    );
+
+    // Jasa — kunci pas / layanan
+    var iconJasa = makeSvgMarker(
+        '<path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z"/>',
+        '#7C3AED', 28
+    );
+
+    // Permukiman — ikon rumah
+    var iconPermukiman = makeSvgMarker(
+        '<path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>',
+        '#8e44ad'
+    );
+
+
+    // ================================================================
+    // 12a. POPUP HELPER — format seragam untuk semua layer titik
+    // ================================================================
+
+    function makePopup(accentColor, typeLabel, name, rows) {
+        var html =
+            '<div style="font-family:\'Inter\',sans-serif;min-width:170px;font-size:13px;line-height:1.65;">' +
+            '<div style="font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;' +
+            'color:' + accentColor + ';margin-bottom:3px;">' + typeLabel + '</div>' +
+            '<div style="font-weight:700;font-size:14px;color:#111827;margin-bottom:7px;' +
+            'padding-bottom:6px;border-bottom:1px solid rgba(0,0,0,.07);">' + (name || '—') + '</div>';
+        rows.forEach(function (r) {
+            if (r.value !== null && r.value !== undefined && String(r.value).trim() !== '') {
+                html +=
+                    '<div style="display:flex;justify-content:space-between;gap:10px;margin-bottom:2px;">' +
+                    '<span style="color:#6B7280;font-size:12px;">' + r.label + '</span>' +
+                    '<span style="font-weight:500;color:#111827;font-size:12px;text-align:right;">' + r.value + '</span>' +
+                    '</div>';
+            }
+        });
+        return html + '</div>';
+    }
 
 
     // ================================================================
@@ -484,11 +558,11 @@ document.addEventListener("DOMContentLoaded", function () {
                     },
                     onEachFeature: function (f, l) {
                         var p = f.properties;
-                        l.bindPopup(
-                            "<b>" + p.nama + "</b><br>" +
-                            (p.jenis_sumber ? "Jenis: " + p.jenis_sumber + "<br>" : "") +
-                            (p.kondisi      ? "Kondisi: " + p.kondisi : "")
-                        );
+                        l.bindPopup(makePopup('#2563EB', '💧 Sumber Air', p.nama, [
+                            { label: 'Jenis',   value: p.jenis_sumber },
+                            { label: 'Kondisi', value: p.kondisi },
+                            { label: 'Debit',   value: p.debit ? p.debit + ' L/det' : null }
+                        ]));
                     }
                 });
                 document.getElementById("countAir").textContent = c;
@@ -496,6 +570,7 @@ document.addEventListener("DOMContentLoaded", function () {
             .catch(function () { console.warn("Sumber air layer gagal dimuat."); });
 
         // Fasilitas (Hotel, Resto, Jasa)
+        var JENIS_LABEL = { hotel: 'Hotel', resto: 'Restoran', homestay: 'Homestay', jasa: 'Jasa' };
         fetch("/api/fasilitas-geojson/")
             .then(function (r) { return r.json(); })
             .then(function (data) {
@@ -508,11 +583,14 @@ document.addEventListener("DOMContentLoaded", function () {
                     },
                     onEachFeature: function (f, l) {
                         var p = f.properties;
-                        l.bindPopup(
-                            "<b>" + p.nama + "</b><br>Jenis: " + p.jenis + "<br>" +
-                            (p.kamar    ? "Kamar: "     + p.kamar    + "<br>" : "") +
-                            (p.kapasitas ? "Kapasitas: " + p.kapasitas : "")
-                        );
+                        var jenis = p.jenis;
+                        var accent = jenis === 'hotel' ? '#EA580C' : jenis === 'resto' ? '#CA8A04' : '#7C3AED';
+                        var icon   = jenis === 'hotel' ? '🏨 Hotel' : jenis === 'resto' ? '🍽️ Tempat Makan' : '🔧 Jasa';
+                        l.bindPopup(makePopup(accent, icon, p.nama, [
+                            { label: 'Kategori',  value: JENIS_LABEL[p.jenis] || p.jenis },
+                            { label: 'Kamar',     value: p.kamar    ? p.kamar + ' kamar'  : null },
+                            { label: 'Kapasitas', value: p.kapasitas ? p.kapasitas + ' orang' : null }
+                        ]));
                     }
                 });
                 document.getElementById("countHotel").textContent = hotel;
@@ -521,7 +599,7 @@ document.addEventListener("DOMContentLoaded", function () {
             })
             .catch(function () { console.warn("Fasilitas layer gagal dimuat."); });
 
-        // Permukiman
+        // Permukiman — gunakan ikon rumah, bukan circleMarker
         fetch("/api/permukiman-geojson/")
             .then(function (r) { return r.json(); })
             .then(function (data) {
@@ -529,18 +607,21 @@ document.addEventListener("DOMContentLoaded", function () {
                 L.geoJSON(data, {
                     pointToLayer: function (f, ll) {
                         tot += f.properties.jumlah_penduduk || 0;
-                        return L.circleMarker(ll, { radius: 6, color: "#8e44ad", fillOpacity: 0.8 }).addTo(pendudukLayer);
+                        return L.marker(ll, { icon: iconPermukiman }).addTo(pendudukLayer);
                     },
                     onEachFeature: function (f, l) {
                         var p = f.properties;
-                        l.bindPopup("<b>" + p.nama_dusun + "</b><br>KK: " + p.jumlah_kk + "<br>Penduduk: " + p.jumlah_penduduk);
+                        l.bindPopup(makePopup('#8e44ad', '🏠 Permukiman', p.nama_dusun, [
+                            { label: 'Jumlah KK',      value: p.jumlah_kk       ? p.jumlah_kk + ' KK'      : null },
+                            { label: 'Jumlah Penduduk', value: p.jumlah_penduduk ? p.jumlah_penduduk + ' jiwa' : null }
+                        ]));
                     }
                 });
                 document.getElementById("totalPenduduk").textContent = tot;
             })
             .catch(function () { console.warn("Permukiman layer gagal dimuat."); });
 
-        // Reservoir
+        // Reservoir / Tandon Air
         fetch("/api/reservoir-geojson/")
             .then(function (r) { return r.json(); })
             .then(function (data) {
@@ -552,7 +633,10 @@ document.addEventListener("DOMContentLoaded", function () {
                     },
                     onEachFeature: function (f, l) {
                         var p = f.properties;
-                        l.bindPopup("<b>" + p.nama + "</b><br>Kapasitas: " + p.kapasitas_m3 + " m³");
+                        l.bindPopup(makePopup('#0891B2', '🏗️ Tandon Air', p.nama, [
+                            { label: 'Kapasitas', value: p.kapasitas_m3 ? p.kapasitas_m3 + ' m³' : null },
+                            { label: 'Elevasi',   value: p.elevasi      ? p.elevasi + ' m dpl'    : null }
+                        ]));
                     }
                 });
                 document.getElementById("countReservoir").textContent = c;
@@ -564,14 +648,13 @@ document.addEventListener("DOMContentLoaded", function () {
             .then(function (r) { return r.json(); })
             .then(function (data) {
                 L.geoJSON(data, {
-                    style: { color: "#e67e22", weight: 3, opacity: 0.8 },
+                    style: { color: "#F59E0B", weight: 3, opacity: 0.85 },
                     onEachFeature: function (f, l) {
                         var p = f.properties;
-                        l.bindPopup(
-                            "<b>" + p.nama + "</b><br>" +
-                            (p.diameter_mm ? "Diameter: " + p.diameter_mm + " mm<br>" : "") +
-                            (p.kondisi     ? "Kondisi: "  + p.kondisi : "")
-                        );
+                        l.bindPopup(makePopup('#D97706', '🔗 Jaringan Pipa', p.nama, [
+                            { label: 'Diameter', value: p.diameter_mm ? p.diameter_mm + ' mm' : null },
+                            { label: 'Kondisi',  value: p.kondisi }
+                        ]));
                     }
                 }).addTo(pipaLayer);
             })

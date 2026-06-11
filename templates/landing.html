@@ -6,7 +6,9 @@
 <style>
 body { background: #07111F; }
 
-/* ── HERO ─────────────────────────────────────────────── */
+/* ══════════════════════════════════════════════
+   HERO
+══════════════════════════════════════════════ */
 .hero {
   min-height: 100vh;
   position: relative;
@@ -22,9 +24,9 @@ body { background: #07111F; }
 .hero-aurora {
   position: absolute; inset: 0; pointer-events: none; z-index: 0;
   background:
-    radial-gradient(ellipse 120% 70% at 70% -10%, rgba(59,130,246,.08) 0%, transparent 55%),
+    radial-gradient(ellipse 120% 70% at 70% -10%, rgba(59,130,246,.1) 0%, transparent 55%),
     radial-gradient(ellipse 80% 60% at 10% 80%, rgba(14,45,71,.6) 0%, transparent 50%),
-    radial-gradient(ellipse 60% 50% at 90% 90%, rgba(99,102,241,.04) 0%, transparent 50%);
+    radial-gradient(ellipse 60% 50% at 90% 90%, rgba(99,102,241,.05) 0%, transparent 50%);
 }
 .hero-topo {
   position: absolute; inset: 0; pointer-events: none; z-index: 0;
@@ -35,33 +37,32 @@ body { background: #07111F; }
       rgba(255,255,255,.7) 35px, transparent 36px,
       transparent 69px, rgba(255,255,255,.5) 70px,
       transparent 71px, transparent 104px,
-      rgba(255,255,255,.35) 105px, transparent 106px
-    );
+      rgba(255,255,255,.35) 105px, transparent 106px);
 }
 
 .hero-body {
   position: relative; z-index: 2;
-  display: grid; grid-template-columns: 1fr 1fr;
-  align-items: center; gap: 60px;
-  padding: 100px 7% 70px;
+  display: grid; grid-template-columns: 1fr 1.15fr;
+  align-items: center; gap: 48px;
+  padding: 96px 7% 60px;
   flex: 1;
 }
 
 .hero-eyebrow {
   display: inline-flex; align-items: center; gap: 10px;
   font-size: 11px; font-weight: 500; letter-spacing: 2.5px;
-  text-transform: uppercase; color: rgba(59,130,246,.7);
-  margin-bottom: 28px;
+  text-transform: uppercase; color: rgba(59,130,246,.75);
+  margin-bottom: 24px;
   animation: hUp .9s ease both;
 }
-.hero-eyebrow::before { content:''; width: 28px; height: 1px; background: rgba(59,130,246,.5); }
+.hero-eyebrow::before { content:''; width: 24px; height: 1px; background: rgba(59,130,246,.5); }
 
 .hero-h1 {
   font-family: 'Fraunces', serif;
   font-size: clamp(52px, 8vw, 96px);
   font-weight: 200; line-height: .9;
   letter-spacing: -3px; color: rgba(255,255,255,.95);
-  margin-bottom: 10px;
+  margin-bottom: 8px;
   animation: hUp .9s ease .08s both;
 }
 .hero-h1 em { font-style: italic; color: rgba(59,130,246,.85); }
@@ -69,97 +70,105 @@ body { background: #07111F; }
 .hero-loc {
   font-size: 12px; font-weight: 400; letter-spacing: 2.5px;
   text-transform: uppercase; color: rgba(255,255,255,.2);
-  margin-bottom: 36px;
+  margin-bottom: 24px;
   animation: hUp .9s ease .14s both;
 }
 
-.hero-desc {
-  font-size: 16px; font-weight: 300; line-height: 1.85;
-  color: rgba(255,255,255,.45); max-width: 420px;
-  margin-bottom: 48px;
-  animation: hUp .9s ease .2s both;
+.hero-tagline {
+  font-size: 17px; font-weight: 300; line-height: 1.7;
+  color: rgba(255,255,255,.55); max-width: 400px;
+  margin-bottom: 28px;
+  animation: hUp .9s ease .18s both;
+}
+
+/* Value proposition pills */
+.hero-pills {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  margin-bottom: 36px;
+  animation: hUp .9s ease .22s both;
+}
+.hp {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 14px; border-radius: 30px;
+  background: rgba(59,130,246,.08);
+  border: 1px solid rgba(59,130,246,.18);
+  font-size: 12px; font-weight: 400;
+  color: rgba(59,130,246,.8);
+  letter-spacing: .3px;
 }
 
 .hero-btns {
   display: flex; gap: 12px; flex-wrap: wrap;
-  animation: hUp .9s ease .26s both;
+  animation: hUp .9s ease .28s both;
 }
 .btn-hero-fill {
-  padding: 12px 28px; border-radius: 8px;
+  padding: 13px 30px; border-radius: 8px;
   background: #3B82F6; color: white;
   font-size: 14px; font-weight: 500;
   font-family: 'Inter', sans-serif;
   text-decoration: none; border: none; cursor: pointer;
-  transition: all .2s; display: inline-block;
+  transition: all .2s; display: inline-flex; align-items: center; gap: 7px;
 }
-.btn-hero-fill:hover { background: #2563EB; transform: translateY(-1px); }
+.btn-hero-fill:hover { background: #2563EB; transform: translateY(-1px); box-shadow: 0 8px 24px rgba(59,130,246,.35); }
 .btn-hero-ghost {
-  padding: 12px 28px; border-radius: 8px;
+  padding: 13px 30px; border-radius: 8px;
   background: transparent; color: rgba(255,255,255,.5);
   font-size: 14px; font-weight: 400;
   font-family: 'Inter', sans-serif;
   text-decoration: none;
-  border: 1px solid rgba(255,255,255,.1);
+  border: 1px solid rgba(255,255,255,.12);
   transition: all .2s; display: inline-block;
 }
-.btn-hero-ghost:hover { color: rgba(255,255,255,.8); border-color: rgba(255,255,255,.25); }
+.btn-hero-ghost:hover { color: rgba(255,255,255,.8); border-color: rgba(255,255,255,.28); }
 
-/* Hero right panel */
-.hero-panel {
-  background: rgba(255,255,255,.03);
-  border: 1px solid rgba(255,255,255,.07);
-  border-radius: 20px; padding: 28px;
-  backdrop-filter: blur(8px);
-  animation: hUp .9s ease .32s both;
+/* Product screenshot frame */
+.hero-product-frame {
+  background: #0A1929;
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 40px 120px rgba(0,0,0,.7), 0 0 0 1px rgba(255,255,255,.04);
+  animation: hUp .9s ease .34s both;
 }
-.hero-panel-lbl {
-  font-size: 10px; font-weight: 500; letter-spacing: 2px;
-  text-transform: uppercase; color: rgba(255,255,255,.2);
-  margin-bottom: 20px;
+.hero-product-bar {
+  background: #0D2139;
+  padding: 10px 14px;
+  display: flex; align-items: center; gap: 6px;
+  border-bottom: 1px solid rgba(255,255,255,.06);
 }
-.stat-quad {
-  display: grid; grid-template-columns: 1fr 1fr;
-  gap: 1px; background: rgba(255,255,255,.05);
-  border-radius: 12px; overflow: hidden; margin-bottom: 20px;
+.hpb-dot { width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0; }
+.hpb-addr {
+  margin-left: 8px; flex: 1;
+  background: rgba(255,255,255,.05);
+  border-radius: 5px; padding: 4px 10px;
+  font-size: 11px; color: rgba(255,255,255,.28);
+  font-family: 'Inter', sans-serif; letter-spacing: .3px;
 }
-.sq {
-  background: rgba(255,255,255,.03);
-  padding: 20px 14px; text-align: center;
-  transition: background .2s;
+.hero-product-img {
+  width: 100%; display: block;
+  max-height: 400px; object-fit: cover; object-position: top;
 }
-.sq:hover { background: rgba(59,130,246,.06); }
-.sq-num {
-  font-family: 'Fraunces', serif;
-  font-size: 38px; font-weight: 200; color: rgba(255,255,255,.9);
-  display: block; margin-bottom: 4px; line-height: 1;
-}
-.sq-lbl { font-size: 11px; color: rgba(255,255,255,.25); letter-spacing: .3px; }
-.hero-panel-footer {
-  font-size: 12px; font-weight: 300; color: rgba(255,255,255,.2);
-  line-height: 1.6; text-align: center;
-  border-top: 1px solid rgba(255,255,255,.05); padding-top: 16px;
-}
-.hero-panel-footer strong { color: rgba(255,255,255,.4); font-weight: 400; }
 
-/* Hero bottom */
+/* Hero bottom stats bar */
 .hero-bottom {
   position: relative; z-index: 2;
   display: grid; grid-template-columns: repeat(4,1fr);
-  border-top: 1px solid rgba(255,255,255,.05);
+  border-top: 1px solid rgba(255,255,255,.06);
 }
 .hb-item {
-  padding: 20px 32px;
-  border-right: 1px solid rgba(255,255,255,.05);
-  animation: hUp .9s ease .4s both;
+  padding: 22px 28px; text-align: center;
+  border-right: 1px solid rgba(255,255,255,.06);
+  animation: hUp .9s ease .42s both;
+  transition: background .2s;
 }
 .hb-item:last-child { border-right: none; }
-.hb-num {
+.hb-item:hover { background: rgba(59,130,246,.04); }
+.hb-num-stat {
   font-family: 'Fraunces', serif;
-  font-size: 11px; font-weight: 400;
-  color: rgba(255,255,255,.25); margin-bottom: 4px;
-  letter-spacing: .5px; text-transform: uppercase;
+  font-size: 44px; font-weight: 200; color: rgba(255,255,255,.9);
+  display: block; line-height: 1; margin-bottom: 4px;
 }
-.hb-val { font-size: 13px; color: rgba(255,255,255,.55); font-weight: 300; line-height: 1.4; }
+.hb-lbl { font-size: 11px; color: rgba(255,255,255,.28); letter-spacing: .4px; }
 
 /* Wave */
 .hero-wave { position: relative; z-index: 2; line-height: 0; }
@@ -170,8 +179,10 @@ body { background: #07111F; }
   to   { opacity: 1; transform: none; }
 }
 
-/* ── SECTIONS ─────────────────────────────────────────── */
-.sec { padding: 96px 7%; background: #F8FAFC; }
+/* ══════════════════════════════════════════════
+   SECTION BASE
+══════════════════════════════════════════════ */
+.sec { padding: 72px 7%; background: #F8FAFC; }
 .sec-white { background: #fff; }
 .sec-dark  { background: #07111F; }
 .sec-deep  { background: #0E2238; }
@@ -181,7 +192,7 @@ body { background: #07111F; }
   display: inline-flex; align-items: center; gap: 8px;
   font-size: 10px; font-weight: 600; letter-spacing: 3px;
   text-transform: uppercase; color: #3B82F6;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
 }
 .lbl::before { content:''; width: 18px; height: 1px; background: #3B82F6; }
 .lbl-lt { color: rgba(59,130,246,.6); }
@@ -189,32 +200,76 @@ body { background: #07111F; }
 
 .sec-h {
   font-family: 'Fraunces', serif;
-  font-size: clamp(30px, 4vw, 50px);
-  font-weight: 300; letter-spacing: -1.5px; line-height: 1.05;
-  margin-bottom: 14px;
+  font-size: clamp(28px, 4vw, 48px);
+  font-weight: 300; letter-spacing: -1.5px; line-height: 1.08;
+  margin-bottom: 12px;
 }
 .sec-h em { font-style: italic; }
 .sec-h-lt { color: rgba(255,255,255,.92); }
-.sec-p {
-  font-size: 15px; font-weight: 300; color: #64748B;
-  line-height: 1.85; max-width: 500px; margin-bottom: 52px;
+.sec-sub {
+  font-size: 14px; font-weight: 300; color: #64748B;
+  line-height: 1.8; max-width: 540px; margin-bottom: 40px;
 }
-.sec-p-lt { color: rgba(255,255,255,.4); }
+.sec-sub-lt { color: rgba(255,255,255,.38); }
 
-/* Reveal */
-.rv { opacity: 0; transform: translateY(18px); transition: opacity .65s ease, transform .65s ease; }
+/* Reveal animation */
+.rv { opacity: 0; transform: translateY(16px); transition: opacity .6s ease, transform .6s ease; }
 .rv.on { opacity: 1; transform: none; }
 .d1{transition-delay:.07s;} .d2{transition-delay:.14s;} .d3{transition-delay:.21s;}
 .d4{transition-delay:.28s;} .d5{transition-delay:.35s;}
 
-/* ── MASALAH ──────────────────────────────────────────── */
+/* ══════════════════════════════════════════════
+   MENGAPA AQUAVISION (new section)
+══════════════════════════════════════════════ */
+.why-grid {
+  display: grid; grid-template-columns: repeat(4,1fr); gap: 16px;
+}
+.why-card {
+  background: #F8FAFC; border: 1px solid #E2E8F0;
+  border-radius: 16px; padding: 30px 22px;
+  transition: all .25s; display: flex; flex-direction: column; gap: 12px;
+  position: relative; overflow: hidden;
+}
+.why-card::after {
+  content: '';
+  position: absolute; bottom: 0; left: 0; right: 0;
+  height: 2px; opacity: 0;
+  transition: opacity .25s;
+}
+.why-card:hover {
+  border-color: rgba(59,130,246,.28);
+  box-shadow: 0 12px 40px rgba(59,130,246,.08);
+  transform: translateY(-3px);
+  background: white;
+}
+.why-card:hover::after { opacity: 1; }
+.wc-1::after { background: #3B82F6; }
+.wc-2::after { background: #06B6D4; }
+.wc-3::after { background: #8B5CF6; }
+.wc-4::after { background: #10B981; }
+.why-icon {
+  width: 46px; height: 46px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center; font-size: 22px;
+}
+.why-card h3 { font-size: 14px; font-weight: 600; color: #0F172A; line-height: 1.4; }
+.why-card p  { font-size: 13px; font-weight: 300; color: #64748B; line-height: 1.8; flex: 1; }
+.why-link {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 12px; font-weight: 500; color: #3B82F6;
+  text-decoration: none; margin-top: 4px;
+}
+.why-link:hover { gap: 8px; }
+
+/* ══════════════════════════════════════════════
+   MASALAH
+══════════════════════════════════════════════ */
 .prob-layout {
   display: grid; grid-template-columns: 1fr 1fr;
   border-radius: 16px; overflow: hidden;
   border: 1px solid #E2E8F0;
 }
 .prob-cell {
-  padding: 44px 40px;
+  padding: 40px 36px;
   border-right: 1px solid #E2E8F0;
   border-bottom: 1px solid #E2E8F0;
   background: #fff; position: relative; overflow: hidden;
@@ -225,34 +280,35 @@ body { background: #07111F; }
 .prob-cell:hover { background: #F8FAFC; }
 .prob-line {
   position: absolute; top: 0; left: 0;
-  width: 2px; height: 0;
-  background: #3B82F6;
+  width: 2px; height: 0; background: #3B82F6;
   transition: height .4s ease;
 }
 .prob-cell:hover .prob-line { height: 100%; }
 .prob-n {
   font-family: 'Fraunces', serif;
-  font-size: 52px; font-weight: 200; line-height: 1;
-  color: rgba(59,130,246,.55); margin-bottom: 20px;
+  font-size: 48px; font-weight: 200; line-height: 1;
+  color: rgba(59,130,246,.45); margin-bottom: 16px;
   transition: color .3s;
 }
-.prob-cell:hover .prob-n { color: rgba(59,130,246,.85); }
-.prob-cell h3 { font-size: 16px; font-weight: 600; color: #0F172A; margin-bottom: 10px; }
-.prob-cell p  { font-size: 14px; font-weight: 300; color: #64748B; line-height: 1.8; }
+.prob-cell:hover .prob-n { color: rgba(59,130,246,.8); }
+.prob-cell h3 { font-size: 15px; font-weight: 600; color: #0F172A; margin-bottom: 10px; }
+.prob-cell p  { font-size: 13px; font-weight: 300; color: #64748B; line-height: 1.85; }
 
-/* ── FITUR ────────────────────────────────────────────── */
+/* ══════════════════════════════════════════════
+   FITUR UTAMA
+══════════════════════════════════════════════ */
 .feat-layout {
   display: grid; grid-template-columns: repeat(3,1fr); gap: 14px;
 }
 .fc {
   background: #fff; border: 1px solid #E2E8F0;
-  border-radius: 14px; padding: 28px 24px;
-  transition: all .25s; display: flex; flex-direction: column; gap: 12px;
+  border-radius: 14px; padding: 26px 22px;
+  transition: all .25s; display: flex; flex-direction: column; gap: 10px;
 }
 .fc.span2 { grid-column: span 2; }
 .fc:hover {
   border-color: rgba(59,130,246,.25);
-  box-shadow: 0 8px 32px rgba(59,130,246,.06);
+  box-shadow: 0 8px 32px rgba(59,130,246,.07);
   transform: translateY(-2px);
 }
 .fc-icon {
@@ -263,29 +319,147 @@ body { background: #07111F; }
 .fc h3 { font-size: 14px; font-weight: 600; color: #0F172A; }
 .fc p  { font-size: 13px; font-weight: 300; color: #64748B; line-height: 1.8; flex: 1; }
 
-/* ── LAYER PILLS ──────────────────────────────────────── */
-.lp-wrap { display: flex; flex-wrap: wrap; gap: 10px; }
-.lp {
+/* ══════════════════════════════════════════════
+   AI ASSISTANT (new section)
+══════════════════════════════════════════════ */
+.ai-layout {
+  display: grid; grid-template-columns: 1fr 1.05fr;
+  gap: 56px; align-items: center;
+}
+.ai-badge {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: rgba(99,102,241,.12); border: 1px solid rgba(99,102,241,.2);
+  border-radius: 30px; padding: 5px 14px;
+  font-size: 11px; font-weight: 500; color: #A78BFA;
+  letter-spacing: .5px; margin-bottom: 20px;
+}
+.ai-feature-list {
+  list-style: none; padding: 0; margin: 0 0 32px;
+  display: flex; flex-direction: column; gap: 12px;
+}
+.ai-feature-list li {
+  display: flex; align-items: flex-start; gap: 10px;
+  font-size: 14px; font-weight: 300; color: rgba(255,255,255,.6); line-height: 1.65;
+}
+.ai-feature-list li::before {
+  content: '✓';
+  font-size: 11px; font-weight: 700; color: #10B981;
+  background: rgba(16,185,129,.12); border-radius: 50%;
+  width: 20px; height: 20px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; margin-top: 1px;
+}
+
+/* Chat mockup */
+.chat-frame {
+  background: rgba(255,255,255,.03);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 16px; overflow: hidden;
+}
+.chat-topbar {
+  background: rgba(255,255,255,.04);
+  padding: 12px 16px;
+  display: flex; align-items: center; gap: 8px;
+  border-bottom: 1px solid rgba(255,255,255,.06);
+}
+.chat-top-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: rgba(99,102,241,.55);
+}
+.chat-top-name {
+  font-size: 12px; font-weight: 500; color: rgba(255,255,255,.5); letter-spacing: .3px;
+  margin-left: 4px;
+}
+.chat-top-badge {
+  margin-left: auto;
+  font-size: 10px; font-weight: 500; letter-spacing: 1px;
+  text-transform: uppercase; color: #10B981;
+  background: rgba(16,185,129,.1); border: 1px solid rgba(16,185,129,.2);
+  border-radius: 20px; padding: 2px 8px;
+}
+.chat-body {
+  padding: 20px 16px;
+  display: flex; flex-direction: column; gap: 14px;
+}
+.chat-row-user { display: flex; justify-content: flex-end; }
+.chat-row-ai   { display: flex; flex-direction: column; gap: 4px; }
+.chat-ai-lbl {
+  font-size: 10px; font-weight: 600; letter-spacing: 1.5px;
+  text-transform: uppercase; color: rgba(99,102,241,.6);
+  padding-left: 2px;
+}
+.chat-bubble {
+  max-width: 88%;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-size: 13px; line-height: 1.7; font-weight: 300;
+  font-family: 'Inter', sans-serif;
+}
+.chat-bubble-user {
+  background: #1E3A8A;
+  color: rgba(255,255,255,.88);
+  border-bottom-right-radius: 4px;
+}
+.chat-bubble-ai {
+  background: rgba(255,255,255,.05);
+  color: rgba(255,255,255,.72);
+  border-bottom-left-radius: 4px;
+  border: 1px solid rgba(255,255,255,.06);
+  max-width: 95%;
+}
+.chat-input-row {
+  padding: 12px 16px;
+  border-top: 1px solid rgba(255,255,255,.06);
   display: flex; align-items: center; gap: 10px;
-  padding: 9px 16px; border-radius: 40px;
+}
+.chat-input-fake {
+  flex: 1; background: rgba(255,255,255,.05);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 8px; padding: 9px 14px;
+  font-size: 12px; color: rgba(255,255,255,.2);
+  font-family: 'Inter', sans-serif;
+}
+.chat-send-btn {
+  width: 34px; height: 34px; border-radius: 8px;
+  background: rgba(99,102,241,.3);
+  display: flex; align-items: center; justify-content: center;
+  color: rgba(255,255,255,.7); font-size: 14px;
+  border: 1px solid rgba(99,102,241,.25);
+}
+
+/* ══════════════════════════════════════════════
+   LAYER PILLS
+══════════════════════════════════════════════ */
+.lp-section-lbl {
+  font-size: 10px; font-weight: 600; letter-spacing: 2px;
+  text-transform: uppercase; color: rgba(255,255,255,.2);
+  margin-bottom: 10px; margin-top: 20px;
+}
+.lp-section-lbl:first-child { margin-top: 0; }
+.lp-wrap { display: flex; flex-wrap: wrap; gap: 9px; margin-bottom: 6px; }
+.lp {
+  display: flex; align-items: center; gap: 9px;
+  padding: 8px 15px; border-radius: 40px;
   background: rgba(255,255,255,.04);
   border: 1px solid rgba(255,255,255,.08);
   transition: all .2s; cursor: default;
 }
 .lp:hover { background: rgba(59,130,246,.08); border-color: rgba(59,130,246,.25); transform: translateY(-1px); }
 .lp-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
-.lp span { font-size: 13px; font-weight: 300; color: rgba(255,255,255,.6); }
+.lp span { font-size: 12px; font-weight: 300; color: rgba(255,255,255,.6); }
 
-/* ── LOKASI ───────────────────────────────────────────── */
+/* ══════════════════════════════════════════════
+   LOKASI
+══════════════════════════════════════════════ */
 .lokasi-wrap {
-  display: grid; grid-template-columns: 1fr 1.4fr; gap: 60px; align-items: center;
+  display: grid; grid-template-columns: 1fr 1.4fr; gap: 56px; align-items: center;
 }
 .map-embed {
   border-radius: 16px; overflow: hidden; position: relative;
   border: 1px solid rgba(255,255,255,.08);
   box-shadow: 0 32px 80px rgba(0,0,0,.5);
 }
-.map-embed iframe { display: block; width: 100%; height: 380px; border: none; filter: saturate(.6) brightness(.85); }
+.map-embed iframe { display: block; width: 100%; height: 360px; border: none; filter: saturate(.6) brightness(.85); }
 .map-pin {
   position: absolute; bottom: 16px; left: 16px;
   background: rgba(7,17,31,.92); backdrop-filter: blur(8px);
@@ -293,71 +467,115 @@ body { background: #07111F; }
   border-radius: 8px; padding: 9px 13px;
   display: flex; align-items: center; gap: 8px;
 }
-.pin-dot { width: 7px; height: 7px; border-radius: 50%; background: #EF4444; box-shadow: 0 0 0 3px rgba(239,68,68,.2); animation: pp 2s infinite; }
+.pin-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: #EF4444; box-shadow: 0 0 0 3px rgba(239,68,68,.2);
+  animation: pp 2s infinite;
+}
 @keyframes pp { 0%,100%{box-shadow:0 0 0 3px rgba(239,68,68,.2);}50%{box-shadow:0 0 0 6px rgba(239,68,68,.07);} }
 .map-pin span { font-size: 12px; color: rgba(255,255,255,.7); }
 
-/* ── PREVIEW ──────────────────────────────────────────── */
+/* ══════════════════════════════════════════════
+   PREVIEW DASHBOARD
+══════════════════════════════════════════════ */
 .prev-wrap {
   border-radius: 16px; overflow: hidden;
   border: 1px solid rgba(255,255,255,.08);
-  box-shadow: 0 40px 100px rgba(0,0,0,.5);
+  box-shadow: 0 40px 100px rgba(0,0,0,.6);
   background: #0D2236;
 }
 .prev-wrap img {
   width: 100%; display: block;
-  min-height: 260px; max-height: 460px; object-fit: cover;
-  background: #0D2236;
+  min-height: 260px; max-height: 500px; object-fit: cover;
 }
 .prev-img-placeholder {
-  width: 100%; min-height: 260px; max-height: 460px;
+  width: 100%; min-height: 300px;
   background: linear-gradient(135deg, #0D2236 0%, #0e2a45 50%, #0D2236 100%);
   display: flex; align-items: center; justify-content: center;
-  color: rgba(255,255,255,.15); font-size: 13px; font-family: 'Inter',sans-serif;
-  letter-spacing: .5px;
+  color: rgba(255,255,255,.15); font-size: 13px;
+  font-family: 'Inter',sans-serif; letter-spacing: .5px;
 }
 .prev-bar {
-  background: #0D2236; padding: 18px 24px;
+  background: #0D2236; padding: 20px 28px;
   display: flex; justify-content: space-between; align-items: center;
   flex-wrap: wrap; gap: 12px;
   border-top: 1px solid rgba(255,255,255,.05);
 }
 .prev-bar h4 { font-size: 13px; font-weight: 400; color: rgba(255,255,255,.65); }
-.prev-bar p  { font-size: 11px; color: rgba(255,255,255,.25); margin-top: 2px; }
-.btn-prev {
-  padding: 9px 20px; border-radius: 7px;
+.prev-bar p  { font-size: 11px; color: rgba(255,255,255,.25); margin-top: 3px; }
+.btn-prev-main {
+  padding: 11px 24px; border-radius: 8px;
   background: #3B82F6; color: white;
-  font-size: 13px; font-weight: 500;
+  font-size: 13px; font-weight: 600;
   font-family: 'Inter', sans-serif; text-decoration: none;
   transition: all .2s; white-space: nowrap;
+  box-shadow: 0 4px 16px rgba(59,130,246,.35);
 }
-.btn-prev:hover { background: #2563EB; transform: translateY(-1px); }
+.btn-prev-main:hover { background: #2563EB; transform: translateY(-1px); box-shadow: 0 8px 24px rgba(59,130,246,.45); }
 
-/* ── CTA ──────────────────────────────────────────────── */
-.cta-wrap { text-align: center; max-width: 500px; margin: 0 auto; }
-.cta-wrap .sec-h { margin-bottom: 16px; }
-.cta-wrap .sec-p { text-align: center; margin: 0 auto 40px; }
-.cta-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+/* Preview feature tags */
+.prev-tags {
+  display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px;
+}
+.prev-tag {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 12px; border-radius: 20px;
+  background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.08);
+  font-size: 11px; color: rgba(255,255,255,.5); font-weight: 400;
+}
+
+/* ══════════════════════════════════════════════
+   SOCIAL PROOF / TRUST
+══════════════════════════════════════════════ */
+.proof-grid {
+  display: grid; grid-template-columns: repeat(4,1fr); gap: 16px;
+}
+.proof-card {
+  background: #fff; border: 1px solid #E2E8F0;
+  border-radius: 14px; padding: 28px 20px;
+  text-align: center; transition: all .25s;
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+}
+.proof-card:hover {
+  border-color: rgba(59,130,246,.2);
+  box-shadow: 0 8px 28px rgba(59,130,246,.07);
+  transform: translateY(-2px);
+}
+.proof-icon {
+  font-size: 30px; line-height: 1;
+  width: 56px; height: 56px; border-radius: 14px;
+  background: #F8FAFC; display: flex; align-items: center; justify-content: center;
+}
+.proof-card h4 { font-size: 13px; font-weight: 600; color: #0F172A; }
+.proof-card p  { font-size: 12px; color: #64748B; line-height: 1.75; font-weight: 300; }
+
+/* ══════════════════════════════════════════════
+   CTA
+══════════════════════════════════════════════ */
+.cta-wrap { text-align: center; max-width: 520px; margin: 0 auto; }
 .btn-cta-fill {
-  padding: 13px 32px; border-radius: 8px;
+  padding: 14px 36px; border-radius: 8px;
   background: #1a5276; color: white;
-  font-size: 14px; font-weight: 500;
+  font-size: 15px; font-weight: 500;
   font-family: 'Inter', sans-serif;
   text-decoration: none; border: none; cursor: pointer; transition: all .2s;
 }
 .btn-cta-fill:hover { background: #0E2238; }
 .btn-cta-out {
-  padding: 13px 32px; border-radius: 8px;
+  padding: 14px 36px; border-radius: 8px;
   background: transparent; color: #1a5276;
-  font-size: 14px; font-weight: 400;
+  font-size: 15px; font-weight: 400;
   font-family: 'Inter', sans-serif;
   text-decoration: none;
-  border: 1.5px solid rgba(26,82,118,.2);
+  border: 1.5px solid rgba(26,82,118,.22);
   transition: all .2s;
 }
 .btn-cta-out:hover { border-color: #1a5276; }
+.cta-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
 
-/* ── FEEDBACK ─────────────────────────────────────────── */
+/* ══════════════════════════════════════════════
+   FEEDBACK
+══════════════════════════════════════════════ */
 .fb-wrap { max-width: 480px; margin: 0 auto; }
 .fb-lbl { display: block; font-size: 11px; font-weight: 500; letter-spacing: 1.2px; text-transform: uppercase; color: #94A3B8; margin-bottom: 6px; }
 .fb-in {
@@ -366,10 +584,11 @@ body { background: #07111F; }
   border-radius: 8px; font-size: 14px;
   font-family: 'Inter', sans-serif; color: #0F172A;
   transition: border-color .15s; margin-bottom: 12px;
+  box-sizing: border-box;
 }
 .fb-in:focus { outline: none; border-color: #3B82F6; box-shadow: 0 0 0 3px rgba(59,130,246,.07); }
 .fb-btn {
-  width: 100%; padding: 12px;
+  width: 100%; padding: 13px;
   background: #1a5276; color: white; border: none;
   border-radius: 8px; font-size: 14px; font-weight: 500;
   cursor: pointer; font-family: 'Inter', sans-serif; transition: all .2s;
@@ -389,36 +608,25 @@ body { background: #07111F; }
 .star-btn:hover { transform: scale(1.15); }
 .star-hint { font-size: 12px; color: #94A3B8; margin-left: 8px; align-self: center; }
 
-/* ── TIM ──────────────────────────────────────────────── */
-/* P1.1: Profile cards */
+/* ══════════════════════════════════════════════
+   TIM
+══════════════════════════════════════════════ */
 .team-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
-  margin-bottom: 36px;
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 20px; margin-bottom: 36px;
 }
 .team-card {
-  background: white;
-  border: 1px solid #E2E8F0;
-  border-radius: 16px;
-  padding: 28px 20px 22px;
-  text-align: center;
-  transition: all .25s;
+  background: white; border: 1px solid #E2E8F0;
+  border-radius: 16px; padding: 28px 20px 22px;
+  text-align: center; transition: all .25s;
   position: relative; overflow: hidden;
 }
 .team-card::before {
-  content: '';
-  position: absolute; top: 0; left: 0; right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, #1a5276, #3B82F6);
-  opacity: 0;
-  transition: opacity .25s;
+  content: ''; position: absolute; top: 0; left: 0; right: 0;
+  height: 3px; background: linear-gradient(90deg, #1a5276, #3B82F6);
+  opacity: 0; transition: opacity .25s;
 }
-.team-card:hover {
-  border-color: rgba(59,130,246,.25);
-  box-shadow: 0 12px 40px rgba(59,130,246,.08);
-  transform: translateY(-3px);
-}
+.team-card:hover { border-color: rgba(59,130,246,.25); box-shadow: 0 12px 40px rgba(59,130,246,.08); transform: translateY(-3px); }
 .team-card:hover::before { opacity: 1; }
 .tc-avatar {
   width: 64px; height: 64px; border-radius: 16px;
@@ -426,31 +634,19 @@ body { background: #07111F; }
   color: white; font-family: 'Fraunces', serif;
   font-size: 22px; font-weight: 300; font-style: italic;
   display: flex; align-items: center; justify-content: center;
-  margin: 0 auto 14px;
-  transition: transform .25s;
+  margin: 0 auto 14px; transition: transform .25s;
 }
-.team-card.supervisor .tc-avatar {
-  background: linear-gradient(135deg, #15803D, #16A34A);
-}
+.team-card.supervisor .tc-avatar { background: linear-gradient(135deg, #15803D, #16A34A); }
 .team-card:hover .tc-avatar { transform: rotate(-4deg) scale(1.07); }
 .tc-badge {
-  display: inline-block;
-  font-size: 10px; font-weight: 600; letter-spacing: 1.5px;
-  text-transform: uppercase;
-  padding: 3px 10px; border-radius: 20px;
-  margin-bottom: 10px;
+  display: inline-block; font-size: 10px; font-weight: 600; letter-spacing: 1.5px;
+  text-transform: uppercase; padding: 3px 10px; border-radius: 20px; margin-bottom: 10px;
 }
-.tc-badge-student  { background: rgba(59,130,246,.08); color: #2563EB; }
+.tc-badge-student    { background: rgba(59,130,246,.08); color: #2563EB; }
 .tc-badge-supervisor { background: rgba(22,163,74,.08); color: #15803D; }
-.tc-name {
-  font-size: 14px; font-weight: 600; color: #0F172A;
-  margin-bottom: 2px; line-height: 1.3;
-  word-break: break-word; overflow-wrap: break-word;
-}
-.tc-nim { font-size: 11px; color: #94A3B8; margin-bottom: 12px; }
-.tc-links {
-  display: flex; justify-content: center; gap: 6px; flex-wrap: wrap;
-}
+.tc-name { font-size: 14px; font-weight: 600; color: #0F172A; margin-bottom: 2px; line-height: 1.3; word-break: break-word; }
+.tc-nim  { font-size: 11px; color: #94A3B8; margin-bottom: 12px; }
+.tc-links { display: flex; justify-content: center; gap: 6px; flex-wrap: wrap; }
 .tc-link {
   display: inline-flex; align-items: center; gap: 5px;
   font-size: 11px; font-weight: 500;
@@ -463,7 +659,6 @@ body { background: #07111F; }
 .tc-link-linkedin:hover { background: rgba(10,102,194,.12); }
 .tc-link-profile  { background: #F0FDF4; color: #15803D; border: 1px solid rgba(22,163,74,.15); }
 .tc-link-profile:hover { background: #DCFCE7; }
-
 .pmb {
   background: white; border: 1px solid #E2E8F0;
   border-radius: 12px; padding: 22px 36px;
@@ -472,151 +667,352 @@ body { background: #07111F; }
 .pmb p { font-size: 13px; font-weight: 300; color: #64748B; line-height: 1.9; }
 .pmb strong { font-weight: 600; color: #0F172A; }
 
-/* Responsive */
+/* ══════════════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════════════ */
+@media (max-width: 1100px) {
+  .why-grid   { grid-template-columns: repeat(2, 1fr); }
+  .proof-grid { grid-template-columns: repeat(2, 1fr); }
+  .ai-layout  { grid-template-columns: 1fr; gap: 36px; }
+}
 @media (max-width: 900px) {
-  .hero-body { grid-template-columns: 1fr; padding: 80px 6% 40px; }
-  .hero-panel { display: none; }
-  .hero-bottom { grid-template-columns: repeat(2,1fr); }
+  .hero-body      { grid-template-columns: 1fr; padding: 80px 6% 40px; gap: 32px; }
+  .hero-product-frame { max-height: 260px; overflow: hidden; }
+  .hero-bottom    { grid-template-columns: repeat(2,1fr); }
   .hb-item:nth-child(2) { border-right: none; }
   .hb-item:nth-child(3) { border-top: 1px solid rgba(255,255,255,.05); }
-  .prob-layout { grid-template-columns: 1fr; }
-  .prob-cell { border-right: none !important; }
-  .feat-layout { grid-template-columns: 1fr; }
-  .fc.span2 { grid-column: span 1; }
-  .lokasi-wrap { grid-template-columns: 1fr; gap: 36px; }
-  .sec { padding: 64px 6%; }
-  .lnd-foot { flex-direction: column; text-align: center; }
-  .team-grid { grid-template-columns: repeat(2, 1fr); }
+  .prob-layout    { grid-template-columns: 1fr; }
+  .prob-cell      { border-right: none !important; }
+  .feat-layout    { grid-template-columns: 1fr; }
+  .fc.span2       { grid-column: span 1; }
+  .lokasi-wrap    { grid-template-columns: 1fr; gap: 32px; }
+  .sec            { padding: 56px 6%; }
+  .team-grid      { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 640px) {
+  .why-grid       { grid-template-columns: 1fr; }
+  .proof-grid     { grid-template-columns: 1fr 1fr; }
 }
 @media (max-width: 540px) {
   .hero-btns, .cta-btns { flex-direction: column; }
-  .hero-bottom { grid-template-columns: repeat(2,1fr); }
-  .hb-item { padding: 14px 20px; }
-  .lp-wrap { gap: 8px; }
-  .team-grid { grid-template-columns: 1fr; max-width: 360px; margin: 0 auto 36px; }
-  .pmb { padding: 18px 20px; }
+  .hero-bottom    { grid-template-columns: repeat(2,1fr); }
+  .hb-item        { padding: 16px 16px; }
+  .hb-num-stat    { font-size: 36px; }
+  .hero-pills     { gap: 6px; }
+  .hp             { font-size: 11px; padding: 5px 11px; }
+  .team-grid      { grid-template-columns: 1fr; max-width: 360px; margin: 0 auto 36px; }
+  .pmb            { padding: 18px 20px; }
+  .proof-grid     { grid-template-columns: 1fr; }
 }
-
-/* ── P0.2: Mobile overflow fix (320–414px) ────────────────────── */
 @media (max-width: 480px) {
-  .hero-body { padding: 72px 5% 36px; gap: 24px; }
-  .hb-item { padding: 12px 14px; }
-  .hb-val { font-size: 12px; }
-  .sec { padding: 52px 5%; }
-  .prob-cell { padding: 28px 20px; }
-  .feat-layout .fc { padding: 20px 16px; }
-  .lokasi-wrap { gap: 24px; }
-  .lp { padding: 7px 12px; }
-  .lp span { font-size: 12px; }
-  .prev-bar { flex-direction: column; }
-  .pmb { padding: 18px 20px; }
+  .hero-body  { padding: 72px 5% 32px; }
+  .sec        { padding: 48px 5%; }
+  .prob-cell  { padding: 28px 20px; }
+  .prev-bar   { flex-direction: column; }
 }
 </style>
 {% endblock %}
 
 {% block content %}
 
-<!-- HERO -->
+<!-- ══════════════════════════════════════════
+     HERO
+══════════════════════════════════════════ -->
 <section class="hero">
   <div class="hero-noise"></div>
   <div class="hero-aurora"></div>
   <div class="hero-topo"></div>
+
   <div class="hero-body">
+
+    <!-- Kiri: teks + CTA -->
     <div>
       <div class="hero-eyebrow">Platform Informasi Sumber Daya Air</div>
       <h1 class="hero-h1">AQUA<em>VISION</em></h1>
       <p class="hero-loc">Desa Wonotoro · Sukapura · Probolinggo</p>
-      <p class="hero-desc">Platform pemetaan dan analisis sumber daya air berbasis WebGIS untuk mendukung pengelolaan air yang berkelanjutan di kawasan wisata Bromo Tengger Semeru.</p>
+
+      <p class="hero-tagline">Pahami kondisi sumber daya air secara visual, dari data menuju keputusan yang lebih baik.</p>
+
+      <div class="hero-pills">
+        <span class="hp">🗺️ Peta Interaktif</span>
+        <span class="hp">💧 Analisis Ketersediaan</span>
+        <span class="hp">🤖 AI Assistant</span>
+        <span class="hp">📥 Data Portal</span>
+      </div>
+
       <div class="hero-btns">
+        <a href="/" class="btn-hero-fill">Buka Dashboard →</a>
         {% if user.is_authenticated %}
-          <a href="/" class="btn-hero-fill">Buka Peta</a>
           <a href="/data/" class="btn-hero-ghost">Data Portal</a>
         {% else %}
-          <a href="/login/" class="btn-hero-fill">Masuk ke Sistem</a>
-          <a href="/register/" class="btn-hero-ghost">Daftar Akun</a>
+          <a href="#mengapa" class="btn-hero-ghost">Pelajari Fitur</a>
         {% endif %}
       </div>
     </div>
-    <div class="hero-panel">
-      <p class="hero-panel-lbl">Ringkasan Data</p>
-      <div class="stat-quad">
-        <div class="sq"><span class="sq-num" id="statAir" data-t="{{ jumlah_air }}">—</span><span class="sq-lbl">Sumber Air</span></div>
-        <div class="sq"><span class="sq-num" id="statFasilitas" data-t="{{ jumlah_fasilitas }}">—</span><span class="sq-lbl">Fasilitas Wisata</span></div>
-        <div class="sq"><span class="sq-num" id="statPermukiman" data-t="{{ jumlah_permukiman }}">—</span><span class="sq-lbl">Permukiman</span></div>
-        <div class="sq"><span class="sq-num" id="statPipa" data-t="{{ jumlah_pipa }}">—</span><span class="sq-lbl">Segmen Pipa</span></div>
+
+    <!-- Kanan: screenshot dashboard -->
+    <div class="hero-product-frame">
+      <div class="hero-product-bar">
+        <span class="hpb-dot" style="background:#FF5F57"></span>
+        <span class="hpb-dot" style="background:#FEBC2E"></span>
+        <span class="hpb-dot" style="background:#28C840"></span>
+        <div class="hpb-addr">aquavision.id</div>
       </div>
-      <p class="hero-panel-footer">Data diperbarui secara berkala dari sistem basis data spasial AQUAVISION.</p>
+      <img
+        src="{% static 'images/webgis_preview.png' %}"
+        alt="Dashboard AQUAVISION — peta interaktif sumber daya air"
+        class="hero-product-img"
+        loading="eager" decoding="async"
+        onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
+      >
+      <div class="prev-img-placeholder" style="display:none;min-height:320px;">Dashboard AQUAVISION</div>
+    </div>
+
+  </div><!-- /hero-body -->
+
+  <!-- Stats bar -->
+  <div class="hero-bottom">
+    <div class="hb-item">
+      <span class="hb-num-stat" id="statAir" data-t="{{ jumlah_air }}">—</span>
+      <div class="hb-lbl">Sumber Air</div>
+    </div>
+    <div class="hb-item">
+      <span class="hb-num-stat" id="statReservoir" data-t="{{ jumlah_reservoir }}">—</span>
+      <div class="hb-lbl">Tandon Air</div>
+    </div>
+    <div class="hb-item">
+      <span class="hb-num-stat" id="statFasilitas" data-t="{{ jumlah_fasilitas }}">—</span>
+      <div class="hb-lbl">Fasilitas Wisata</div>
+    </div>
+    <div class="hb-item">
+      <span class="hb-num-stat" id="statPermukiman" data-t="{{ jumlah_permukiman }}">—</span>
+      <div class="hb-lbl">Permukiman</div>
     </div>
   </div>
-  <div class="hero-bottom">
-    <div class="hb-item"><div class="hb-num">Sistem</div><div class="hb-val">WebGIS berbasis Leaflet, Django, PostGIS</div></div>
-    <div class="hb-item"><div class="hb-num">Standar</div><div class="hb-val">OGC WMS/WFS, RFC 7946 GeoJSON, ISO/IEC 25010</div></div>
-    <div class="hb-item"><div class="hb-num">Proyeksi</div><div class="hb-val">WGS 84 / EPSG:4326 · UTM Zone 49S</div></div>
-    <div class="hb-item"><div class="hb-num">Kawasan</div><div class="hb-val">KSPN Bromo Tengger Semeru</div></div>
-  </div>
+
   <div class="hero-wave">
     <svg viewBox="0 0 1440 48" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
-      <path d="M0,24 C480,48 960,0 1440,24 L1440,48 L0,48 Z" fill="#F8FAFC"/>
+      <path d="M0,24 C480,48 960,0 1440,24 L1440,48 L0,48 Z" fill="#fff"/>
     </svg>
   </div>
 </section>
 
-<!-- MASALAH -->
-<section class="sec">
+<!-- ══════════════════════════════════════════
+     MENGAPA AQUAVISION?
+══════════════════════════════════════════ -->
+<section class="sec sec-white" id="mengapa">
+  <span class="lbl rv">Keunggulan</span>
+  <div style="max-width:600px;margin-bottom:36px;">
+    <h2 class="sec-h rv d1">Mengapa <em>AQUAVISION?</em></h2>
+    <p class="sec-sub rv d2">Lebih dari sekadar peta — platform terintegrasi untuk memahami, menganalisis, dan mengelola sumber daya air secara menyeluruh.</p>
+  </div>
+  <div class="why-grid">
+
+    <div class="why-card wc-1 rv d1">
+      <div class="why-icon" style="background:rgba(59,130,246,.08);">🗺️</div>
+      <h3>Dashboard Interaktif</h3>
+      <p>Visualisasikan seluruh data sumber daya air di peta multi-layer. Aktifkan, nonaktifkan, dan kombinasikan layer secara bebas sesuai kebutuhan analisis.</p>
+      <a href="/" class="why-link">Buka Dashboard →</a>
+    </div>
+
+    <div class="why-card wc-2 rv d2">
+      <div class="why-icon" style="background:rgba(6,182,212,.08);">💧</div>
+      <h3>Analisis Ketersediaan Air</h3>
+      <p>Pantau perbandingan supply dan demand air harian. Indikator status AMAN, WASPADA, atau KRITIS membantu pengambilan keputusan berbasis data aktual.</p>
+      <a href="/" class="why-link">Lihat Dashboard →</a>
+    </div>
+
+    <div class="why-card wc-3 rv d3">
+      <div class="why-icon" style="background:rgba(139,92,246,.08);">📥</div>
+      <h3>Data Portal Terbuka</h3>
+      <p>Unduh dataset spasial sumber daya air dalam format CSV, GeoJSON, KML, dan Shapefile. Tersedia untuk analisis lebih lanjut menggunakan GIS desktop.</p>
+      <a href="/data/" class="why-link">Buka Data Portal →</a>
+    </div>
+
+    <div class="why-card wc-4 rv d4">
+      <div class="why-icon" style="background:rgba(16,185,129,.08);">🤖</div>
+      <h3>AI Assistant</h3>
+      <p>Ajukan pertanyaan tentang kondisi sumber daya air menggunakan bahasa alami. Jawaban sepenuhnya berdasarkan data aktual yang tersimpan di sistem.</p>
+      <a href="/" class="why-link">Coba Sekarang →</a>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     MASALAH
+══════════════════════════════════════════ -->
+<section class="sec" style="background:#F8FAFC;">
   <span class="lbl rv">Konteks</span>
   <div style="display:flex;align-items:baseline;gap:24px;flex-wrap:wrap;margin-bottom:32px;">
-    <h2 class="sec-h rv d1" style="margin-bottom:0;">Tantangan pengelolaan air <em>di Desa Wonotoro</em></h2>
-    <p class="rv d2" style="font-size:14px;font-weight:300;color:#64748B;line-height:1.7;margin:0;">Setiap permasalahan di bawah ini terdokumentasi, terukur, dan berdampak langsung pada kehidupan warga serta keberlanjutan sektor wisata.</p>
+    <h2 class="sec-h rv d1" style="margin-bottom:0;">Tantangan pengelolaan air<br><em>di Desa Wonotoro</em></h2>
+    <p class="rv d2" style="font-size:13px;font-weight:300;color:#64748B;line-height:1.75;margin:0;max-width:360px;">Setiap permasalahan berikut terdokumentasi, terukur, dan berdampak langsung pada kehidupan warga serta keberlanjutan sektor wisata.</p>
   </div>
-  <div class="prob-layout">
-    <div class="prob-cell rv d1"><div class="prob-line"></div><div class="prob-n">01</div><h3>Kekeringan saat musim kemarau</h3><p>Debit air alami turun drastis saat kemarau. Di waktu bersamaan, kebutuhan air melonjak akibat kunjungan wisatawan dan pertanian hortikultura. Persaingan penggunaan air antara warga, petani, dan pengelola wisata menjadi tidak terkendali.</p></div>
-    <div class="prob-cell rv d2"><div class="prob-line"></div><div class="prob-n">02</div><h3>Jaringan pipa tidak terstruktur</h3><p>Pipa dibangun sendiri oleh warga tanpa perencanaan teknis. Kebocoran tinggi dan distribusi tidak merata memicu konflik antarwarga, terutama saat debit mengecil dan semua pihak bersaing mendapatkan aliran air.</p></div>
-    <div class="prob-cell rv d3"><div class="prob-line"></div><div class="prob-n">03</div><h3>Data aset air tidak terintegrasi</h3><p>Kebakaran hutan Bromo 2023 membuktikan kerapuhan sistem: warga harus menyusuri pipa belasan kilometer secara manual karena tidak ada peta aset digital. Informasi lokasi sumber air, pipa, dan tandon tersebar tanpa dokumentasi terpadu.</p></div>
-    <div class="prob-cell rv d4"><div class="prob-line"></div><div class="prob-n">04</div><h3>Topografi curam membatasi akses</h3><p>Sumber mata air utama berada di kawasan pegunungan terjal yang jauh dari permukiman. Pembangunan jaringan baru berbiaya tinggi, sementara pemeliharaan infrastruktur eksisting sulit dilakukan secara berkala.</p></div>
+  <div class="prob-layout rv d3">
+    <div class="prob-cell"><div class="prob-line"></div><div class="prob-n">01</div><h3>Kekeringan saat musim kemarau</h3><p>Debit air alami turun drastis saat kemarau. Di waktu bersamaan, kebutuhan melonjak akibat kunjungan wisatawan dan pertanian hortikultura. Persaingan penggunaan air menjadi tidak terkendali.</p></div>
+    <div class="prob-cell"><div class="prob-line"></div><div class="prob-n">02</div><h3>Jaringan pipa tidak terstruktur</h3><p>Pipa dibangun sendiri oleh warga tanpa perencanaan teknis. Kebocoran tinggi dan distribusi tidak merata memicu konflik, terutama saat debit mengecil.</p></div>
+    <div class="prob-cell"><div class="prob-line"></div><div class="prob-n">03</div><h3>Data aset air tidak terintegrasi</h3><p>Kebakaran hutan Bromo 2023 membuktikan kerapuhan sistem: warga harus menyusuri pipa belasan kilometer secara manual karena tidak ada peta aset digital yang tersimpan terpadu.</p></div>
+    <div class="prob-cell"><div class="prob-line"></div><div class="prob-n">04</div><h3>Topografi curam membatasi akses</h3><p>Sumber mata air utama berada di kawasan pegunungan terjal. Pembangunan jaringan baru berbiaya tinggi, sementara pemeliharaan infrastruktur eksisting sulit dilakukan secara berkala.</p></div>
   </div>
 </section>
 
-<!-- FITUR -->
-<section class="sec sec-white">
+<!-- ══════════════════════════════════════════
+     FITUR UTAMA
+══════════════════════════════════════════ -->
+<section class="sec sec-white" id="fitur">
   <span class="lbl rv">Sistem</span>
   <div style="margin-bottom:32px;">
-    <h2 class="sec-h rv d1">Platform terintegrasi <em>untuk pengelolaan air</em></h2>
-    <p class="rv d2" style="font-size:14px;font-weight:300;color:#64748B;line-height:1.7;margin:8px 0 0;">Semua informasi sumber daya air tersedia dalam satu platform yang dapat diakses dari browser, tanpa perlu perangkat lunak tambahan.</p>
+    <h2 class="sec-h rv d1">Fitur utama <em>AQUAVISION</em></h2>
+    <p class="sec-sub rv d2" style="margin-bottom:0;">Semua informasi sumber daya air tersedia dalam satu platform — dapat diakses dari browser tanpa perangkat lunak tambahan.</p>
   </div>
   <div class="feat-layout">
-    <div class="fc span2 rv d1"><div class="fc-icon">🗺️</div><h3>Peta interaktif multi-layer</h3><p>Aktifkan dan kombinasikan lapisan peta sesuai kebutuhan: data debit puncak aliran per bulan, zonasi potensi air tanah, jaringan sungai, jalur pipa distribusi, lokasi sumber air, tandon, hingga fasilitas wisata. Nilai piksel ditampilkan real-time saat kursor bergerak.</p></div>
-    <div class="fc rv d2"><div class="fc-icon">💧</div><h3>Ketersediaan air</h3><p>Pantau perbandingan ketersediaan dan kebutuhan harian dengan indikator AMAN, WASPADA, atau KRITIS beserta simulasi skenario multi-parameter.</p></div>
-    <div class="fc rv d1"><div class="fc-icon">📏</div><h3>Pengukuran jarak spasial</h3><p>Ukur jarak dari sumber air ke tandon atau permukiman langsung di peta untuk memperkirakan kebutuhan material jaringan pipa baru.</p></div>
-    <div class="fc rv d2"><div class="fc-icon">🌿</div><h3>Analisis potensi air tanah</h3><p>Zonasi daerah resapan dan tangkapan air berbasis metode AHP untuk mengidentifikasi lokasi sumber air potensial baru.</p></div>
-    <div class="fc rv d3"><div class="fc-icon">📥</div><h3>Unduh data terbuka</h3><p>Semua dataset tersedia dalam format CSV, GeoJSON, KML, dan Shapefile untuk analisis lebih lanjut.</p></div>
-    <div class="fc rv d4"><div class="fc-icon">✏️</div><h3>Manajemen aset lapangan</h3><p>Admin dapat menambah dan memperbarui data langsung melalui peta atau dengan upload Shapefile hasil survei.</p></div>
+    <div class="fc span2 rv d1">
+      <div class="fc-icon">🗺️</div>
+      <h3>Peta interaktif multi-layer</h3>
+      <p>Aktifkan dan kombinasikan lapisan peta sesuai kebutuhan: data debit puncak aliran per bulan, zonasi potensi air tanah, jaringan sungai, jalur pipa distribusi, lokasi sumber air, tandon, hingga fasilitas wisata. Nilai piksel ditampilkan secara real-time saat kursor bergerak di atas layer raster.</p>
+    </div>
+    <div class="fc rv d2">
+      <div class="fc-icon">💧</div>
+      <h3>Ketersediaan air</h3>
+      <p>Pantau perbandingan ketersediaan dan kebutuhan air harian dengan indikator AMAN, WASPADA, atau KRITIS beserta simulasi skenario multi-parameter.</p>
+    </div>
+    <div class="fc rv d1">
+      <div class="fc-icon">📏</div>
+      <h3>Pengukuran jarak spasial</h3>
+      <p>Ukur jarak dari sumber air ke tandon atau permukiman langsung di peta untuk memperkirakan kebutuhan material jaringan pipa baru.</p>
+    </div>
+    <div class="fc rv d2">
+      <div class="fc-icon">🌿</div>
+      <h3>Analisis potensi air tanah</h3>
+      <p>Zonasi daerah resapan dan tangkapan air berbasis metode AHP untuk mengidentifikasi lokasi sumber air potensial baru.</p>
+    </div>
+    <div class="fc rv d3">
+      <div class="fc-icon">📥</div>
+      <h3>Unduh data terbuka</h3>
+      <p>Semua dataset tersedia dalam format CSV, GeoJSON, KML, dan Shapefile untuk analisis lebih lanjut menggunakan perangkat GIS.</p>
+    </div>
+    <div class="fc rv d4">
+      <div class="fc-icon">✏️</div>
+      <h3>Manajemen aset lapangan</h3>
+      <p>Admin dapat menambah dan memperbarui data langsung melalui peta atau dengan mengunggah Shapefile hasil survei lapangan.</p>
+    </div>
   </div>
 </section>
 
-<!-- LAYER DATA -->
+<!-- ══════════════════════════════════════════
+     AI ASSISTANT
+══════════════════════════════════════════ -->
 <section class="sec sec-dark">
-  <span class="lbl lbl-lt rv">Dataset Spasial</span>
-  <h2 class="sec-h sec-h-lt rv d1" style="margin-bottom:8px;">Lapisan data <em>yang dapat diakses</em></h2>
-  <p class="rv d2" style="font-size:14px;font-weight:300;color:rgba(255,255,255,.35);line-height:1.7;margin-bottom:36px;">Setiap lapisan dapat diaktifkan, dinonaktifkan, dan dikombinasikan bebas di peta interaktif.</p>
-  <div class="lp-wrap rv d3">
-    <div class="lp"><div class="lp-dot" style="background:linear-gradient(135deg,#c7e9ff,#022d4d);"></div><span>Debit Puncak Aliran — 12 Bulan</span></div>
-    <div class="lp"><div class="lp-dot" style="background:linear-gradient(135deg,#DC2626,#16A34A);"></div><span>Daerah Potensi Air Tanah</span></div>
-    <div class="lp"><div class="lp-dot" style="background:#2980b9;"></div><span>Daerah Aliran Sungai</span></div>
-    <div class="lp"><div class="lp-dot" style="background:#F59E0B;"></div><span>Jaringan Pipa Distribusi</span></div>
-    <div class="lp"><div class="lp-dot" style="background:#3B82F6;border-radius:50%;"></div><span>Sumber Air</span></div>
-    <div class="lp"><div class="lp-dot" style="background:#16A34A;border-radius:50%;"></div><span>Tandon Air</span></div>
-    <div class="lp"><div class="lp-dot" style="background:#DC2626;border-radius:50%;"></div><span>Fasilitas Wisata</span></div>
-    <div class="lp"><div class="lp-dot" style="border:2px dashed rgba(220,38,38,.5);border-radius:3px;"></div><span>Batas Administrasi Desa</span></div>
+  <div class="ai-layout">
+
+    <!-- Kiri: penjelasan -->
+    <div>
+      <div class="ai-badge rv">
+        <span style="font-size:14px;">🤖</span> AI Assistant
+      </div>
+      <h2 class="sec-h sec-h-lt rv d1">Tanyakan kondisi air<br><em>dalam bahasa alami</em></h2>
+      <p class="rv d2" style="font-size:14px;font-weight:300;color:rgba(255,255,255,.4);line-height:1.8;margin-bottom:28px;">AQUAVISION dilengkapi AI Assistant yang mampu menjawab pertanyaan tentang sumber daya air berdasarkan data aktual sistem — bukan jawaban generik.</p>
+      <ul class="ai-feature-list rv d3">
+        <li>Tanyakan status ketersediaan dan kondisi sumber air</li>
+        <li>Navigasi fitur dan layer peta menggunakan kalimat biasa</li>
+        <li>Semua jawaban berbasis data aktual dari database sistem</li>
+        <li>Tersedia langsung di Dashboard tanpa instalasi tambahan</li>
+      </ul>
+      <a href="/" class="btn-hero-fill rv d4" style="display:inline-flex;align-items:center;gap:8px;">Coba AI Assistant →</a>
+    </div>
+
+    <!-- Kanan: chat mockup -->
+    <div class="chat-frame rv d2">
+      <div class="chat-topbar">
+        <div class="chat-top-dot"></div>
+        <span class="chat-top-name">AQUAVISION AI</span>
+        <span class="chat-top-badge">Online</span>
+      </div>
+      <div class="chat-body">
+
+        <div class="chat-row-user">
+          <div class="chat-bubble chat-bubble-user">
+            Bagaimana cara melihat debit aliran per bulan di peta?
+          </div>
+        </div>
+
+        <div class="chat-row-ai">
+          <div class="chat-ai-lbl">AQUAVISION AI</div>
+          <div class="chat-bubble chat-bubble-ai">
+            Aktifkan layer <strong style="color:rgba(255,255,255,.85);">"Debit Puncak Aliran"</strong> di panel Analisis Hidrologi pada Dashboard. Gunakan kontrol bulan untuk memilih periode yang ingin dilihat — peta akan diperbarui secara otomatis. Klik titik mana pun untuk membaca nilai piksel debit.
+          </div>
+        </div>
+
+        <div class="chat-row-user">
+          <div class="chat-bubble chat-bubble-user">
+            Di mana lokasi tandon air yang tersedia?
+          </div>
+        </div>
+
+        <div class="chat-row-ai">
+          <div class="chat-ai-lbl">AQUAVISION AI</div>
+          <div class="chat-bubble chat-bubble-ai">
+            Aktifkan layer <strong style="color:rgba(255,255,255,.85);">"Tandon Air"</strong> di panel Infrastruktur Air. Setiap titik dapat diklik untuk melihat nama, kapasitas (m³), dan elevasi. Data lengkapnya juga dapat diunduh melalui <strong style="color:rgba(255,255,255,.85);">Data Portal</strong>.
+          </div>
+        </div>
+
+      </div>
+      <div class="chat-input-row">
+        <div class="chat-input-fake">Ketik pertanyaan Anda...</div>
+        <div class="chat-send-btn">➤</div>
+      </div>
+    </div>
+
   </div>
 </section>
 
-<!-- LOKASI -->
+<!-- ══════════════════════════════════════════
+     DATASET SPASIAL
+══════════════════════════════════════════ -->
 <section class="sec sec-deep">
+  <span class="lbl lbl-lt rv">Dataset Spasial</span>
+  <h2 class="sec-h sec-h-lt rv d1" style="margin-bottom:6px;">Lapisan data <em>yang dapat diakses</em></h2>
+  <p class="rv d2" style="font-size:13px;font-weight:300;color:rgba(255,255,255,.3);line-height:1.7;margin-bottom:32px;">Setiap lapisan dapat diaktifkan, dinonaktifkan, dan dikombinasikan bebas di peta interaktif.</p>
+
+  <div class="rv d3">
+    <div class="lp-section-lbl">Batas &amp; Wilayah</div>
+    <div class="lp-wrap">
+      <div class="lp"><div class="lp-dot" style="border:2px solid rgba(231,76,60,.6);background:transparent;border-radius:3px;"></div><span>Batas Administrasi Desa</span></div>
+      <div class="lp"><div class="lp-dot" style="background:#2980b9;"></div><span>Daerah Aliran Sungai</span></div>
+    </div>
+
+    <div class="lp-section-lbl">Infrastruktur Air</div>
+    <div class="lp-wrap">
+      <div class="lp"><div class="lp-dot" style="background:#2563EB;"></div><span>Sumber Air</span></div>
+      <div class="lp"><div class="lp-dot" style="background:#0891B2;"></div><span>Tandon Air</span></div>
+      <div class="lp"><div class="lp-dot" style="background:#F59E0B;border-radius:2px;height:5px;width:14px;"></div><span>Jaringan Pipa Distribusi</span></div>
+    </div>
+
+    <div class="lp-section-lbl">Analisis Hidrologi</div>
+    <div class="lp-wrap">
+      <div class="lp"><div class="lp-dot" style="background:linear-gradient(135deg,#c7e9ff,#022d4d);"></div><span>Debit Puncak Aliran — 12 Bulan</span></div>
+      <div class="lp"><div class="lp-dot" style="background:linear-gradient(135deg,#e74c3c,#27ae60);"></div><span>Daerah Potensi Air Tanah</span></div>
+    </div>
+
+    <div class="lp-section-lbl">Fasilitas &amp; Penduduk</div>
+    <div class="lp-wrap">
+      <div class="lp"><div class="lp-dot" style="background:#EA580C;"></div><span>Hotel &amp; Penginapan</span></div>
+      <div class="lp"><div class="lp-dot" style="background:#CA8A04;"></div><span>Tempat Makan</span></div>
+      <div class="lp"><div class="lp-dot" style="background:#7C3AED;"></div><span>Jasa</span></div>
+      <div class="lp"><div class="lp-dot" style="background:#8e44ad;"></div><span>Permukiman</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     LOKASI
+══════════════════════════════════════════ -->
+<section class="sec sec-mid">
   <div class="lokasi-wrap">
     <div>
       <span class="lbl lbl-lt rv">Wilayah Kajian</span>
       <h2 class="sec-h sec-h-lt rv d1">Desa Wonotoro,<br><em>kaki Gunung Bromo</em></h2>
-      <p class="sec-p sec-p-lt rv d2">Kecamatan Sukapura, Kabupaten Probolinggo. Kawasan penyangga KSPN Bromo Tengger Semeru yang dikunjungi lebih dari 300.000 wisatawan per tahun.</p>
+      <p class="rv d2" style="font-size:14px;font-weight:300;color:rgba(255,255,255,.38);line-height:1.85;margin-bottom:0;">Kecamatan Sukapura, Kabupaten Probolinggo, Jawa Timur. Kawasan penyangga KSPN Bromo Tengger Semeru yang menjadi destinasi wisata vulkanik terkemuka di Indonesia.</p>
     </div>
     <div class="map-embed rv d3">
       <div class="map-pin"><div class="pin-dot"></div><span>Desa Wonotoro, Sukapura</span></div>
@@ -625,60 +1021,118 @@ body { background: #07111F; }
   </div>
 </section>
 
-<!-- PREVIEW -->
+<!-- ══════════════════════════════════════════
+     PREVIEW DASHBOARD
+══════════════════════════════════════════ -->
 <section class="sec sec-dark">
-  <span class="lbl lbl-lt rv">Preview</span>
-  <h2 class="sec-h sec-h-lt rv d1">Tampilan sistem</h2>
-  <div class="prev-wrap rv d2">
+  <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:20px;margin-bottom:24px;">
+    <div>
+      <span class="lbl lbl-lt rv">Preview</span>
+      <h2 class="sec-h sec-h-lt rv d1" style="margin-bottom:6px;">Lihat <em>Dashboard</em> AQUAVISION</h2>
+      <p class="rv d2" style="font-size:13px;font-weight:300;color:rgba(255,255,255,.35);line-height:1.7;margin:0;">Platform lengkap — peta, analisis, AI, dan data portal dalam satu tampilan.</p>
+    </div>
+    <div class="rv d3">
+      {% if user.is_authenticated %}
+        <a href="/" class="btn-prev-main">Buka Dashboard →</a>
+      {% else %}
+        <a href="/" class="btn-prev-main">Buka Dashboard →</a>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="prev-tags rv d2">
+    <span class="prev-tag">🗺️ Peta Multi-Layer</span>
+    <span class="prev-tag">💧 Ketersediaan Air</span>
+    <span class="prev-tag">📊 Analisis Hidrologi</span>
+    <span class="prev-tag">🤖 AI Assistant</span>
+    <span class="prev-tag">📥 Data Portal</span>
+    <span class="prev-tag">✏️ Manajemen Aset</span>
+  </div>
+
+  <div class="prev-wrap rv d3">
     <img
       src="{% static 'images/webgis_preview.png' %}"
       alt="Preview Dashboard AQUAVISION"
-      loading="lazy"
-      decoding="async"
-      width="1280"
-      height="720"
-      onerror="this.style.display='none'; this.nextElementSibling && (this.nextElementSibling.style.display='flex');"
+      loading="lazy" decoding="async"
+      width="1280" height="720"
+      onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
     >
     <div class="prev-img-placeholder" style="display:none;">Memuat pratinjau dashboard...</div>
     <div class="prev-bar">
       <div>
         <h4>📍 Desa Wonotoro, Kec. Sukapura, Kab. Probolinggo</h4>
-        <p>WGS84 / EPSG:4326 · Kawasan penyangga KSPN Bromo Tengger Semeru</p>
+        <p>WGS84 / EPSG:4326 · Kawasan Penyangga KSPN Bromo Tengger Semeru</p>
       </div>
-      {% if user.is_authenticated %}<a href="/" class="btn-prev">Buka Peta →</a>
-      {% else %}<a href="/login/" class="btn-prev">Masuk untuk Akses →</a>{% endif %}
+      <a href="/" class="btn-prev-main">Buka Dashboard →</a>
     </div>
   </div>
 </section>
 
-<!-- CTA -->
+<!-- ══════════════════════════════════════════
+     SOCIAL PROOF / TRUST
+══════════════════════════════════════════ -->
 <section class="sec sec-white">
+  <div style="text-align:center;max-width:500px;margin:0 auto 40px;">
+    <span class="lbl rv" style="display:inline-flex;">Tentang Pengembangan</span>
+    <h2 class="sec-h rv d1">Dibangun dengan <em>standar yang tepat</em></h2>
+  </div>
+  <div class="proof-grid">
+
+    <div class="proof-card rv d1">
+      <div class="proof-icon">🎓</div>
+      <h4>Institut Teknologi Bandung</h4>
+      <p>Capstone Design Project — Teknik Geodesi dan Geomatika FITB ITB 2026</p>
+    </div>
+
+    <div class="proof-card rv d2">
+      <div class="proof-icon">📊</div>
+      <h4>Data Spasial Aktual</h4>
+      <p>Berbasis survei lapangan dan citra satelit — bukan data estimasi atau rekayasa</p>
+    </div>
+
+    <div class="proof-card rv d3">
+      <div class="proof-icon">🌐</div>
+      <h4>WebGIS Modern</h4>
+      <p>Leaflet.js · PostGIS · Django · OGC · RFC 7946 · UTM Zone 49S / EPSG:4326</p>
+    </div>
+
+    <div class="proof-card rv d4">
+      <div class="proof-icon">🤖</div>
+      <h4>AI Berbasis Data Nyata</h4>
+      <p>AI Assistant hanya menggunakan data aktual dari database sistem AQUAVISION</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     CTA
+══════════════════════════════════════════ -->
+<section class="sec" style="background:#F0F7FF;">
   <div class="cta-wrap">
     <span class="lbl rv" style="display:inline-flex;">Mulai</span>
-    <h2 class="sec-h rv d1">Kelola data air Wonotoro<br><em>secara digital</em></h2>
-    <p class="sec-p rv d2" style="text-align:center;margin:0 auto 40px;">Satu platform untuk semua informasi sumber daya air — dapat diakses kapan saja dari perangkat apapun.</p>
+    <h2 class="sec-h rv d1" style="margin-bottom:12px;">Kelola data air Wonotoro<br><em>secara digital</em></h2>
+    <p class="rv d2" style="font-size:14px;font-weight:300;color:#64748B;line-height:1.8;text-align:center;margin:0 auto 36px;max-width:420px;">Satu platform untuk semua informasi sumber daya air — dapat diakses kapan saja dari perangkat apapun.</p>
     <div class="cta-btns rv d3">
-      {% if user.is_authenticated %}
-        <a href="/" class="btn-cta-fill">Buka Dashboard</a>
-        <a href="/data/" class="btn-cta-out">Lihat Data Portal</a>
-      {% else %}
-        <a href="/login/" class="btn-cta-fill">Masuk ke Sistem</a>
-        <a href="/register/" class="btn-cta-out">Daftar Akun</a>
-      {% endif %}
+      <a href="/" class="btn-cta-fill">Buka Dashboard</a>
+      <a href="/data/" class="btn-cta-out">Lihat Data Portal</a>
     </div>
   </div>
 </section>
 
-<!-- FEEDBACK -->
+<!-- ══════════════════════════════════════════
+     FEEDBACK
+══════════════════════════════════════════ -->
 <section class="sec" style="background:#F8FAFC;">
-  <div style="text-align:center;max-width:440px;margin:0 auto 44px;">
+  <div style="text-align:center;max-width:440px;margin:0 auto 40px;">
     <span class="lbl rv" style="display:inline-flex;">Masukan</span>
     <h2 class="sec-h rv d1">Sampaikan<br><em>pendapat Anda</em></h2>
-    <p class="sec-p rv d2" style="text-align:center;margin:0 auto;">Kami terbuka terhadap masukan dari masyarakat, pengelola wisata, dan semua pihak yang berkepentingan.</p>
+    <p class="rv d2" style="font-size:13px;font-weight:300;color:#64748B;line-height:1.8;text-align:center;margin:0 auto;">Kami terbuka terhadap masukan dari masyarakat, pengelola wisata, dan semua pihak yang berkepentingan.</p>
   </div>
   <div class="fb-wrap rv d3">
     <label class="fb-lbl">Nama</label>
     <input type="text" class="fb-in" id="feedbackNama" placeholder="Nama Anda">
+
     <label class="fb-lbl">Rating Pengalaman</label>
     <div style="display:flex;align-items:center;margin-bottom:14px;">
       <div class="star-row" id="starRow">
@@ -690,6 +1144,7 @@ body { background: #07111F; }
       </div>
       <span class="star-hint" id="starHint">Pilih bintang</span>
     </div>
+
     <label class="fb-lbl">Pesan</label>
     <textarea class="fb-in" id="feedbackPesan" rows="4" placeholder="Tulis masukan atau saran Anda..."></textarea>
     <button id="btnFeedback" class="fb-btn">Kirim Masukan</button>
@@ -698,132 +1153,185 @@ body { background: #07111F; }
   <div id="feedbackList" style="max-width:480px;margin:28px auto 0;"></div>
 </section>
 
-<!-- TIM -->
+<!-- ══════════════════════════════════════════
+     TIM
+══════════════════════════════════════════ -->
 <section class="sec sec-white" id="tim">
   <div style="text-align:center;">
-    <span class="lbl rv" style="display:inline-flex;">Tim</span>
+    <span class="lbl rv" style="display:inline-flex;">Tim Pengembang</span>
     <h2 class="sec-h rv d1">Capstone Design Project<br><em>2026</em></h2>
-    <p class="sec-p rv d2" style="text-align:center;margin:0 auto 44px;">Program Studi Teknik Geodesi dan Geomatika<br>Fakultas Ilmu dan Teknologi Kebumian, Institut Teknologi Bandung</p>
+    <p class="rv d2" style="font-size:13px;font-weight:300;color:#64748B;text-align:center;margin:0 auto 40px;max-width:420px;">
+      Program Studi Teknik Geodesi dan Geomatika<br>
+      Fakultas Ilmu dan Teknologi Kebumian, Institut Teknologi Bandung
+    </p>
 
     <!-- Mahasiswa -->
-    <div class="team-grid rv d3" style="max-width:900px; margin:0 auto 40px;">
-
+    <div class="team-grid rv d3" style="max-width:900px;margin:0 auto 40px;">
       <div class="team-card">
         <div class="tc-avatar">NM</div>
         <span class="tc-badge tc-badge-student">Mahasiswa</span>
         <p class="tc-name">Najwa Maharani</p>
         <p class="tc-nim">15122103</p>
         <div class="tc-links">
-          <a href="mailto:najwamaharani34@gmail.com" target="_blank" rel="noopener" class="tc-link tc-link-email" title="Email">✉ Email</a>
-          <a href="https://linkedin.com/in/najwamhrn/" target="_blank" rel="noopener" class="tc-link tc-link-linkedin" title="LinkedIn">in LinkedIn</a>
+          <a href="mailto:najwamaharani34@gmail.com" target="_blank" rel="noopener" class="tc-link tc-link-email">✉ Email</a>
+          <a href="https://linkedin.com/in/najwamhrn/" target="_blank" rel="noopener" class="tc-link tc-link-linkedin">in LinkedIn</a>
         </div>
       </div>
-
       <div class="team-card">
         <div class="tc-avatar">RF</div>
         <span class="tc-badge tc-badge-student">Mahasiswa</span>
         <p class="tc-name">Rayhan Fadhil M.</p>
         <p class="tc-nim">15122106</p>
         <div class="tc-links">
-          <a href="mailto:rayhanfm.business@gmail.com" target="_blank" rel="noopener" class="tc-link tc-link-email" title="Email">✉ Email</a>
-          <a href="https://linkedin.com/in/rrayhanfadhil/" target="_blank" rel="noopener" class="tc-link tc-link-linkedin" title="LinkedIn">in LinkedIn</a>
+          <a href="mailto:rayhanfm.business@gmail.com" target="_blank" rel="noopener" class="tc-link tc-link-email">✉ Email</a>
+          <a href="https://linkedin.com/in/rrayhanfadhil/" target="_blank" rel="noopener" class="tc-link tc-link-linkedin">in LinkedIn</a>
         </div>
       </div>
-
       <div class="team-card">
         <div class="tc-avatar">MR</div>
         <span class="tc-badge tc-badge-student">Mahasiswa</span>
         <p class="tc-name">Muhammad Radja Adzka</p>
         <p class="tc-nim">15122115</p>
         <div class="tc-links">
-          <a href="mailto:radjaadzka18@gmail.com" target="_blank" rel="noopener" class="tc-link tc-link-email" title="Email">✉ Email</a>
-          <a href="https://linkedin.com/in/radjaadzka/" target="_blank" rel="noopener" class="tc-link tc-link-linkedin" title="LinkedIn">in LinkedIn</a>
+          <a href="mailto:radjaadzka18@gmail.com" target="_blank" rel="noopener" class="tc-link tc-link-email">✉ Email</a>
+          <a href="https://linkedin.com/in/radjaadzka/" target="_blank" rel="noopener" class="tc-link tc-link-linkedin">in LinkedIn</a>
         </div>
       </div>
-
     </div>
 
     <!-- Dosen Pembimbing -->
-    <p style="font-size:10px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:#94A3B8;margin-bottom:20px;" class="rv d4">Dosen Pembimbing</p>
-    <div class="team-grid rv d5" style="max-width:900px; margin:0 auto 12px;">
-
+    <p class="rv d4" style="font-size:10px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:#94A3B8;margin-bottom:20px;">Dosen Pembimbing</p>
+    <div class="team-grid rv d5" style="max-width:900px;margin:0 auto 12px;">
       <div class="team-card supervisor">
         <div class="tc-avatar">RW</div>
         <span class="tc-badge tc-badge-supervisor">Koordinator</span>
         <p class="tc-name">Dr. Ratri Widyastuti, S.T., M.T.</p>
         <p class="tc-nim">&nbsp;</p>
         <div class="tc-links">
-          <a href="https://itb.ac.id/staf/profil/5705/ratri-widyastuti" target="_blank" rel="noopener" class="tc-link tc-link-profile" title="Profil ITB">🏛 Profil ITB</a>
+          <a href="https://itb.ac.id/staf/profil/5705/ratri-widyastuti" target="_blank" rel="noopener" class="tc-link tc-link-profile">🏛 Profil ITB</a>
         </div>
       </div>
-
       <div class="team-card supervisor">
         <div class="tc-avatar">MM</div>
         <span class="tc-badge tc-badge-supervisor">Pembimbing</span>
         <p class="tc-name">Miga Magenika Julian, S.T., M.T.</p>
         <p class="tc-nim">&nbsp;</p>
         <div class="tc-links">
-          <a href="https://itb.ac.id/staf/profil/miga-magenika-julian" target="_blank" rel="noopener" class="tc-link tc-link-profile" title="Profil ITB">🏛 Profil ITB</a>
+          <a href="https://itb.ac.id/staf/profil/miga-magenika-julian" target="_blank" rel="noopener" class="tc-link tc-link-profile">🏛 Profil ITB</a>
         </div>
       </div>
-
       <div class="team-card supervisor">
         <div class="tc-avatar">AB</div>
         <span class="tc-badge tc-badge-supervisor">Pembimbing</span>
         <p class="tc-name">Ir. Agustinus Bambang Setyadji, M.Si., D.Sc.</p>
         <p class="tc-nim">&nbsp;</p>
         <div class="tc-links">
-          <a href="https://itb.ac.id/staf/profil/agustinus-bambang-setyadji" target="_blank" rel="noopener" class="tc-link tc-link-profile" title="Profil ITB">🏛 Profil ITB</a>
+          <a href="https://itb.ac.id/staf/profil/agustinus-bambang-setyadji" target="_blank" rel="noopener" class="tc-link tc-link-profile">🏛 Profil ITB</a>
         </div>
       </div>
-
     </div>
   </div>
 </section>
 
 {% endblock %}
+
 {% block extra_js %}
 <script>
+/* Counter animation */
 function cnt(el,t,d){if(!el)return;var t0=null;(function tick(ts){if(!t0)t0=ts;var p=Math.min((ts-t0)/d,1),e=1-Math.pow(1-p,4);el.textContent=Math.floor(e*t);if(p<1)requestAnimationFrame(tick);else el.textContent=t;})(performance.now());}
-['Air','Fasilitas','Permukiman','Pipa'].forEach(function(k,i){var el=document.getElementById('stat'+k);if(el)cnt(el,+el.dataset.t||0,1200+i*200);});
-var obs=new IntersectionObserver(function(e){e.forEach(function(x){if(x.isIntersecting){x.target.classList.add('on');obs.unobserve(x.target);}});},{threshold:.1,rootMargin:'0px 0px -20px 0px'});
+['Air','Reservoir','Fasilitas','Permukiman'].forEach(function(k,i){
+  var el=document.getElementById('stat'+k);
+  if(el)cnt(el,+el.dataset.t||0,1200+i*200);
+});
+
+/* Scroll reveal */
+var obs=new IntersectionObserver(function(e){e.forEach(function(x){if(x.isIntersecting){x.target.classList.add('on');obs.unobserve(x.target);}});},{threshold:.08,rootMargin:'0px 0px -16px 0px'});
 document.querySelectorAll('.rv').forEach(function(el){obs.observe(el);});
-// ── Star rating ────────────────────────────────────────────────
+
+/* Smooth scroll for anchor links */
+document.querySelectorAll('a[href^="#"]').forEach(function(a){
+  a.addEventListener('click',function(e){
+    var id=this.getAttribute('href').slice(1);
+    var el=document.getElementById(id);
+    if(el){e.preventDefault();el.scrollIntoView({behavior:'smooth',block:'start'});}
+  });
+});
+
+/* ── Star rating ── */
 var selectedRating = 0;
 var STAR_LABELS = ['','Sangat Buruk','Buruk','Cukup','Baik','Sangat Baik'];
 document.querySelectorAll('#starRow .star-btn').forEach(function(btn){
   btn.addEventListener('click',function(){
-    selectedRating = +this.dataset.val;
+    selectedRating=+this.dataset.val;
     document.querySelectorAll('#starRow .star-btn').forEach(function(b){
-      b.classList.toggle('active', +b.dataset.val <= selectedRating);
+      b.classList.toggle('active',+b.dataset.val<=selectedRating);
     });
-    document.getElementById('starHint').textContent = selectedRating + ' — ' + STAR_LABELS[selectedRating];
+    document.getElementById('starHint').textContent=selectedRating+' — '+STAR_LABELS[selectedRating];
   });
   btn.addEventListener('mouseenter',function(){
-    var v = +this.dataset.val;
+    var v=+this.dataset.val;
     document.querySelectorAll('#starRow .star-btn').forEach(function(b){
-      b.style.color = +b.dataset.val <= v ? '#F59E0B' : '';
+      b.style.color=+b.dataset.val<=v?'#F59E0B':'';
     });
   });
   btn.addEventListener('mouseleave',function(){
-    document.querySelectorAll('#starRow .star-btn').forEach(function(b){
-      b.style.color = '';
-    });
+    document.querySelectorAll('#starRow .star-btn').forEach(function(b){b.style.color='';});
   });
 });
 
+/* ── Feedback submit ── */
 document.getElementById('btnFeedback')?.addEventListener('click',function(){
-  var nama=document.getElementById('feedbackNama').value.trim(),pesan=document.getElementById('feedbackPesan').value.trim(),st=document.getElementById('feedbackStatus');
+  var nama=document.getElementById('feedbackNama').value.trim(),
+      pesan=document.getElementById('feedbackPesan').value.trim(),
+      st=document.getElementById('feedbackStatus');
   if(!nama||!pesan){st.innerHTML='<span style="color:#DC2626;">⚠️ Nama dan pesan wajib diisi.</span>';return;}
   this.disabled=true;this.textContent='Mengirim...';var btn=this;
-  var payload = {nama:nama, pesan:pesan};
-  if(selectedRating >= 1 && selectedRating <= 5) payload.rating = selectedRating;
-  fetch('/api/feedback/',{method:'POST',headers:{'Content-Type':'application/json','X-CSRFToken':(document.cookie.match(/csrftoken=([^;]+)/)||['',''])[1]},body:JSON.stringify(payload)})
-  .then(r=>r.json()).then(d=>{btn.disabled=false;btn.textContent='Kirim Masukan';if(d.message){st.innerHTML='<span style="color:#16A34A;">✅ '+d.message+'</span>';document.getElementById('feedbackNama').value='';document.getElementById('feedbackPesan').value='';selectedRating=0;document.querySelectorAll('#starRow .star-btn').forEach(function(b){b.classList.remove('active');});document.getElementById('starHint').textContent='Pilih bintang';loadFb();}else st.innerHTML='<span style="color:#DC2626;">'+(d.error||'Gagal.')+'</span>';})
-  .catch(()=>{btn.disabled=false;btn.textContent='Kirim Masukan';st.innerHTML='<span style="color:#DC2626;">Gagal.</span>';});
+  var payload={nama:nama,pesan:pesan};
+  if(selectedRating>=1&&selectedRating<=5)payload.rating=selectedRating;
+  fetch('/api/feedback/',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','X-CSRFToken':(document.cookie.match(/csrftoken=([^;]+)/)||['',''])[1]},
+    body:JSON.stringify(payload)
+  }).then(r=>r.json()).then(d=>{
+    btn.disabled=false;btn.textContent='Kirim Masukan';
+    if(d.message){
+      st.innerHTML='<span style="color:#16A34A;">✅ '+d.message+'</span>';
+      document.getElementById('feedbackNama').value='';
+      document.getElementById('feedbackPesan').value='';
+      selectedRating=0;
+      document.querySelectorAll('#starRow .star-btn').forEach(function(b){b.classList.remove('active');});
+      document.getElementById('starHint').textContent='Pilih bintang';
+      loadFb();
+    }else st.innerHTML='<span style="color:#DC2626;">'+(d.error||'Gagal mengirim.')+'</span>';
+  }).catch(()=>{btn.disabled=false;btn.textContent='Kirim Masukan';st.innerHTML='<span style="color:#DC2626;">Gagal mengirim. Coba lagi.</span>';});
 });
-function starsHtml(r){if(!r)return '';var s='';for(var i=1;i<=5;i++){s+='<span style="color:'+(i<=r?'#F59E0B':'#D1D5DB')+';font-size:14px;">★</span>';}return '<span style="display:inline-flex;gap:1px;margin-left:4px;">'+s+'</span>';}
-function loadFb(){fetch('/api/feedback/list/').then(r=>r.json()).then(data=>{var c=document.getElementById('feedbackList');if(!c||!data.length)return;var h='<p style="font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#94A3B8;margin-bottom:12px;">Masukan Terbaru</p>';data.forEach(f=>{h+='<div style="background:white;padding:14px 18px;border-radius:10px;margin-bottom:8px;border:1px solid #E2E8F0;border-left:2px solid #3B82F6;"><div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;margin-bottom:6px;"><span style="font-weight:600;font-size:13px;color:#0F172A;">'+f.nama+starsHtml(f.rating)+'</span><span style="font-size:11px;color:#94A3B8;background:#F1F5F9;padding:2px 8px;border-radius:4px;">'+f.tanggal+'</span></div><p style="font-size:13px;color:#64748B;line-height:1.7;font-weight:300;">'+f.pesan+'</p></div>';});c.innerHTML=h;}).catch(()=>{});}
+
+/* ── Render bintang di daftar feedback ── */
+function starsHtml(r){
+  if(!r)return '';
+  var s='';
+  for(var i=1;i<=5;i++){
+    s+='<span style="color:'+(i<=r?'#F59E0B':'#D1D5DB')+';font-size:14px;">★</span>';
+  }
+  return '<span style="display:inline-flex;gap:1px;margin-left:4px;">'+s+'</span>';
+}
+
+/* ── Load daftar feedback ── */
+function loadFb(){
+  fetch('/api/feedback/list/').then(r=>r.json()).then(data=>{
+    var c=document.getElementById('feedbackList');
+    if(!c||!data.length)return;
+    var h='<p style="font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#94A3B8;margin-bottom:12px;">Masukan Terbaru</p>';
+    data.forEach(f=>{
+      h+='<div style="background:white;padding:14px 18px;border-radius:10px;margin-bottom:8px;border:1px solid #E2E8F0;border-left:2px solid #3B82F6;">'+
+         '<div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;margin-bottom:6px;">'+
+         '<span style="font-weight:600;font-size:13px;color:#0F172A;">'+f.nama+starsHtml(f.rating)+'</span>'+
+         '<span style="font-size:11px;color:#94A3B8;background:#F1F5F9;padding:2px 8px;border-radius:4px;">'+f.tanggal+'</span>'+
+         '</div><p style="font-size:13px;color:#64748B;line-height:1.7;font-weight:300;margin:0;">'+f.pesan+'</p></div>';
+    });
+    c.innerHTML=h;
+  }).catch(()=>{});
+}
 loadFb();
 </script>
 {% endblock %}
