@@ -336,20 +336,6 @@ a   { text-decoration: none; color: inherit; }
 }
 .shb-welcome strong { color:rgba(255,255,255,.6); }
 
-/* ── Quick Action Grid ───────────────────────────────────────── */
-.qa-grid { display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:4px; }
-.qa-btn {
-    display:block; width:100%;
-    background:rgba(255,255,255,.04);
-    border:1px solid rgba(255,255,255,.08);
-    color:rgba(255,255,255,.55);
-    border-radius:8px; padding:10px 6px;
-    font-size:11px; text-align:center; cursor:pointer;
-    line-height:1.5; transition:background .15s, color .15s;
-    font-family:'Inter',sans-serif;
-}
-.qa-btn:hover { background:rgba(59,130,246,.12); color:rgba(147,197,253,.9); border-color:rgba(59,130,246,.2); }
-
 /* ── Quick Insight ────────────────────────────────────────────── */
 .quick-insight {
     font-size:11px; color:rgba(255,255,255,.45);
