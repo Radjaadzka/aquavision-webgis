@@ -344,7 +344,9 @@
 
         <div class="sidebar-scroll">
 
-            <!-- ── Hero Status Air (kesan pertama) ─────────────── -->
+            <!-- ════════════════════════════════════════════════════
+                 1. STATUS AIR — Hero (paling menonjol)
+            ════════════════════════════════════════════════════ -->
             <div class="water-status-card" id="waterStatusCard">
                 <div class="wsc-head">
                     <span class="wsc-icon">🌊</span>
@@ -355,131 +357,187 @@
                 <div class="wsc-supply"><strong id="wscSupplyVal">—</strong> m³/hari tersedia</div>
             </div>
 
-            <!-- ── Sidebar Hero + Status ─────────────────────── -->
-            <div class="shb">
-                <div class="shb-top">
-                    <span class="shb-brand">AQUAVISION</span>
-                    <span class="shb-dot-status" id="shbDot" title="Status ketersediaan air saat ini"></span>
-                </div>
-                <div class="shb-sub">Platform Informasi Sumber Daya Air · Desa Wonotoro</div>
-                <div class="shb-stats-row">
-                    <span class="shb-stat">💧 <strong id="heroAir">—</strong> Sumber</span>
-                    <span class="shb-stat">🔧 <strong id="heroPipa">—</strong> Pipa</span>
-                    <span class="shb-stat">🚰 <strong id="heroReservoir">—</strong> Tandon</span>
-                </div>
-                <div class="shb-welcome">
+            <!-- ════════════════════════════════════════════════════
+                 2. AKSES CEPAT
+            ════════════════════════════════════════════════════ -->
+            <div class="sb-section">
+                <div class="sb-section-title">⚡ Akses Cepat</div>
+                <div class="qa-grid">
+                    <button class="qa-btn" onclick="document.getElementById('btnLayer').click()">
+                        <span>🗺️</span><span>Layer</span>
+                    </button>
+                    <a href="{% url 'data_list' %}" class="qa-btn">
+                        <span>📥</span><span>Data</span>
+                    </a>
                     {% if user.is_authenticated %}
-                        {% if is_admin %}Selamat datang, Admin <strong>{{ user.username }}</strong>. Kelola data AQUAVISION.{% else %}Selamat datang kembali, <strong>{{ user.username }}</strong>.{% endif %}
-                    {% else %}Jelajahi sumber daya air Desa Wonotoro secara interaktif.{% endif %}
+                    <a href="/hubungi/" class="qa-btn">
+                        <span>🤖</span><span>Tanya AI</span>
+                    </a>
+                    {% else %}
+                    <a href="/login/?next=/" class="qa-btn">
+                        <span>🔑</span><span>Login</span>
+                    </a>
+                    {% endif %}
+                    <button class="qa-btn" onclick="window.resetTour && window.resetTour();">
+                        <span>📖</span><span>Panduan</span>
+                    </button>
                 </div>
             </div>
 
-            <!-- Daftar Layer -->
-            <button class="menu-btn" id="btnLayer">Daftar Layer</button>
-            <div id="layerPanel" class="layer-panel">
-
-                <p>Batas & Wilayah</p>
-                <label title="Batas administrasi wilayah dan dusun-dusun di Desa Wonotoro."><input type="checkbox" id="chkAdminGab"> Administrasi Desa <span class="lyr-info" onclick="showLayerInfo('administrasi')">ℹ</span></label>
-                <label title="Jaringan sungai dan daerah aliran sungai (DAS) di wilayah Desa Wonotoro."><input type="checkbox" id="chkSungaiVektor"> Daerah Aliran Sungai <span class="lyr-info" onclick="showLayerInfo('sungai')">ℹ</span></label>
-                <hr>
-
-                <p>Infrastruktur Air</p>
-                <label title="Lokasi mata air dan sumber air minum aktif yang melayani penduduk Desa Wonotoro."><input type="checkbox" id="chkAir">       Sumber Air <span class="lyr-info" onclick="showLayerInfo('sumber_air')">ℹ</span></label>
-                <label title="Lokasi bak penampungan dan tandon air yang mendistribusikan air ke permukiman."><input type="checkbox" id="chkReservoir"> Tandon Air <span class="lyr-info" onclick="showLayerInfo('reservoir')">ℹ</span></label>
-                <label title="Jalur jaringan pipa distribusi air dari sumber ke tandon dan permukiman."><input type="checkbox" id="chkPipa">      Jaringan Pipa <span class="lyr-info" onclick="showLayerInfo('pipa')">ℹ</span></label>
-                <hr>
-
-                <p>Analisis Hidrologi</p>
-                <label title="Area berpotensi menyimpan cadangan air tanah, hasil analisis AHP 5 kriteria. Resolusi Spasial: 30m × 30m."><input type="checkbox" id="chkPotensiAirTanah"> Daerah Potensi Air Tanah <small style="color:rgba(255,255,255,.25);font-size:10px;">30m×30m</small> <span class="lyr-info" onclick="showLayerInfo('potensi')">ℹ</span></label>
-                <label title="Estimasi debit puncak aliran permukaan bulanan, tersedia untuk 12 bulan. Resolusi Spasial: 10m × 10m."><input type="checkbox" id="chkDebitPuncak">     Debit Puncak Aliran <small style="color:rgba(255,255,255,.25);font-size:10px;">10m×10m</small> <span class="lyr-info" onclick="showLayerInfo('debit')">ℹ</span></label>
-                <div id="debitBulanPanel" style="display:none; margin:4px 0 4px 6px;">
-                    <select id="selectDebitBulan" style="font-size:12px;">
-                        <option value="">-- Pilih Bulan --</option>
-                        <option value="Jan">Januari</option>
-                        <option value="Feb">Februari</option>
-                        <option value="Mar">Maret</option>
-                        <option value="Apr">April</option>
-                        <option value="Mei">Mei</option>
-                        <option value="Jun">Juni</option>
-                        <option value="Jul">Juli</option>
-                        <option value="Ags">Agustus</option>
-                        <option value="Sep">September</option>
-                        <option value="Okt">Oktober</option>
-                        <option value="Nov">November</option>
-                        <option value="Des">Desember</option>
-                    </select>
-                </div>
-                <hr>
-
-                <p>Fasilitas & Penduduk</p>
-                <label title="Lokasi hotel dan penginapan di kawasan wisata sekitar Bromo."><input type="checkbox" id="chkHotel">      Hotel <span class="lyr-info" onclick="showLayerInfo('fasilitas')">ℹ</span></label>
-                <label title="Lokasi restoran dan warung makan yang beroperasi di kawasan wisata."><input type="checkbox" id="chkMakan">      Tempat Makan</label>
-                <label title="Lokasi usaha jasa (transportasi, sewa, dll.) yang mendukung pariwisata."><input type="checkbox" id="chkJasa">       Jasa</label>
-                <label title="Lokasi permukiman penduduk Desa Wonotoro beserta data jumlah KK dan penduduk."><input type="checkbox" id="chkPermukiman"> Permukiman <span class="lyr-info" onclick="showLayerInfo('permukiman')">ℹ</span></label>
-
-            </div><!-- /layerPanel -->
-
-            <!-- Legenda Peta -->
-            <div class="card" id="legendCard" style="display:none;">
-                <div class="accordion-header" data-target="legendBody">
-                    <h3>Legenda Peta</h3>
-                    <span class="accordion-arrow open">▼</span>
-                </div>
-                <div class="accordion-body open" id="legendBody">
-                    <div id="legendItems" style="display:flex; flex-direction:column; gap:5px;"></div>
+            <!-- ════════════════════════════════════════════════════
+                 3. DATA WONOTORO — Ringkasan selalu terlihat
+            ════════════════════════════════════════════════════ -->
+            <div class="sb-section">
+                <div class="sb-section-title">📊 Data Wonotoro</div>
+                <div class="dc-grid">
+                {% if is_admin %}
+                    <div class="dc-card">
+                        <div class="dc-num skel" id="countAir">0</div>
+                        <div class="dc-label">💧 Sumber Air</div>
+                    </div>
+                    <div class="dc-card">
+                        <div class="dc-num skel" id="countReservoir">0</div>
+                        <div class="dc-label">🚰 Tandon Air</div>
+                    </div>
+                    <div class="dc-card">
+                        <div class="dc-num skel" id="statConv">0</div>
+                        <div class="dc-label">✉️ Percakapan</div>
+                    </div>
+                    <div class="dc-card">
+                        <div class="dc-num skel" id="statDl">0</div>
+                        <div class="dc-label">📥 Download</div>
+                    </div>
+                {% else %}
+                    <div class="dc-card">
+                        <div class="dc-num skel" id="countAir">0</div>
+                        <div class="dc-label">💧 Sumber Air</div>
+                    </div>
+                    <div class="dc-card">
+                        <div class="dc-num skel" id="countReservoir">0</div>
+                        <div class="dc-label">🚰 Tandon Air</div>
+                    </div>
+                    <div class="dc-card">
+                        <div class="dc-num skel" id="countHotel">0</div>
+                        <div class="dc-label">🏨 Hotel</div>
+                    </div>
+                    <div class="dc-card">
+                        <div class="dc-num skel" id="countJasa">0</div>
+                        <div class="dc-label">🛠️ Jasa</div>
+                    </div>
+                    <div class="dc-card dc-wide">
+                        <div class="dc-num skel" id="statPenduduk">0</div>
+                        <div class="dc-label">👥 Total Penduduk</div>
+                    </div>
+                {% endif %}
                 </div>
             </div>
 
-            <!-- Input Data (hanya untuk user yang login) -->
-            {% if user.is_authenticated %}
-            <button class="menu-btn" id="btnInputToggle">Input Data</button>
-            <div id="inputChoicePanel" class="layer-panel">
-                <button class="menu-btn" id="btnInput"     style="font-size:12px; padding:8px;">✏️ Input Manual</button>
-                <button class="menu-btn" id="btnUploadSHP" style="font-size:12px; padding:8px;">📁 Upload Shapefile</button>
-            </div>
+            <!-- Elemen tersembunyi untuk JS callbacks (selalu ada di DOM) -->
+            <div style="display:none;" aria-hidden="true">
+                <span id="totalPenduduk">0</span>
+                <span id="shbDot"></span>
+                <strong id="heroAir">—</strong>
+                <strong id="heroPipa">—</strong>
+                <strong id="heroReservoir">—</strong>
+            {% if is_admin %}
+                <span id="countHotel">0</span>
+                <span id="countMakan">0</span>
+                <span id="countJasa">0</span>
+                <span id="statPenduduk">0</span>
+                <span id="statLayer">9</span>
+                <span id="statDataset">8</span>
+            {% else %}
+                <span id="countMakan">0</span>
+                <span id="countPipa">0</span>
+                <span id="statConv">0</span>
+                <span id="statDl">0</span>
+                <span id="statLayer">9</span>
+                <span id="statDataset">8</span>
             {% endif %}
-
-            <!-- Pengukuran Jarak -->
-            <button class="menu-btn" id="btnDistance">Pengukuran Jarak</button>
-            <div id="distancePanel" class="layer-panel">
-                <label><input type="radio" name="mode" value="click"  checked> Klik 2 Titik</label>
-                <label><input type="radio" name="mode" value="manual">          Input Manual</label>
-                <div id="manualInput" style="display:none;">
-                    <input type="number" id="lat1" placeholder="Lat 1" step="any">
-                    <input type="number" id="lng1" placeholder="Lng 1" step="any">
-                    <input type="number" id="lat2" placeholder="Lat 2" step="any">
-                    <input type="number" id="lng2" placeholder="Lng 2" step="any">
-                    <button id="btnHitungManual">Hitung</button>
-                </div>
-                <p id="distanceResult" style="color:rgba(255,255,255,.6); font-size:12px; margin-top:6px;"></p>
             </div>
 
-            <!-- Data Portal -->
-            <a href="{% url 'data_list' %}">
-                <button class="menu-btn">📊 Data Portal</button>
-            </a>
+            <!-- ════════════════════════════════════════════════════
+                 4. EKSPLORASI PETA
+            ════════════════════════════════════════════════════ -->
+            <div class="sb-section">
+                <div class="sb-section-title">🗺️ Eksplorasi Peta</div>
 
-            <!-- Hubungi Admin (hanya untuk user yang login) -->
-            {% if user.is_authenticated %}
-            <a href="/hubungi/" style="position:relative; display:block;">
-                <button class="menu-btn" style="position:relative;">
-                    ✉️ Hubungi Admin
-                    <span id="notifBadge" style="display:none; position:absolute; top:6px; right:10px; background:#EF4444; color:white; font-size:10px; font-weight:700; min-width:18px; height:18px; border-radius:9px; line-height:18px; text-align:center; padding:0 4px;">0</span>
-                </button>
-            </a>
-            {% endif %}
+                <!-- Daftar Layer -->
+                <button class="menu-btn" id="btnLayer">Daftar Layer</button>
+                <div id="layerPanel" class="layer-panel">
+                    <p>Batas &amp; Wilayah</p>
+                    <label title="Batas administrasi wilayah dan dusun-dusun di Desa Wonotoro."><input type="checkbox" id="chkAdminGab"> Administrasi Desa <span class="lyr-info" onclick="showLayerInfo('administrasi')">ℹ</span></label>
+                    <label title="Jaringan sungai dan daerah aliran sungai (DAS) di wilayah Desa Wonotoro."><input type="checkbox" id="chkSungaiVektor"> Daerah Aliran Sungai <span class="lyr-info" onclick="showLayerInfo('sungai')">ℹ</span></label>
+                    <hr>
+                    <p>Infrastruktur Air</p>
+                    <label title="Lokasi mata air dan sumber air minum aktif yang melayani penduduk Desa Wonotoro."><input type="checkbox" id="chkAir">       Sumber Air <span class="lyr-info" onclick="showLayerInfo('sumber_air')">ℹ</span></label>
+                    <label title="Lokasi bak penampungan dan tandon air yang mendistribusikan air ke permukiman."><input type="checkbox" id="chkReservoir"> Tandon Air <span class="lyr-info" onclick="showLayerInfo('reservoir')">ℹ</span></label>
+                    <label title="Jalur jaringan pipa distribusi air dari sumber ke tandon dan permukiman."><input type="checkbox" id="chkPipa">      Jaringan Pipa <span class="lyr-info" onclick="showLayerInfo('pipa')">ℹ</span></label>
+                    <hr>
+                    <p>Analisis Hidrologi</p>
+                    <label title="Area berpotensi menyimpan cadangan air tanah, hasil analisis AHP 5 kriteria. Resolusi Spasial: 30m × 30m."><input type="checkbox" id="chkPotensiAirTanah"> Daerah Potensi Air Tanah <small style="color:rgba(255,255,255,.25);font-size:10px;">30m×30m</small> <span class="lyr-info" onclick="showLayerInfo('potensi')">ℹ</span></label>
+                    <label title="Estimasi debit puncak aliran permukaan bulanan, tersedia untuk 12 bulan. Resolusi Spasial: 10m × 10m."><input type="checkbox" id="chkDebitPuncak">     Debit Puncak Aliran <small style="color:rgba(255,255,255,.25);font-size:10px;">10m×10m</small> <span class="lyr-info" onclick="showLayerInfo('debit')">ℹ</span></label>
+                    <div id="debitBulanPanel" style="display:none; margin:4px 0 4px 6px;">
+                        <select id="selectDebitBulan" style="font-size:12px;">
+                            <option value="">-- Pilih Bulan --</option>
+                            <option value="Jan">Januari</option>
+                            <option value="Feb">Februari</option>
+                            <option value="Mar">Maret</option>
+                            <option value="Apr">April</option>
+                            <option value="Mei">Mei</option>
+                            <option value="Jun">Juni</option>
+                            <option value="Jul">Juli</option>
+                            <option value="Ags">Agustus</option>
+                            <option value="Sep">September</option>
+                            <option value="Okt">Oktober</option>
+                            <option value="Nov">November</option>
+                            <option value="Des">Desember</option>
+                        </select>
+                    </div>
+                    <hr>
+                    <p>Fasilitas &amp; Penduduk</p>
+                    <label title="Lokasi hotel dan penginapan di kawasan wisata sekitar Bromo."><input type="checkbox" id="chkHotel">      Hotel <span class="lyr-info" onclick="showLayerInfo('fasilitas')">ℹ</span></label>
+                    <label title="Lokasi restoran dan warung makan yang beroperasi di kawasan wisata."><input type="checkbox" id="chkMakan">      Tempat Makan</label>
+                    <label title="Lokasi usaha jasa (transportasi, sewa, dll.) yang mendukung pariwisata."><input type="checkbox" id="chkJasa">       Jasa</label>
+                    <label title="Lokasi permukiman penduduk Desa Wonotoro beserta data jumlah KK dan penduduk."><input type="checkbox" id="chkPermukiman"> Permukiman <span class="lyr-info" onclick="showLayerInfo('permukiman')">ℹ</span></label>
+                </div><!-- /layerPanel -->
 
-            <!-- Pusat Bantuan -->
-            <a href="/bantuan/">
-                <button class="menu-btn">❓ Pusat Bantuan</button>
-            </a>
+                <!-- Legenda Peta -->
+                <div class="card" id="legendCard" style="display:none;">
+                    <div class="accordion-header" data-target="legendBody">
+                        <h3>Legenda Peta</h3>
+                        <span class="accordion-arrow open">▼</span>
+                    </div>
+                    <div class="accordion-body open" id="legendBody">
+                        <div id="legendItems" style="display:flex; flex-direction:column; gap:5px;"></div>
+                    </div>
+                </div>
 
-            <!-- Login prompt untuk guest -->
-            {% if not user.is_authenticated %}
-            <a href="/login/?next=/">
-                <button class="menu-btn" style="border-color:rgba(59,130,246,.3); color:rgba(59,130,246,.8);">🔑 Masuk / Daftar</button>
-            </a>
-            {% endif %}
+                <!-- Input Data (hanya untuk user yang login) -->
+                {% if user.is_authenticated %}
+                <button class="menu-btn" id="btnInputToggle">Input Data</button>
+                <div id="inputChoicePanel" class="layer-panel">
+                    <button class="menu-btn" id="btnInput"     style="font-size:12px; padding:8px;">✏️ Input Manual</button>
+                    <button class="menu-btn" id="btnUploadSHP" style="font-size:12px; padding:8px;">📁 Upload Shapefile</button>
+                </div>
+                {% endif %}
+
+                <!-- Pengukuran Jarak -->
+                <button class="menu-btn" id="btnDistance">Pengukuran Jarak</button>
+                <div id="distancePanel" class="layer-panel">
+                    <label><input type="radio" name="mode" value="click"  checked> Klik 2 Titik</label>
+                    <label><input type="radio" name="mode" value="manual"> Input Manual</label>
+                    <div id="manualInput" style="display:none;">
+                        <input type="number" id="lat1" placeholder="Lat 1" step="any">
+                        <input type="number" id="lng1" placeholder="Lng 1" step="any">
+                        <input type="number" id="lat2" placeholder="Lat 2" step="any">
+                        <input type="number" id="lng2" placeholder="Lng 2" step="any">
+                        <button id="btnHitungManual">Hitung</button>
+                    </div>
+                    <p id="distanceResult" style="color:rgba(255,255,255,.6); font-size:12px; margin-top:6px;"></p>
+                </div>
+
+            </div><!-- /sb-section Eksplorasi Peta -->
 
             <!-- Info Wilayah (muncul saat polygon diklik) -->
             <div class="card" id="polygonStatsPanel" style="display:none;">
@@ -492,167 +550,156 @@
                 </div>
             </div>
 
-            <!-- Dashboard Summary -->
-            <div class="card">
-                <div class="accordion-header" data-target="statsBody">
-                    <h3>Ringkasan Data</h3>
-                    <span class="accordion-arrow open">▼</span>
-                </div>
-                <div class="accordion-body open" id="statsBody">
-                    <div class="stats-compact">
-                    {% if is_admin %}
-                        <!-- Admin / Superadmin: statistik internal sistem -->
-                        <div class="stat-mini"><div class="stat-mini-icon">🗂️</div><div class="stat-mini-num" id="statLayer">9</div><div class="stat-mini-label">Layer GIS</div></div>
-                        <div class="stat-mini"><div class="stat-mini-icon">📦</div><div class="stat-mini-num" id="statDataset">8</div><div class="stat-mini-label">Dataset</div></div>
-                        <div class="stat-mini"><div class="stat-mini-icon">💧</div><div class="stat-mini-num skel" id="countAir">0</div><div class="stat-mini-label">Sumber Air</div></div>
-                        <div class="stat-mini"><div class="stat-mini-icon">🏗</div><div class="stat-mini-num skel" id="countReservoir">0</div><div class="stat-mini-label">Tandon Air</div></div>
-                        <div class="stat-mini"><div class="stat-mini-icon">✉️</div><div class="stat-mini-num skel" id="statConv">0</div><div class="stat-mini-label">Percakapan</div></div>
-                        <div class="stat-mini"><div class="stat-mini-icon">📥</div><div class="stat-mini-num skel" id="statDl">0</div><div class="stat-mini-label">Download</div></div>
-                    {% else %}
-                        <!-- Guest / User: statistik objek wisata & air -->
-                        <div class="stat-mini"><div class="stat-mini-icon">💧</div><div class="stat-mini-num skel" id="countAir">0</div><div class="stat-mini-label">Sumber Air</div></div>
-                        <div class="stat-mini"><div class="stat-mini-icon">🚰</div><div class="stat-mini-num skel" id="countReservoir">0</div><div class="stat-mini-label">Tandon Air</div></div>
-                        <div class="stat-mini"><div class="stat-mini-icon">🔧</div><div class="stat-mini-num skel" id="countPipa">0</div><div class="stat-mini-label">Segmen Pipa</div></div>
-                        <div class="stat-mini"><div class="stat-mini-icon">🏨</div><div class="stat-mini-num skel" id="countHotel">0</div><div class="stat-mini-label">Hotel</div></div>
-                        <div class="stat-mini"><div class="stat-mini-icon">🍽️</div><div class="stat-mini-num skel" id="countMakan">0</div><div class="stat-mini-label">Rumah Makan</div></div>
-                        <div class="stat-mini"><div class="stat-mini-icon">🛠️</div><div class="stat-mini-num skel" id="countJasa">0</div><div class="stat-mini-label">Jasa</div></div>
-                        <div class="stat-mini" style="grid-column:span 3;"><div class="stat-mini-icon">👥</div><div class="stat-mini-num skel" id="statPenduduk">0</div><div class="stat-mini-label">Total Penduduk</div></div>
-                    {% endif %}
+            <!-- ════════════════════════════════════════════════════
+                 5. ANALISIS
+            ════════════════════════════════════════════════════ -->
+            <div class="sb-section">
+                <div class="sb-section-title">📈 Analisis</div>
+
+                <!-- Ketersediaan Air -->
+                <div class="card">
+                    <div class="accordion-header" data-target="debitBody">
+                        <h3>Ketersediaan Air</h3>
+                        <span class="accordion-arrow open">▼</span>
+                    </div>
+                    <div class="accordion-body open" id="debitBody">
+                        <div class="debit-info">
+                            <div class="debit-box debit-box-supply">
+                                <div class="debit-box-num" id="debitSupply">0</div>
+                                <div class="debit-box-label">Ketersediaan (m³/hari)</div>
+                            </div>
+                            <div class="debit-box debit-box-demand">
+                                <div class="debit-box-num" id="debitDemand">0</div>
+                                <div class="debit-box-label">Kebutuhan (m³/hari)</div>
+                            </div>
+                        </div>
+                        <div class="status-bar" id="statusBar" style="background:rgba(22,163,74,.12);">
+                            <div class="status-dot" id="statusDot" style="background:#F59E0B;"></div>
+                            <div>
+                                <span id="statusLabel"  style="font-weight:600; font-size:13px; color:rgba(255,255,255,.8);">-</span>
+                                <span id="statusPersen" style="font-size:11px; color:rgba(255,255,255,.3); margin-left:6px;">0%</span>
+                            </div>
+                        </div>
+                        <div class="quick-insight" id="quickInsight">
+                            <span id="quickInsightText">Memuat data ketersediaan air...</span>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Elemen tersembunyi untuk script.js callbacks (selalu ada di DOM) -->
-            <div style="display:none;" aria-hidden="true">
-                <span id="totalPenduduk">0</span>
+                <!-- Simulasi Skenario -->
+                <div class="card">
+                    <div class="accordion-header" id="simHeader" data-target="simBody">
+                        <h3>Simulasi Skenario</h3>
+                        <span class="accordion-arrow">▼</span>
+                    </div>
+                    <div class="accordion-body" id="simBody">
+                        <p style="font-size:11px; color:rgba(255,255,255,.35); margin:4px 0 8px;">Proyeksikan kebutuhan air berdasarkan skenario pengembangan wisata:</p>
+                        <input type="number" id="simPenduduk"  placeholder="Jumlah Penduduk (orang)" style="margin-top:4px;" min="0">
+                        <input type="number" id="simHotel"     placeholder="Jumlah Kamar Hotel" min="0">
+                        <input type="number" id="simResto"     placeholder="Jumlah Kursi Restoran" min="0">
+                        <input type="number" id="simPertanian" placeholder="Luas Pertanian (ha)" step="0.1" min="0">
+                        <p style="font-size:10px; color:rgba(255,255,255,.2); margin:4px 0 8px; line-height:1.6;">
+                            Asumsi: 120 L/org/hari · 250 L/kamar/hari · 25 L/kursi/hari · 86.4 m³/ha/hari
+                        </p>
+                        <button id="btnSimulasi">⚡ Hitung Simulasi</button>
+                        <div id="simResult" style="display:none; margin-top:10px; padding:10px 12px; border-radius:8px; border:1px solid rgba(255,255,255,.08); background:rgba(255,255,255,.03);">
+                            <div style="font-size:11px; color:rgba(255,255,255,.4); margin-bottom:6px;">Hasil Proyeksi Simulasi</div>
+                            <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:8px;">
+                                <div style="font-size:11px; color:rgba(255,255,255,.35);">Kebutuhan</div>
+                                <div style="font-size:13px; font-weight:600; color:rgba(255,255,255,.85);" id="simDemandVal">—</div>
+                                <div style="font-size:11px; color:rgba(255,255,255,.35);">Ketersediaan</div>
+                                <div style="font-size:13px; font-weight:600; color:rgba(255,255,255,.85);" id="simSupplyVal">—</div>
+                                <div style="font-size:11px; color:rgba(255,255,255,.35);">Selisih</div>
+                                <div style="font-size:13px; font-weight:600;" id="simSisaVal">—</div>
+                            </div>
+                            <div id="simStatusBadge" style="display:inline-block; font-size:11px; font-weight:700; padding:3px 10px; border-radius:20px; letter-spacing:.8px;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Grafik Ketersediaan Air -->
+                <div class="card">
+                    <div class="accordion-header" id="chartHeader" data-target="chartBody">
+                        <h3>Grafik Ketersediaan Air</h3>
+                        <span class="accordion-arrow">▼</span>
+                    </div>
+                    <div class="accordion-body" id="chartBody">
+                        <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:4px; margin:6px 0 4px;">
+                            <div class="stat-mini"><div class="stat-mini-label" style="color:rgba(255,255,255,.3);">Supply</div><div class="stat-mini-num" id="cardSupply"  style="font-size:13px;">—</div></div>
+                            <div class="stat-mini"><div class="stat-mini-label" style="color:rgba(255,255,255,.3);">Demand</div><div class="stat-mini-num" id="cardDemand"  style="font-size:13px;">—</div></div>
+                            <div class="stat-mini"><div class="stat-mini-label" style="color:rgba(255,255,255,.3);">Sisa</div>  <div class="stat-mini-num" id="cardSisa"    style="font-size:13px;">—</div></div>
+                        </div>
+                        <svg id="gaugeSVG" viewBox="0 0 260 160" width="100%" style="display:block; margin:auto;">
+                            <path   id="arcBg"       fill="none" stroke-linecap="round"/>
+                            <path   id="arcFill"     fill="none" stroke-linecap="round"/>
+                            <line   id="gaugeNeedle" x1="130" y1="130" x2="130" y2="130" stroke-width="3" stroke-linecap="round"/>
+                            <circle id="needleHub"   cx="130" cy="130" r="6"/>
+                            <text   id="pctText"     x="130" y="118" text-anchor="middle" font-size="32" font-weight="400" font-family="Inter,sans-serif"></text>
+                            <text   id="statusText"  x="130" y="136" text-anchor="middle" font-size="11"  fill="rgba(255,255,255,.4)" font-family="Inter,sans-serif"></text>
+                            <text x="18"  y="150" text-anchor="middle" font-size="10" fill="rgba(255,255,255,.2)" font-family="Inter,sans-serif">0%</text>
+                            <text x="242" y="150" text-anchor="middle" font-size="10" fill="rgba(255,255,255,.2)" font-family="Inter,sans-serif">100%</text>
+                        </svg>
+                    </div>
+                </div>
+
                 {% if is_admin %}
-                <span id="countHotel">0</span>
-                <span id="countMakan">0</span>
-                <span id="countJasa">0</span>
+                <!-- Status Sistem — admin/superadmin only -->
+                <div class="card">
+                    <div class="accordion-header" data-target="healthBody">
+                        <h3>Status Sistem</h3>
+                        <span class="accordion-arrow">▼</span>
+                    </div>
+                    <div class="accordion-body" id="healthBody">
+                        <div style="display:flex; flex-direction:column; gap:6px; margin-top:4px;">
+                            <div class="health-row"><span class="health-dot" id="hDot-database"></span><span class="health-label">Database</span><span class="health-val" id="hVal-database">...</span></div>
+                            <div class="health-row"><span class="health-dot" id="hDot-api"></span><span class="health-label">API</span><span class="health-val" id="hVal-api">...</span></div>
+                            <div class="health-row"><span class="health-dot" id="hDot-layers"></span><span class="health-label">Layer GIS</span><span class="health-val" id="hVal-layers">...</span></div>
+                            <div class="health-row"><span class="health-dot" id="hDot-storage"></span><span class="health-label">Storage</span><span class="health-val" id="hVal-storage">...</span></div>
+                        </div>
+                    </div>
+                </div>
                 {% endif %}
+
+            </div><!-- /sb-section Analisis -->
+
+            <!-- ════════════════════════════════════════════════════
+                 6. FAKTA AQUAVISION (was "Tahukah Anda?")
+            ════════════════════════════════════════════════════ -->
+            <div class="sb-section">
+                <div class="sb-section-title">💡 Fakta AQUAVISION</div>
+                <p class="dyk-text" id="dykText">Memuat fakta menarik...</p>
             </div>
 
-            <!-- Ketersediaan Air -->
-            <div class="card">
-                <div class="accordion-header" data-target="debitBody">
-                    <h3>Ketersediaan Air</h3>
-                    <span class="accordion-arrow open">▼</span>
-                </div>
-                <div class="accordion-body open" id="debitBody">
-                    <div class="debit-info">
-                        <div class="debit-box debit-box-supply">
-                            <div class="debit-box-num" id="debitSupply">0</div>
-                            <div class="debit-box-label">Ketersediaan (m³/hari)</div>
-                        </div>
-                        <div class="debit-box debit-box-demand">
-                            <div class="debit-box-num" id="debitDemand">0</div>
-                            <div class="debit-box-label">Kebutuhan (m³/hari)</div>
-                        </div>
-                    </div>
-                    <div class="status-bar" id="statusBar" style="background:rgba(22,163,74,.12);">
-                        <div class="status-dot" id="statusDot" style="background:#F59E0B;"></div>
-                        <div>
-                            <span id="statusLabel"  style="font-weight:600; font-size:13px; color:rgba(255,255,255,.8);">-</span>
-                            <span id="statusPersen" style="font-size:11px; color:rgba(255,255,255,.3); margin-left:6px;">0%</span>
-                        </div>
-                    </div>
-                    <div class="quick-insight" id="quickInsight">
-                        <span id="quickInsightText">Memuat data ketersediaan air...</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Simulasi Skenario -->
-            <div class="card">
-                <div class="accordion-header" id="simHeader" data-target="simBody">
-                    <h3>Simulasi Skenario</h3>
-                    <span class="accordion-arrow">▼</span>
-                </div>
-                <div class="accordion-body" id="simBody">
-                    <p style="font-size:11px; color:rgba(255,255,255,.35); margin:4px 0 8px;">Proyeksikan kebutuhan air berdasarkan skenario pengembangan wisata:</p>
-                    <input type="number" id="simPenduduk"  placeholder="Jumlah Penduduk (orang)" style="margin-top:4px;" min="0">
-                    <input type="number" id="simHotel"     placeholder="Jumlah Kamar Hotel" min="0">
-                    <input type="number" id="simResto"     placeholder="Jumlah Kursi Restoran" min="0">
-                    <input type="number" id="simPertanian" placeholder="Luas Pertanian (ha)" step="0.1" min="0">
-                    <p style="font-size:10px; color:rgba(255,255,255,.2); margin:4px 0 8px; line-height:1.6;">
-                        Asumsi: 120 L/org/hari · 250 L/kamar/hari · 25 L/kursi/hari · 86.4 m³/ha/hari
-                    </p>
-                    <button id="btnSimulasi">⚡ Hitung Simulasi</button>
-                    <div id="simResult" style="display:none; margin-top:10px; padding:10px 12px; border-radius:8px; border:1px solid rgba(255,255,255,.08); background:rgba(255,255,255,.03);">
-                        <div style="font-size:11px; color:rgba(255,255,255,.4); margin-bottom:6px;">Hasil Proyeksi Simulasi</div>
-                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:8px;">
-                            <div style="font-size:11px; color:rgba(255,255,255,.35);">Kebutuhan</div>
-                            <div style="font-size:13px; font-weight:600; color:rgba(255,255,255,.85);" id="simDemandVal">—</div>
-                            <div style="font-size:11px; color:rgba(255,255,255,.35);">Ketersediaan</div>
-                            <div style="font-size:13px; font-weight:600; color:rgba(255,255,255,.85);" id="simSupplyVal">—</div>
-                            <div style="font-size:11px; color:rgba(255,255,255,.35);">Selisih</div>
-                            <div style="font-size:13px; font-weight:600;" id="simSisaVal">—</div>
-                        </div>
-                        <div id="simStatusBadge" style="display:inline-block; font-size:11px; font-weight:700; padding:3px 10px; border-radius:20px; letter-spacing:.8px;"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Grafik Ketersediaan Air -->
-            <div class="card">
-                <div class="accordion-header" id="chartHeader" data-target="chartBody">
-                    <h3>Grafik Ketersediaan Air</h3>
-                    <span class="accordion-arrow">▼</span>
-                </div>
-                <div class="accordion-body" id="chartBody">
-                    <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:4px; margin:6px 0 4px;">
-                        <div class="stat-mini"><div class="stat-mini-label" style="color:rgba(255,255,255,.3);">Supply</div><div class="stat-mini-num" id="cardSupply"  style="font-size:13px;">—</div></div>
-                        <div class="stat-mini"><div class="stat-mini-label" style="color:rgba(255,255,255,.3);">Demand</div><div class="stat-mini-num" id="cardDemand"  style="font-size:13px;">—</div></div>
-                        <div class="stat-mini"><div class="stat-mini-label" style="color:rgba(255,255,255,.3);">Sisa</div>  <div class="stat-mini-num" id="cardSisa"    style="font-size:13px;">—</div></div>
-                    </div>
-                    <svg id="gaugeSVG" viewBox="0 0 260 160" width="100%" style="display:block; margin:auto;">
-                        <path   id="arcBg"       fill="none" stroke-linecap="round"/>
-                        <path   id="arcFill"     fill="none" stroke-linecap="round"/>
-                        <line   id="gaugeNeedle" x1="130" y1="130" x2="130" y2="130" stroke-width="3" stroke-linecap="round"/>
-                        <circle id="needleHub"   cx="130" cy="130" r="6"/>
-                        <text   id="pctText"     x="130" y="118" text-anchor="middle" font-size="32" font-weight="400" font-family="Inter,sans-serif"></text>
-                        <text   id="statusText"  x="130" y="136" text-anchor="middle" font-size="11"  fill="rgba(255,255,255,.4)" font-family="Inter,sans-serif"></text>
-                        <text x="18"  y="150" text-anchor="middle" font-size="10" fill="rgba(255,255,255,.2)" font-family="Inter,sans-serif">0%</text>
-                        <text x="242" y="150" text-anchor="middle" font-size="10" fill="rgba(255,255,255,.2)" font-family="Inter,sans-serif">100%</text>
-                    </svg>
-                </div>
-            </div>
-
-            {% if is_admin %}
-            <!-- Health Status — admin/superadmin only -->
-            <div class="card">
-                <div class="accordion-header" data-target="healthBody">
-                    <h3>Status Sistem</h3>
-                    <span class="accordion-arrow">▼</span>
-                </div>
-                <div class="accordion-body" id="healthBody">
-                    <div style="display:flex; flex-direction:column; gap:6px; margin-top:4px;">
-                        <div class="health-row"><span class="health-dot" id="hDot-database"></span><span class="health-label">Database</span><span class="health-val" id="hVal-database">...</span></div>
-                        <div class="health-row"><span class="health-dot" id="hDot-api"></span><span class="health-label">API</span><span class="health-val" id="hVal-api">...</span></div>
-                        <div class="health-row"><span class="health-dot" id="hDot-layers"></span><span class="health-label">Layer GIS</span><span class="health-val" id="hVal-layers">...</span></div>
-                        <div class="health-row"><span class="health-dot" id="hDot-storage"></span><span class="health-label">Storage</span><span class="health-val" id="hVal-storage">...</span></div>
-                    </div>
-                </div>
-            </div>
-            {% endif %}
-
-            <!-- Tahukah Anda? -->
-            <div class="card">
-                <div class="accordion-header" data-target="dykBody">
-                    <h3>📍 Tahukah Anda?</h3>
-                    <span class="accordion-arrow open">▼</span>
-                </div>
-                <div class="accordion-body open" id="dykBody">
-                    <p class="dyk-text" id="dykText">Memuat fakta menarik...</p>
-                </div>
-            </div>
-
-            <!-- Panduan Dashboard -->
-            <button class="menu-btn" id="btnGuide"
-                onclick="window.resetTour && window.resetTour();"
-                style="border-color:rgba(99,179,237,.2); color:rgba(99,179,237,.55); font-size:12px; margin-top:4px;">
-                ⓘ Lihat Panduan Dashboard
-            </button>
+            <!-- ════════════════════════════════════════════════════
+                 7. LAYANAN
+            ════════════════════════════════════════════════════ -->
+            <div class="sb-section">
+                <div class="sb-section-title">🛎️ Layanan</div>
+                <a href="{% url 'data_list' %}">
+                    <button class="menu-btn">📊 Data Portal</button>
+                </a>
+                {% if user.is_authenticated %}
+                <a href="/hubungi/" style="position:relative; display:block;">
+                    <button class="menu-btn" style="position:relative;">
+                        ✉️ Hubungi Admin
+                        <span id="notifBadge" style="display:none; position:absolute; top:6px; right:10px; background:#EF4444; color:white; font-size:10px; font-weight:700; min-width:18px; height:18px; border-radius:9px; line-height:18px; text-align:center; padding:0 4px;">0</span>
+                    </button>
+                </a>
+                {% endif %}
+                <a href="/bantuan/">
+                    <button class="menu-btn">❓ Pusat Bantuan</button>
+                </a>
+                {% if not user.is_authenticated %}
+                <a href="/login/?next=/">
+                    <button class="menu-btn" style="border-color:rgba(59,130,246,.3); color:rgba(59,130,246,.8);">🔑 Masuk / Daftar</button>
+                </a>
+                {% endif %}
+                <button class="menu-btn" id="btnGuide"
+                    onclick="window.resetTour && window.resetTour();"
+                    style="border-color:rgba(99,179,237,.2); color:rgba(99,179,237,.55); font-size:12px; margin-top:4px;">
+                    ⓘ Lihat Panduan Dashboard
+                </button>
+            </div><!-- /sb-section Layanan -->
 
         </div><!-- /sidebar-scroll -->
     </aside><!-- /sidebar -->
@@ -1232,10 +1279,18 @@ document.getElementById('modalLayerInfo').addEventListener('click', function(e) 
             if (sv && sv !== '0' && sv !== '—') supVal.textContent = sv;
         }
     }
+    // Observe statusLabel AND debitSupply so hero card stays in sync even
+    // when simulation result leaves status unchanged (AMAN → AMAN).
     var sl = document.getElementById('statusLabel');
+    var ds = document.getElementById('debitSupply');
     if (sl && window.MutationObserver) {
         new MutationObserver(syncInsight).observe(sl, { childList: true, subtree: true, characterData: true });
     }
+    if (ds && window.MutationObserver) {
+        new MutationObserver(syncInsight).observe(ds, { childList: true, subtree: true, characterData: true });
+    }
+    // Expose globally so simulation handler can force-sync after update
+    window.aquaSyncStatus = syncInsight;
     // Fallback: poll once after 4 s in case observer fires before content is set
     setTimeout(syncInsight, 4000);
 })();

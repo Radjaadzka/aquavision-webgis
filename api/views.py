@@ -25,7 +25,8 @@ from django.contrib.gis.gdal         import DataSource
 from django.contrib.gis.geos         import GEOSGeometry, MultiLineString, MultiPolygon, Point
 from django.core.paginator           import Paginator
 from django.core.serializers         import serialize
-from django.db.models                import ExpressionWrapper, F, FloatField, Q, Sum
+from django.core.cache               import cache
+from django.db.models                import Count, ExpressionWrapper, F, FloatField, OuterRef, Q, Subquery, Sum
 from django.http                     import HttpResponse, JsonResponse
 from django.shortcuts                import redirect, render
 from django.utils                    import timezone
@@ -233,32 +234,42 @@ class IsAdminOrReadOnly(BasePermission):
 
 
 # ================================================================
-# GEOJSON ENDPOINTS (read-only, public — guests can view the map)
+# GEOJSON ENDPOINTS (read-only, login required)
 # ================================================================
 
+def _geojson_response(qs, cache_key, timeout=120):
+    """Serialize queryset to GeoJSON with short-lived cache and no double JSON parse."""
+    data = cache.get(cache_key)
+    if data is None:
+        data = serialize('geojson', qs)
+        cache.set(cache_key, data, timeout)
+    resp = HttpResponse(data, content_type='application/json')
+    resp['Cache-Control'] = 'private, max-age=60'
+    return resp
+
 def sumber_air_geojson(request):
-    return JsonResponse(json.loads(serialize('geojson', SumberAir.objects.all())), safe=False)
+    return _geojson_response(SumberAir.objects.all(), 'geojson_sumberair')
 
 def fasilitas_geojson(request):
-    return JsonResponse(json.loads(serialize('geojson', FasilitasWisata.objects.all())), safe=False)
+    return _geojson_response(FasilitasWisata.objects.all(), 'geojson_fasilitas')
 
 def permukiman_geojson(request):
-    return JsonResponse(json.loads(serialize('geojson', Permukiman.objects.all())), safe=False)
+    return _geojson_response(Permukiman.objects.all(), 'geojson_permukiman')
 
 def administrasi_geojson(request):
-    return JsonResponse(json.loads(serialize('geojson', AdministrasiDesa.objects.all())), safe=False)
+    return _geojson_response(AdministrasiDesa.objects.all(), 'geojson_administrasi', timeout=600)
 
 def recharge_geojson(request):
-    return JsonResponse(json.loads(serialize('geojson', RechargeArea.objects.all())), safe=False)
+    return _geojson_response(RechargeArea.objects.all(), 'geojson_recharge', timeout=600)
 
 def catchment_geojson(request):
-    return JsonResponse(json.loads(serialize('geojson', CatchmentArea.objects.all())), safe=False)
+    return _geojson_response(CatchmentArea.objects.all(), 'geojson_catchment', timeout=600)
 
 def jaringan_pipa_geojson(request):
-    return JsonResponse(json.loads(serialize('geojson', JaringanPipa.objects.all())), safe=False)
+    return _geojson_response(JaringanPipa.objects.all(), 'geojson_pipa')
 
 def reservoir_geojson(request):
-    return JsonResponse(json.loads(serialize('geojson', Reservoir.objects.all())), safe=False)
+    return _geojson_response(Reservoir.objects.all(), 'geojson_reservoir')
 
 
 # ================================================================
@@ -280,6 +291,7 @@ def create_sumber_air(request):
             jenis_sumber = data.get('jenis_sumber', ''),
             lokasi       = point,
         )
+        cache.delete_many(['geojson_sumberair', 'water_status', 'dashboard_stats'])
         return JsonResponse({'message': 'Sumber air berhasil disimpan'}, status=201)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=400)
@@ -301,6 +313,7 @@ def create_fasilitas(request):
             kapasitas = data.get('kapasitas') or None,
             lokasi    = point,
         )
+        cache.delete_many(['geojson_fasilitas', 'water_status', 'dashboard_stats'])
         return JsonResponse({'message': 'Fasilitas berhasil disimpan'}, status=201)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=400)
@@ -321,6 +334,7 @@ def create_permukiman(request):
             jumlah_penduduk  = int(data.get('jumlah_penduduk', 0)),
             lokasi           = point,
         )
+        cache.delete_many(['geojson_permukiman', 'water_status', 'dashboard_stats'])
         return JsonResponse({'message': 'Permukiman berhasil disimpan'}, status=201)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=400)
@@ -341,6 +355,7 @@ def create_reservoir(request):
             elevasi      = float(data['elevasi']) if data.get('elevasi') else None,
             lokasi       = point,
         )
+        cache.delete_many(['geojson_reservoir', 'dashboard_stats'])
         return JsonResponse({'message': 'Tandon air berhasil disimpan'}, status=201)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=400)
@@ -382,6 +397,9 @@ def edit_data(request, model_name, pk):
                 setattr(obj, geo_field, Point(float(data['lng']), float(data['lat']), srid=4326))
 
         obj.save()
+        cache.delete_many([
+            f'geojson_{model_name}', 'water_status', 'dashboard_stats',
+        ])
         _log_audit(request, 'EDIT', f'{model_name} id={pk}')
         return JsonResponse({'message': 'Data berhasil diperbarui'})
 
@@ -408,6 +426,9 @@ def delete_data(request, model_name, pk):
 
     try:
         model.objects.get(pk=pk).delete()
+        cache.delete_many([
+            f'geojson_{model_name}', 'water_status', 'dashboard_stats',
+        ])
         _log_audit(request, 'DELETE', f'{model_name} id={pk}')
         return JsonResponse({'message': 'Data berhasil dihapus'})
     except model.DoesNotExist:
@@ -571,7 +592,12 @@ def upload_shp(request):
 
 def _compute_water_status():
     """Neraca air mode real (tanpa simulasi) — sumber tunggal kebenaran,
-    dipakai oleh informasi_debit() dan AI Assistant (Hubungi Admin)."""
+    dipakai oleh informasi_debit() dan AI Assistant (Hubungi Admin).
+    Hasil di-cache 30 detik; dibatalkan saat data air berubah."""
+    cached = cache.get('water_status')
+    if cached is not None:
+        return cached
+
     total_debit = SumberAir.objects.aggregate(total=Sum('debit'))['total'] or 0
     supply_m3   = total_debit * 86.4
 
@@ -599,7 +625,7 @@ def _compute_water_status():
     else:
         status_str = 'KRITIS'
 
-    return {
+    result = {
         'ketersediaan_m3':    round(supply_m3,   2),
         'kebutuhan_m3':       round(demand_m3,   2),
         'selisih_m3':         round(selisih,      2),
@@ -607,6 +633,8 @@ def _compute_water_status():
         'status':             status_str,
         'total_debit_ldetik': round(total_debit,  2),
     }
+    cache.set('water_status', result, 30)
+    return result
 
 
 def informasi_debit(request):
@@ -1334,18 +1362,30 @@ def hubungi_admin_page(request):
     if not is_admin_user(request.user):
         from django.http import HttpResponseForbidden
         return HttpResponseForbidden("Akses ditolak.")
-    convs = Conversation.objects.select_related('user').prefetch_related('messages').order_by('-updated_at')
-    conv_data = []
-    for c in convs:
-        last = c.messages.last()
-        conv_data.append({
+
+    last_msg_sub = Message.objects.filter(
+        conversation=OuterRef('pk')
+    ).order_by('-created_at').values('content')[:1]
+
+    convs = Conversation.objects.select_related('user').annotate(
+        last_msg_content=Subquery(last_msg_sub),
+        unread_count=Count(
+            'messages',
+            filter=Q(messages__is_read=False) & Q(messages__sender=F('user')),
+        ),
+    ).order_by('-updated_at')
+
+    conv_data = [
+        {
             'id':         c.id,
             'user':       c.user.username,
             'status':     c.status,
             'updated_at': timezone.localtime(c.updated_at).strftime('%d %b %Y, %H:%M'),
-            'unread':     c.messages.filter(is_read=False, sender=c.user).count(),
-            'last_msg':   last.content[:100] if last else '',
-        })
+            'unread':     c.unread_count,
+            'last_msg':   (c.last_msg_content or '')[:100],
+        }
+        for c in convs
+    ]
     return render(request, 'hubungi_admin.html', {'conversations': conv_data})
 
 
@@ -1355,15 +1395,25 @@ def hubungi_admin_list(request):
     if not is_admin_user(request.user):
         return JsonResponse({'error': 'Forbidden'}, status=403)
 
-    convs = Conversation.objects.select_related('user').prefetch_related('messages')
+    last_msg_sub = Message.objects.filter(
+        conversation=OuterRef('pk')
+    ).order_by('-created_at').values('content')[:1]
+
+    convs = Conversation.objects.select_related('user').annotate(
+        last_msg_content=Subquery(last_msg_sub),
+        unread_count=Count(
+            'messages',
+            filter=Q(messages__is_read=False) & Q(messages__sender=F('user')),
+        ),
+    )
     data = [
         {
-            'id':          c.id,
-            'user':        c.user.username,
-            'status':      c.status,
-            'updated_at':  timezone.localtime(c.updated_at).strftime('%d %b %Y, %H:%M'),
-            'unread':      c.messages.filter(is_read=False, sender=c.user).count(),
-            'last_msg':    c.messages.last().content[:80] if c.messages.exists() else '',
+            'id':         c.id,
+            'user':       c.user.username,
+            'status':     c.status,
+            'updated_at': timezone.localtime(c.updated_at).strftime('%d %b %Y, %H:%M'),
+            'unread':     c.unread_count,
+            'last_msg':   (c.last_msg_content or '')[:80],
         }
         for c in convs
     ]
@@ -1434,28 +1484,34 @@ def hubungi_admin_thread(request, conv_id):
 # ================================================================
 
 def dashboard_stats(request):
-    """Kembalikan jumlah real dari database untuk semua entitas utama."""
+    """Kembalikan jumlah real dari database untuk semua entitas utama.
+    Di-cache 30 detik; dibatalkan saat data berubah."""
+    cached = cache.get('dashboard_stats')
+    if cached is not None:
+        return JsonResponse(cached)
+
+    # Ambil semua count fasilitas dalam 1 query dengan conditional aggregation
     from django.db.models import Sum as _Sum
-    hotel    = FasilitasWisata.objects.filter(jenis='hotel').count()
-    resto    = FasilitasWisata.objects.filter(jenis='resto').count()
-    jasa     = FasilitasWisata.objects.filter(jenis='jasa').count()
+    fasilitas_counts = FasilitasWisata.objects.values('jenis').annotate(n=Count('id'))
+    fc = {row['jenis']: row['n'] for row in fasilitas_counts}
+
     penduduk = Permukiman.objects.aggregate(t=_Sum('jumlah_penduduk'))['t'] or 0
-    return JsonResponse({
-        # Granular counts (for GeoJSON layer callbacks)
+    data = {
         'sumber_air':  SumberAir.objects.count(),
-        'hotel':       hotel,
-        'makan':       resto,
-        'jasa':        jasa,
+        'hotel':       fc.get('hotel', 0),
+        'makan':       fc.get('resto', 0),
+        'jasa':        fc.get('jasa', 0),
         'penduduk':    penduduk,
         'reservoir':   Reservoir.objects.count(),
         'permukiman':  Permukiman.objects.count(),
         'pipa':        JaringanPipa.objects.count(),
-        # Dashboard Summary Panel
         'layer_count':        9,
         'dataset_count':      8,
         'conversation_count': Conversation.objects.count(),
         'download_count':     DownloadLog.objects.count(),
-    })
+    }
+    cache.set('dashboard_stats', data, 30)
+    return JsonResponse(data)
 
 
 # ================================================================

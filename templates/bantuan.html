@@ -43,7 +43,7 @@
 }
 .bantuan-search input {
     width: 100%;
-    padding: 13px 18px 13px 44px;
+    padding: 13px 60px 13px 44px;
     border: 1.5px solid #E2E8F0;
     border-radius: 12px;
     font-size: 14px;
@@ -52,6 +52,21 @@
     background: white;
     transition: all .15s;
     box-shadow: 0 2px 8px rgba(0,0,0,.04);
+}
+.bantuan-search-kbd {
+    position: absolute;
+    right: 13px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 10px;
+    font-weight: 600;
+    color: #CBD5E1;
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    border-radius: 5px;
+    padding: 2px 6px;
+    pointer-events: none;
+    letter-spacing: .5px;
 }
 .bantuan-search input:focus {
     outline: none;
@@ -77,7 +92,7 @@
     justify-content: center;
 }
 .bcat-btn {
-    padding: 7px 16px;
+    padding: 7px 14px;
     border-radius: 20px;
     border: 1.5px solid #E2E8F0;
     background: white;
@@ -86,14 +101,32 @@
     font-weight: 500;
     font-family: 'Inter', sans-serif;
     cursor: pointer;
-    transition: all .15s;
+    transition: all .18s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
 }
-.bcat-btn:hover { border-color: #3B82F6; color: #3B82F6; }
+.bcat-btn:hover { border-color: #3B82F6; color: #3B82F6; background: #F0F7FF; }
 .bcat-btn.active {
     background: #3B82F6;
     border-color: #3B82F6;
     color: white;
 }
+.bcat-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 9px;
+    font-size: 10px;
+    font-weight: 700;
+    background: rgba(0,0,0,.08);
+    color: inherit;
+    line-height: 1;
+}
+.bcat-btn.active .bcat-count { background: rgba(255,255,255,.25); }
 
 /* No results */
 .bantuan-empty {
@@ -236,6 +269,7 @@
         <div class="bantuan-search">
             <span class="bantuan-search-icon">🔍</span>
             <input type="text" id="faqSearch" placeholder="Cari pertanyaan atau topik...">
+            <span class="bantuan-search-kbd">/ cari</span>
         </div>
     </div>
 
@@ -530,14 +564,49 @@
 
 <script>
 (function () {
-    var items   = document.querySelectorAll('.bant-item');
+    var items     = document.querySelectorAll('.bant-item');
     var secTitles = document.querySelectorAll('.bsec-title');
-    var searchEl = document.getElementById('faqSearch');
-    var emptyEl  = document.getElementById('bantEmpty');
-    var catBtns  = document.querySelectorAll('.bcat-btn');
+    var searchEl  = document.getElementById('faqSearch');
+    var emptyEl   = document.getElementById('bantEmpty');
+    var catBtns   = document.querySelectorAll('.bcat-btn');
     var activeCat = 'all';
 
-    // Accordion
+    /* Add count badges to category buttons */
+    catBtns.forEach(function (btn) {
+        var cat = btn.getAttribute('data-cat');
+        var count = cat === 'all'
+            ? items.length
+            : document.querySelectorAll('.bant-item[data-cat="' + cat + '"]').length;
+        var span = document.createElement('span');
+        span.className = 'bcat-count';
+        span.textContent = count;
+        btn.appendChild(span);
+    });
+
+    /* Keyboard shortcut: "/" focuses search */
+    document.addEventListener('keydown', function (e) {
+        if (e.key === '/' && document.activeElement !== searchEl
+            && document.activeElement.tagName !== 'INPUT'
+            && document.activeElement.tagName !== 'TEXTAREA') {
+            e.preventDefault();
+            searchEl.focus();
+            searchEl.select();
+        }
+        if (e.key === 'Escape' && document.activeElement === searchEl) {
+            searchEl.value = '';
+            searchEl.blur();
+            applyFilters();
+        }
+    });
+
+    /* Hide kbd hint when focused */
+    var kbdHint = document.querySelector('.bantuan-search-kbd');
+    if (searchEl && kbdHint) {
+        searchEl.addEventListener('focus',  function () { kbdHint.style.opacity = '0'; });
+        searchEl.addEventListener('blur',   function () { kbdHint.style.opacity = '1'; });
+    }
+
+    /* Accordion */
     items.forEach(function (item) {
         var q = item.querySelector('.bant-q');
         if (q) {
@@ -549,7 +618,7 @@
         }
     });
 
-    // Category filter
+    /* Category filter */
     catBtns.forEach(function (btn) {
         btn.addEventListener('click', function () {
             catBtns.forEach(function (b) { b.classList.remove('active'); });
@@ -559,7 +628,7 @@
         });
     });
 
-    // Search
+    /* Search */
     searchEl.addEventListener('input', applyFilters);
 
     function applyFilters() {
@@ -567,8 +636,8 @@
         var anyVisible = false;
 
         items.forEach(function (item) {
-            var cat  = item.getAttribute('data-cat');
-            var text = (item.querySelector('.bant-q').textContent + ' ' + item.querySelector('.bant-a').textContent).toLowerCase();
+            var cat    = item.getAttribute('data-cat');
+            var text   = (item.querySelector('.bant-q').textContent + ' ' + item.querySelector('.bant-a').textContent).toLowerCase();
             var catOk  = (activeCat === 'all' || cat === activeCat);
             var textOk = (!q || text.indexOf(q) !== -1);
             var show   = catOk && textOk;
@@ -576,14 +645,12 @@
             if (show) anyVisible = true;
         });
 
-        // Show/hide section titles
+        /* Show/hide section titles */
         secTitles.forEach(function (title) {
             var cat = title.getAttribute('data-cat');
             var hasVisible = false;
             items.forEach(function (item) {
-                if (item.getAttribute('data-cat') === cat && !item.classList.contains('hidden')) {
-                    hasVisible = true;
-                }
+                if (item.getAttribute('data-cat') === cat && !item.classList.contains('hidden')) hasVisible = true;
             });
             title.style.display = (activeCat === 'all' || activeCat === cat) && hasVisible ? '' : 'none';
         });

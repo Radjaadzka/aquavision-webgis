@@ -205,6 +205,52 @@
     }
     .auth-back:hover { color: #94A3B8; }
 
+    /* Password strength */
+    .pw-strength { margin-top: 8px; }
+    .pw-bar {
+        display: flex;
+        gap: 4px;
+        margin-bottom: 4px;
+    }
+    .pw-seg {
+        flex: 1;
+        height: 3px;
+        border-radius: 2px;
+        background: #E2E8F0;
+        transition: background .25s;
+    }
+    .pw-seg.weak   { background: #EF4444; }
+    .pw-seg.medium { background: #F59E0B; }
+    .pw-seg.strong { background: #22C55E; }
+    .pw-label {
+        font-size: 11px;
+        font-weight: 400;
+        color: #94A3B8;
+        transition: color .25s;
+    }
+    .pw-label.weak   { color: #EF4444; }
+    .pw-label.medium { color: #F59E0B; }
+    .pw-label.strong { color: #22C55E; }
+
+    /* Password toggle */
+    .pw-wrap { position: relative; }
+    .pw-toggle {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 4px;
+        color: #94A3B8;
+        font-size: 16px;
+        line-height: 1;
+        transition: color .15s;
+    }
+    .pw-toggle:hover { color: #64748B; }
+    .pw-wrap input { padding-right: 38px; }
+
     /* Responsive */
     @media (max-width: 768px) {
         .auth-left    { display: none; }
@@ -290,13 +336,26 @@
 
                 <div class="auth-field">
                     <label>Password</label>
-                    <input type="password" name="password1" id="id_password1" placeholder="Buat password" required>
-                    <span class="auth-hint">Minimal 8 karakter, tidak boleh terlalu umum</span>
+                    <div class="pw-wrap">
+                        <input type="password" name="password1" id="id_password1" placeholder="Buat password" required autocomplete="new-password">
+                        <button type="button" class="pw-toggle" id="pwToggle1" aria-label="Tampilkan password">👁</button>
+                    </div>
+                    <div class="pw-strength" id="pwStrength" style="display:none;">
+                        <div class="pw-bar">
+                            <div class="pw-seg" id="pws1"></div>
+                            <div class="pw-seg" id="pws2"></div>
+                            <div class="pw-seg" id="pws3"></div>
+                        </div>
+                        <span class="pw-label" id="pwLabel"></span>
+                    </div>
                 </div>
 
                 <div class="auth-field">
                     <label>Konfirmasi Password</label>
-                    <input type="password" name="password2" id="id_password2" placeholder="Ketik ulang password" required>
+                    <div class="pw-wrap">
+                        <input type="password" name="password2" id="id_password2" placeholder="Ketik ulang password" required autocomplete="new-password">
+                        <button type="button" class="pw-toggle" id="pwToggle2" aria-label="Tampilkan konfirmasi password">👁</button>
+                    </div>
                 </div>
 
                 <button type="submit" class="auth-submit">Daftar</button>
@@ -312,4 +371,54 @@
     </div>
 
 </section>
+
+{% block extra_js %}
+<script>
+(function () {
+    /* Password strength meter */
+    var inp  = document.getElementById('id_password1');
+    var wrap = document.getElementById('pwStrength');
+    var segs = [document.getElementById('pws1'), document.getElementById('pws2'), document.getElementById('pws3')];
+    var lbl  = document.getElementById('pwLabel');
+
+    function getStrength(pw) {
+        if (!pw) return 0;
+        var score = 0;
+        if (pw.length >= 8)  score++;
+        if (pw.length >= 12) score++;
+        if (/[0-9]/.test(pw) || /[^a-zA-Z0-9]/.test(pw)) score++;
+        return score;
+    }
+
+    if (inp && wrap) {
+        inp.addEventListener('input', function () {
+            var val = inp.value;
+            if (!val) { wrap.style.display = 'none'; return; }
+            wrap.style.display = '';
+            var s = getStrength(val);
+            var cls = s <= 1 ? 'weak' : s === 2 ? 'medium' : 'strong';
+            var txt = s <= 1 ? 'Lemah — tambahkan angka atau karakter khusus' : s === 2 ? 'Sedang — coba panjangkan password' : 'Kuat';
+            segs.forEach(function (seg, i) {
+                seg.className = 'pw-seg' + (i < s ? ' ' + cls : '');
+            });
+            lbl.className = 'pw-label ' + cls;
+            lbl.textContent = txt;
+        });
+    }
+
+    /* Show/hide password toggles */
+    [['pwToggle1', 'id_password1'], ['pwToggle2', 'id_password2']].forEach(function (pair) {
+        var btn = document.getElementById(pair[0]);
+        var fld = document.getElementById(pair[1]);
+        if (btn && fld) {
+            btn.addEventListener('click', function () {
+                var show = fld.type === 'password';
+                fld.type = show ? 'text' : 'password';
+                btn.textContent = show ? '🙈' : '👁';
+            });
+        }
+    });
+})();
+</script>
+{% endblock %}
 {% endblock %}

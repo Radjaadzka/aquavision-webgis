@@ -33,7 +33,7 @@ class FasilitasWisata(models.Model):
         ('jasa',     'Jasa'),
     ]
     nama                 = models.CharField(max_length=100)
-    jenis                = models.CharField(max_length=20, choices=JENIS_CHOICES)
+    jenis                = models.CharField(max_length=20, choices=JENIS_CHOICES, db_index=True)
     lokasi               = models.PointField()
     kamar                = models.IntegerField(blank=True, null=True)
     kapasitas            = models.IntegerField(blank=True, null=True)
@@ -192,7 +192,7 @@ class Conversation(models.Model):
 
     user       = models.OneToOneField(User, on_delete=models.CASCADE, related_name='conversation')
     subject    = models.CharField(max_length=200, blank=True, default='')
-    status     = models.CharField(max_length=20, choices=STATUS_CHOICES, default='open')
+    status     = models.CharField(max_length=20, choices=STATUS_CHOICES, default='open', db_index=True)
     ticket_id  = models.CharField(max_length=30, blank=True, default='')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -212,7 +212,7 @@ class Message(models.Model):
     sender          = models.ForeignKey(User, on_delete=models.CASCADE)
     content         = models.TextField()
     created_at      = models.DateTimeField(auto_now_add=True)
-    is_read         = models.BooleanField(default=False)
+    is_read         = models.BooleanField(default=False, db_index=True)
     is_ai_response  = models.BooleanField(default=False)
 
     class Meta:
@@ -274,7 +274,7 @@ class AuditLog(models.Model):
 class Notification(models.Model):
     user       = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')
     message    = models.CharField(max_length=300)
-    is_read    = models.BooleanField(default=False)
+    is_read    = models.BooleanField(default=False, db_index=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

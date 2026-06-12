@@ -9,11 +9,27 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
+    <!-- Prefetch halaman navigasi yang paling sering dikunjungi -->
+    <link rel="prefetch" href="/tentang/">
+    <link rel="prefetch" href="/bantuan/">
+    {% if user.is_authenticated %}
+    <link rel="prefetch" href="/data/">
+    {% endif %}
+
     <link rel="icon" type="image/png" href="{% static 'images/logo_webgis.png' %}">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+    <!-- Page-transition progress bar -->
+    <style>
+    #aq-progress{position:fixed;top:0;left:0;z-index:99999;height:3px;
+    background:linear-gradient(90deg,#3B82F6,#60A5FA);width:0;display:none;
+    transition:width .25s ease,opacity .3s ease;}
+    </style>
+
     {% block extra_css %}{% endblock %}
 </head>
 <body>
+<div id="aq-progress"></div>
 <button id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" style="display:none;position:fixed;bottom:24px;right:24px;z-index:999;background:var(--primary,#1a5276);color:white;border:none;width:44px;height:44px;border-radius:50%;font-size:20px;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,0.2);">↑</button>
 <script>
 window.addEventListener("scroll",function(){
@@ -199,6 +215,49 @@ document.querySelectorAll('a[href^="#"]').forEach(function(a) {
 </a>
 
 {% block extra_js %}{% endblock %}
+
+<script>
+/* ── Page-transition progress bar ─────────────────────────────── */
+(function () {
+    var bar = document.getElementById('aq-progress');
+    if (!bar) return;
+    var timer = null;
+
+    function startBar() {
+        clearTimeout(timer);
+        bar.style.display = 'block';
+        bar.style.opacity = '1';
+        bar.style.width   = '0%';
+        // Two-step animation: quick jump to 40%, then slow crawl to 75%
+        setTimeout(function () { bar.style.width = '40%'; }, 10);
+        timer = setTimeout(function () { bar.style.width = '75%'; }, 200);
+    }
+
+    function finishBar() {
+        clearTimeout(timer);
+        bar.style.width = '100%';
+        timer = setTimeout(function () {
+            bar.style.opacity = '0';
+            setTimeout(function () { bar.style.display = 'none'; bar.style.width = '0'; }, 300);
+        }, 150);
+    }
+
+    document.addEventListener('click', function (e) {
+        var link = e.target.closest('a[href]');
+        if (!link) return;
+        var href = link.getAttribute('href');
+        if (!href || href.charAt(0) === '#' ||
+            href.indexOf('://') !== -1 ||
+            link.getAttribute('target') === '_blank' ||
+            link.getAttribute('download') !== null) return;
+        // Skip form-submit triggers (logout button wrapped in <a>)
+        if (link.getAttribute('role') === 'button') return;
+        startBar();
+    });
+
+    window.addEventListener('pageshow', finishBar);
+})();
+</script>
 
 <script>
 (function () {

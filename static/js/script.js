@@ -270,7 +270,7 @@ document.addEventListener("DOMContentLoaded", function () {
         return "-";
     }
 
-    function loadPotensiAirTanah() {
+    function loadPotensiAirTanah(addToMap) {
         fetch("/static/data/DaerahResapan.geojson")
             .then(function (r) { return r.json(); })
             .then(function (data) {
@@ -322,12 +322,12 @@ document.addEventListener("DOMContentLoaded", function () {
                         });
                     }
                 });
+                if (addToMap) map.addLayer(potensiAirTanahLayer);
                 console.log("Potensi Air Tanah loaded");
             })
             .catch(function (err) { console.log("Potensi Air Tanah error:", err); });
     }
-
-    loadPotensiAirTanah();
+    // loadPotensiAirTanah() — dibuat lazy: hanya dimuat saat checkbox diaktifkan (hemat 1.49 MB)
 
 
     // ================================================================
@@ -492,9 +492,9 @@ document.addEventListener("DOMContentLoaded", function () {
     // 12. HELPER STATUS NERACA AIR
     // ================================================================
 
-    function getStatusColor(p) { return p < 50 ? "#27ae60" : p < 80 ? "#e67e22" : "#e74c3c"; }
+    function getStatusColor(p) { return p < 50 ? "#22C55E" : p < 80 ? "#F59E0B" : "#EF4444"; }
     function getStatusLabel(p) { return p < 50 ? "AMAN"    : p < 80 ? "WASPADA" : "KRITIS";  }
-    function getStatusBg(p)    { return p < 50 ? "#e8f6f3" : p < 80 ? "#fef9e7" : "#fdedec"; }
+    function getStatusBg(p)    { return p < 50 ? "rgba(34,197,94,.12)" : p < 80 ? "rgba(245,158,11,.12)" : "rgba(239,68,68,.12)"; }
 
 
     // ================================================================
@@ -702,16 +702,7 @@ document.addEventListener("DOMContentLoaded", function () {
             .catch(function () { console.warn("BatasDesa layer gagal dimuat."); });
     }
 
-    // Sungai / DAS — visualisasi wilayah hidrologi saja, tanpa popup/tooltip.
-    // Klik pada layer ini diteruskan ke map.on("click") untuk popup koordinat.
-    fetch("/static/data/Sungai.geojson")
-        .then(function (r) { return r.json(); })
-        .then(function (data) {
-            sungaiVektorLayer = L.geoJSON(data, {
-                style: { color: "#2980b9", weight: 2, opacity: 0.85 }
-            });
-        })
-        .catch(function (err) { console.log("Sungai error:", err); });
+    // Sungai.geojson — dibuat lazy: hanya dimuat saat checkbox diaktifkan (hemat 463 KB)
 
 
     // ================================================================
@@ -739,8 +730,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
     document.getElementById("chkSungaiVektor")?.addEventListener("change", function (e) {
         if (!sungaiVektorLayer) {
-            showNotif("Memuat", "Layer sungai sedang dimuat.", "warning");
-            e.target.checked = false;
+            if (!e.target.checked) return;
+            showNotif("Memuat", "Layer sungai sedang dimuat...", "warning");
+            fetch("/static/data/Sungai.geojson")
+                .then(function (r) { return r.json(); })
+                .then(function (data) {
+                    sungaiVektorLayer = L.geoJSON(data, {
+                        style: { color: "#2980b9", weight: 2, opacity: 0.85 }
+                    });
+                    map.addLayer(sungaiVektorLayer);
+                })
+                .catch(function () { showNotif("Gagal", "Layer sungai gagal dimuat.", "error"); });
             return;
         }
         e.target.checked ? map.addLayer(sungaiVektorLayer) : map.removeLayer(sungaiVektorLayer);
@@ -748,8 +748,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     document.getElementById("chkPotensiAirTanah")?.addEventListener("change", function (e) {
         if (!potensiAirTanahLayer) {
-            showNotif("Memuat", "Layer sedang dimuat.", "warning");
-            e.target.checked = false;
+            if (!e.target.checked) return;
+            showNotif("Memuat", "Layer potensi air tanah sedang dimuat...", "warning");
+            loadPotensiAirTanah(true);  // muat + langsung tampilkan di peta
             return;
         }
         if (e.target.checked) {
@@ -978,12 +979,19 @@ document.addEventListener("DOMContentLoaded", function () {
     // 21. GAUGE CHART NERACA AIR
     // ================================================================
 
-    function renderChart(supply, demand) {
+    function renderChart(supply, demand, apiPersen) {
         var CX = 130, CY = 130, R = 100, SA = Math.PI;
         var svg = document.getElementById("gaugeSVG");
         if (!svg) return;
 
-        var persen = supply > 0 ? Math.min((demand / supply) * 100, 100) : 0;
+        // Use server-provided persen to match status label exactly.
+        // Fall back to local calculation only if not provided.
+        var persen = (apiPersen !== undefined)
+            ? apiPersen
+            : (supply > 0 ? (demand / supply) * 100 : 0);
+
+        // Cap gauge fill arc at 100% visually, but use real persen for color/label
+        var displayPct = Math.min(persen, 100);
 
         function polar(a, r)      { return [CX + r * Math.cos(a), CY + r * Math.sin(a)]; }
         function arcPath(sA, eA, r) {
@@ -991,14 +999,12 @@ document.addEventListener("DOMContentLoaded", function () {
             var large = (eA - sA) > Math.PI ? 1 : 0;
             return "M " + s[0] + " " + s[1] + " A " + r + " " + r + " 0 " + large + " 1 " + e[0] + " " + e[1];
         }
-        function getColor(p) { return p < 50 ? "#1D9E75" : p < 80 ? "#BA7517" : "#E24B4A"; }
-        function getLabel(p) { return p < 50 ? "AMAN"    : p < 80 ? "WASPADA" : "KRITIS";  }
 
-        var color     = getColor(persen);
-        var fillAngle = SA + (persen / 100) * Math.PI;
+        var color     = getStatusColor(persen);
+        var fillAngle = SA + (displayPct / 100) * Math.PI;
 
         svg.querySelector("#arcBg").setAttribute("d",            arcPath(SA, 2 * Math.PI, R));
-        svg.querySelector("#arcBg").setAttribute("stroke",       "#e8e8e8");
+        svg.querySelector("#arcBg").setAttribute("stroke",       "rgba(255,255,255,.08)");
         svg.querySelector("#arcBg").setAttribute("stroke-width", "14");
 
         svg.querySelector("#arcFill").setAttribute("d",            arcPath(SA, fillAngle, R));
@@ -1012,18 +1018,21 @@ document.addEventListener("DOMContentLoaded", function () {
         needle.setAttribute("stroke", color);
 
         svg.querySelector("#needleHub").setAttribute("fill", color);
-        svg.querySelector("#pctText").textContent = persen.toFixed(1) + "%";
+        svg.querySelector("#pctText").textContent = displayPct.toFixed(1) + "%";
         svg.querySelector("#pctText").setAttribute("fill", color);
-        svg.querySelector("#statusText").textContent = getLabel(persen);
+        svg.querySelector("#statusText").textContent = getStatusLabel(persen);
 
-        var sisa = Math.max(supply - demand, 0);
+        var sisa = supply - demand;
         var cs   = document.getElementById("cardSupply");
         var cd   = document.getElementById("cardDemand");
         var cr   = document.getElementById("cardSisa");
 
         if (cs) cs.textContent = supply.toLocaleString("id-ID");
         if (cd) cd.textContent = demand.toLocaleString("id-ID");
-        if (cr) { cr.textContent = sisa.toLocaleString("id-ID"); cr.style.color = color; }
+        if (cr) {
+            cr.textContent = (sisa < 0 ? '' : '') + sisa.toLocaleString("id-ID");
+            cr.style.color = sisa >= 0 ? color : '#F87171';
+        }
     }
 
     function loadDebit() {
@@ -1031,14 +1040,14 @@ document.addEventListener("DOMContentLoaded", function () {
             .then(function (r) { return r.json(); })
             .then(function (data) {
                 var persen = data.pemanfaatan_persen;
-                document.getElementById("debitSupply").textContent  = data.ketersediaan_m3;
-                document.getElementById("debitDemand").textContent  = data.kebutuhan_m3;
+                document.getElementById("debitSupply").textContent  = data.ketersediaan_m3.toLocaleString('id-ID');
+                document.getElementById("debitDemand").textContent  = data.kebutuhan_m3.toLocaleString('id-ID');
                 document.getElementById("statusLabel").textContent  = getStatusLabel(persen);
                 document.getElementById("statusLabel").style.color  = getStatusColor(persen);
-                document.getElementById("statusPersen").textContent = persen + "% terpakai";
+                document.getElementById("statusPersen").textContent = Math.min(Math.round(persen), 100) + "% terpakai";
                 document.getElementById("statusDot").style.background = getStatusColor(persen);
                 document.getElementById("statusBar").style.background = getStatusBg(persen);
-                renderChart(data.ketersediaan_m3, data.kebutuhan_m3);
+                renderChart(data.ketersediaan_m3, data.kebutuhan_m3, persen);
             })
             .catch(function () { console.warn("Informasi debit gagal dimuat."); });
     }
@@ -1064,10 +1073,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 document.getElementById("debitDemand").textContent  = data.kebutuhan_m3.toLocaleString('id-ID');
                 document.getElementById("statusLabel").textContent  = getStatusLabel(p);
                 document.getElementById("statusLabel").style.color  = getStatusColor(p);
-                document.getElementById("statusPersen").textContent = p + "% terpakai";
+                document.getElementById("statusPersen").textContent = Math.min(Math.round(p), 100) + "% terpakai";
                 document.getElementById("statusDot").style.background = getStatusColor(p);
                 document.getElementById("statusBar").style.background = getStatusBg(p);
-                renderChart(data.ketersediaan_m3, data.kebutuhan_m3);
+                renderChart(data.ketersediaan_m3, data.kebutuhan_m3, p);
 
                 // Show inline result in simulasi panel
                 var resultEl = document.getElementById('simResult');
@@ -1087,6 +1096,8 @@ document.addEventListener("DOMContentLoaded", function () {
                     badge.textContent = data.status;
                     badge.style.cssText = 'display:inline-block; font-size:11px; font-weight:700; padding:3px 10px; border-radius:20px; letter-spacing:.8px; background:' + sc.bg + '; color:' + sc.color + '; border:1px solid ' + sc.border + ';';
                 }
+                // Force-sync hero card in case status label didn't change
+                if (window.aquaSyncStatus) window.aquaSyncStatus();
             })
             .catch(function () {
                 btn.disabled = false;

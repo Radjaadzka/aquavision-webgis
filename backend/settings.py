@@ -247,6 +247,18 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 52428800   # 50 MB
 FILE_UPLOAD_MAX_MEMORY_SIZE = 52428800   # 50 MB
 
 # ================================================================
+# CACHE — in-process memory cache; invalidated on server restart
+# ================================================================
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'aquavision-cache',
+        'TIMEOUT': 60,
+    }
+}
+
+# ================================================================
 # DEFAULT AUTO FIELD
 # ================================================================
 

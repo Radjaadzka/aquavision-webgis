@@ -217,6 +217,25 @@
     }
     .auth-footer a { color: #3B82F6; font-weight: 500; }
 
+    /* Password toggle */
+    .pw-wrap { position: relative; }
+    .pw-toggle {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 4px;
+        color: #94A3B8;
+        font-size: 16px;
+        line-height: 1;
+        transition: color .15s;
+    }
+    .pw-toggle:hover { color: #64748B; }
+    .pw-wrap input { padding-right: 38px; }
+
     /* Responsive */
     @media (max-width: 768px) {
         .auth-left    { display: none; }
@@ -278,7 +297,10 @@
                 </div>
                 <div class="auth-field">
                     <label>Password</label>
-                    <input type="password" name="password" placeholder="Masukkan password" autocomplete="current-password">
+                    <div class="pw-wrap">
+                        <input type="password" name="password" id="loginPw" placeholder="Masukkan password" autocomplete="current-password">
+                        <button type="button" class="pw-toggle" id="loginPwToggle" aria-label="Tampilkan password">👁</button>
+                    </div>
                 </div>
                 <input type="hidden" name="next" value="{{ next }}">
                 <button type="submit" class="auth-submit">Masuk</button>
@@ -310,4 +332,20 @@
     </div>
 
 </section>
+
+{% block extra_js %}
+<script>
+(function () {
+    var btn = document.getElementById('loginPwToggle');
+    var fld = document.getElementById('loginPw');
+    if (btn && fld) {
+        btn.addEventListener('click', function () {
+            var show = fld.type === 'password';
+            fld.type = show ? 'text' : 'password';
+            btn.textContent = show ? '🙈' : '👁';
+        });
+    }
+})();
+</script>
+{% endblock %}
 {% endblock %}

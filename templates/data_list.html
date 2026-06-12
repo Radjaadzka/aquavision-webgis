@@ -1,68 +1,384 @@
 {% extends "base.html" %}
+{% block title %}Data Portal — AQUAVISION{% endblock %}
+
+{% block extra_css %}
+<style>
+.portal-section { padding: 32px 32px 0; }
+.portal-container { max-width: 1200px; margin: 0 auto; }
+
+/* Hero header */
+.portal-hero {
+    background: linear-gradient(135deg, #07111F 0%, #0E2238 60%, #0D2236 100%);
+    border-radius: 16px;
+    padding: 40px 40px 36px;
+    margin-bottom: 28px;
+    border: 1px solid rgba(255,255,255,.07);
+    position: relative;
+    overflow: hidden;
+}
+.portal-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 60% 80% at 90% 50%, rgba(59,130,246,.08) 0%, transparent 60%);
+    pointer-events: none;
+}
+.portal-hero-inner { position: relative; z-index: 1; }
+.portal-hero-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: rgba(59,130,246,.8);
+    background: rgba(59,130,246,.1);
+    border: 1px solid rgba(59,130,246,.18);
+    border-radius: 20px;
+    padding: 4px 12px;
+    margin-bottom: 12px;
+}
+.portal-hero h2 {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(22px, 3vw, 32px);
+    font-weight: 200;
+    font-style: italic;
+    color: rgba(255,255,255,.9);
+    margin-bottom: 8px;
+    line-height: 1.2;
+}
+.portal-hero h2 em { color: #60A5FA; }
+.portal-hero p {
+    font-size: 14px;
+    font-weight: 300;
+    color: rgba(255,255,255,.42);
+    max-width: 560px;
+    line-height: 1.7;
+    margin: 0;
+}
+.portal-hero-stats {
+    display: flex;
+    gap: 28px;
+    margin-top: 24px;
+    flex-wrap: wrap;
+}
+.phs { display: flex; flex-direction: column; gap: 2px; }
+.phs-num { font-size: 22px; font-weight: 700; color: #7EC8FD; line-height: 1; }
+.phs-label { font-size: 10px; color: rgba(255,255,255,.35); font-weight: 400; letter-spacing: .5px; }
+
+/* Toolbar */
+.portal-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+.pt-search-wrap {
+    position: relative;
+    flex: 1;
+    min-width: 180px;
+    max-width: 340px;
+}
+.pt-search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94A3B8;
+    font-size: 14px;
+    pointer-events: none;
+}
+.pt-search-input {
+    width: 100%;
+    padding: 10px 14px 10px 36px;
+    border: 1.5px solid #E2E8F0;
+    border-radius: 10px;
+    font-size: 13px;
+    font-family: 'Inter', sans-serif;
+    background: white;
+    color: #0F172A;
+    transition: all .15s;
+    box-sizing: border-box;
+}
+.pt-search-input:focus { outline: none; border-color: #3B82F6; box-shadow: 0 0 0 3px rgba(59,130,246,.08); }
+.pt-submit {
+    padding: 10px 18px;
+    background: #3B82F6;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    transition: background .15s;
+    white-space: nowrap;
+}
+.pt-submit:hover { background: #2563EB; }
+.portal-count-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(59,130,246,.07);
+    color: #3B82F6;
+    border: 1px solid rgba(59,130,246,.14);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    font-family: 'Inter', sans-serif;
+    white-space: nowrap;
+}
+
+/* Dataset grid */
+.dataset-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+    gap: 16px;
+    padding-bottom: 48px;
+}
+
+/* Dataset card */
+.dataset-card {
+    background: white;
+    border: 1px solid #E8ECF4;
+    border-radius: 14px;
+    overflow: hidden;
+    transition: box-shadow .2s, transform .2s, border-color .2s;
+    display: flex;
+    flex-direction: column;
+    animation: dcFadeIn .3s ease both;
+}
+@keyframes dcFadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+.dataset-card:nth-child(2) { animation-delay: .05s; }
+.dataset-card:nth-child(3) { animation-delay: .10s; }
+.dataset-card:nth-child(4) { animation-delay: .15s; }
+.dataset-card:nth-child(5) { animation-delay: .20s; }
+.dataset-card:nth-child(6) { animation-delay: .25s; }
+.dataset-card:nth-child(7) { animation-delay: .30s; }
+.dataset-card:nth-child(8) { animation-delay: .35s; }
+.dataset-card:hover {
+    box-shadow: 0 8px 28px rgba(0,0,0,.09);
+    transform: translateY(-2px);
+    border-color: rgba(59,130,246,.25);
+}
+
+.dc-top { display: flex; align-items: flex-start; gap: 14px; padding: 20px 20px 0; }
+.dc-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+}
+.dc-icon.water   { background: rgba(59,130,246,.1); }
+.dc-icon.pipe    { background: rgba(99,102,241,.1); }
+.dc-icon.tank    { background: rgba(6,182,212,.1); }
+.dc-icon.ground  { background: rgba(34,197,94,.1); }
+.dc-icon.flow    { background: rgba(245,158,11,.1); }
+.dc-icon.tourism { background: rgba(239,68,68,.1); }
+.dc-icon.settle  { background: rgba(168,85,247,.1); }
+.dc-icon.admin   { background: rgba(156,163,175,.1); }
+
+.dc-meta { flex: 1; min-width: 0; }
+.dc-name { font-size: 14px; font-weight: 600; color: #0F172A; line-height: 1.3; margin-bottom: 6px; }
+.dc-type {
+    display: inline-flex;
+    align-items: center;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .8px;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 6px;
+}
+.dc-type.vektor  { background: rgba(59,130,246,.08); color: #3B82F6; }
+.dc-type.raster  { background: rgba(245,158,11,.08); color: #D97706; }
+.dc-type.tabular { background: rgba(34,197,94,.08);  color: #16A34A; }
+
+.dc-desc {
+    padding: 12px 20px;
+    font-size: 13px;
+    font-weight: 300;
+    color: #64748B;
+    line-height: 1.65;
+    flex: 1;
+}
+
+.dc-stats {
+    display: flex;
+    align-items: center;
+    padding: 10px 20px;
+    border-top: 1px solid #F1F5F9;
+    gap: 10px;
+}
+.dc-records { display: flex; align-items: baseline; gap: 4px; }
+.dc-records-num { font-size: 20px; font-weight: 700; color: #1D4ED8; line-height: 1; }
+.dc-records-label { font-size: 10px; color: #94A3B8; font-weight: 400; }
+.dc-formats { display: flex; gap: 4px; margin-left: auto; }
+.dc-fmt {
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: .4px;
+    padding: 2px 6px;
+    border-radius: 5px;
+    background: #F1F5F9;
+    color: #64748B;
+}
+
+.dc-foot { padding: 0 20px 18px; }
+.dc-btn {
+    display: block;
+    text-align: center;
+    padding: 10px;
+    background: #07111F;
+    color: white;
+    border-radius: 9px;
+    font-size: 13px;
+    font-weight: 500;
+    font-family: 'Inter', sans-serif;
+    text-decoration: none;
+    transition: background .18s, box-shadow .18s, transform .18s;
+}
+.dc-btn:hover {
+    background: #1D4ED8;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(29,78,216,.3);
+}
+
+/* Empty state */
+.dp-empty { text-align: center; padding: 64px 20px; }
+.dp-empty-icon { font-size: 40px; margin-bottom: 14px; }
+.dp-empty h4 { font-size: 16px; font-weight: 500; color: #64748B; margin-bottom: 6px; }
+.dp-empty p  { font-size: 13px; font-weight: 300; color: #94A3B8; }
+
+/* Responsive */
+@media (max-width: 768px) {
+    .portal-section { padding: 16px 12px 0; }
+    .portal-hero { padding: 24px 20px 22px; border-radius: 12px; }
+    .portal-hero h2 { font-size: 22px; }
+    .portal-hero-stats { gap: 16px; margin-top: 16px; }
+    .phs-num { font-size: 18px; }
+    .dataset-grid { grid-template-columns: 1fr; gap: 12px; }
+    .portal-toolbar { flex-direction: column; align-items: stretch; }
+    .pt-search-wrap { max-width: 100%; }
+}
+@media (min-width: 769px) and (max-width: 1024px) {
+    .dataset-grid { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+    .portal-section { padding: 24px 20px 0; }
+}
+</style>
+{% endblock %}
+
 {% block content %}
-
 <section class="portal-section">
-    <div class="portal-container">
+<div class="portal-container">
 
-        <div class="portal-header">
-            <h2>📊 Portal Data WebGIS</h2>
-            <p class="portal-subtitle">
-                Kumpulan dataset spasial dan non-spasial yang digunakan dalam sistem WebGIS
-            </p>
+  <!-- Hero Header -->
+  <div class="portal-hero">
+    <div class="portal-hero-inner">
+      <div class="portal-hero-label">📊 Data Portal AQUAVISION</div>
+      <h2>Dataset Spasial <em>Desa Wonotoro</em></h2>
+      <p>Dataset berbasis survei lapangan dan citra satelit — tersedia dalam format CSV, GeoJSON, KML, dan Shapefile untuk analisis GIS lanjutan.</p>
+      <div class="portal-hero-stats">
+        <div class="phs">
+          <span class="phs-num">{{ datasets|length }}</span>
+          <span class="phs-label">Dataset Tersedia</span>
         </div>
-
-        <div class="portal-toolbar">
-            <form method="get" class="search-form">
-                <input type="text" name="q"
-                    placeholder="Cari dataset..."
-                    value="{{ query|default:'' }}">
-                <button type="submit">Cari</button>
-            </form>
-
-            <div class="dataset-summary">
-                <span class="summary-badge">
-                    Total Dataset: {{ datasets|length }}
-                </span>
-            </div>
+        <div class="phs">
+          <span class="phs-num">4</span>
+          <span class="phs-label">Format Ekspor</span>
         </div>
-
-        {% if datasets %}
-        <div class="dataset-grid">
-            {% for d in datasets %}
-            <div class="dataset-card">
-
-                <div class="dataset-card-header">
-                    <h3>{{ d.name }}</h3>
-                    <span class="dataset-badge">
-                        {{ d.count }} data
-                    </span>
-                </div>
-
-                <p class="dataset-description">
-                    {{ d.description }}
-                </p>
-
-                <div class="dataset-meta">
-                    <div><strong>Records:</strong> {{ d.count }}</div>
-                </div>
-
-                <div class="dataset-actions">
-                    <a href="{% url 'dataset_detail' d.slug %}">
-                        <button class="btn-primary">Lihat Dataset</button>
-                    </a>
-                </div>
-
-            </div>
-            {% endfor %}
+        <div class="phs">
+          <span class="phs-num">WGS84</span>
+          <span class="phs-label">Sistem Koordinat</span>
         </div>
-        {% else %}
-            <div class="empty-state">
-                <h4>Tidak ada dataset ditemukan</h4>
-                <p>Coba gunakan kata kunci pencarian yang berbeda.</p>
-            </div>
-        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="portal-toolbar">
+    <form method="get" style="display:flex;gap:8px;flex:1;min-width:0;max-width:400px;">
+      <div class="pt-search-wrap">
+        <span class="pt-search-icon">🔍</span>
+        <input class="pt-search-input" type="text" name="q"
+          placeholder="Cari dataset..."
+          value="{{ query|default:'' }}">
+      </div>
+      <button type="submit" class="pt-submit">Cari</button>
+    </form>
+    <span class="portal-count-badge">📁 {{ datasets|length }} dataset</span>
+  </div>
+
+  <!-- Dataset Grid -->
+  {% if datasets %}
+  <div class="dataset-grid">
+    {% for d in datasets %}
+    <div class="dataset-card">
+
+      <div class="dc-top">
+        <div class="dc-icon {% if d.slug == 'sumberair' %}water{% elif d.slug == 'pipa' %}pipe{% elif d.slug == 'reservoir' %}tank{% elif d.slug == 'recharge' %}ground{% elif d.slug == 'catchment' %}flow{% elif d.slug == 'fasilitas' %}tourism{% elif d.slug == 'permukiman' %}settle{% else %}admin{% endif %}">
+          {% if d.slug == 'sumberair' %}💧
+          {% elif d.slug == 'pipa' %}🔧
+          {% elif d.slug == 'reservoir' %}🏗️
+          {% elif d.slug == 'recharge' %}🌊
+          {% elif d.slug == 'catchment' %}🌧️
+          {% elif d.slug == 'fasilitas' %}🏨
+          {% elif d.slug == 'permukiman' %}🏘️
+          {% else %}🗺️
+          {% endif %}
+        </div>
+        <div class="dc-meta">
+          <div class="dc-name">{{ d.name }}</div>
+          <span class="dc-type {% if d.slug == 'catchment' or d.slug == 'recharge' %}raster{% elif d.slug == 'permukiman' %}tabular{% else %}vektor{% endif %}">
+            {% if d.slug == 'catchment' or d.slug == 'recharge' %}Raster
+            {% elif d.slug == 'permukiman' %}Tabular
+            {% else %}Vektor
+            {% endif %}
+          </span>
+        </div>
+      </div>
+
+      <p class="dc-desc">{{ d.description }}</p>
+
+      <div class="dc-stats">
+        <div class="dc-records">
+          <span class="dc-records-num">{{ d.count }}</span>
+          <span class="dc-records-label">&nbsp;records</span>
+        </div>
+        <div class="dc-formats">
+          <span class="dc-fmt">CSV</span>
+          <span class="dc-fmt">GeoJSON</span>
+          <span class="dc-fmt">KML</span>
+        </div>
+      </div>
+
+      <div class="dc-foot">
+        <a href="{% url 'dataset_detail' d.slug %}" class="dc-btn">Lihat &amp; Unduh →</a>
+      </div>
 
     </div>
-</section>
+    {% endfor %}
+  </div>
 
+  {% else %}
+  <div class="dp-empty">
+    <div class="dp-empty-icon">🔎</div>
+    <h4>Tidak ada dataset ditemukan</h4>
+    <p>Coba gunakan kata kunci yang berbeda atau kosongkan pencarian.</p>
+  </div>
+  {% endif %}
+
+</div>
+</section>
 {% endblock %}
