@@ -3,8 +3,12 @@
 {% block title %}Dashboard — AQUAVISION{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@0.9.8/dist/driver.min.css">
+<!-- Preconnect ke CDN untuk mempercepat koneksi awal -->
+<link rel="preconnect" href="https://unpkg.com" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<!-- Leaflet CSS: critical untuk peta, tetap di head -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="anonymous"/>
+<!-- driver.js CSS dihapus dari head (render-blocking); diinjeksi dinamis oleh tour.js saat tour dimulai -->
 <style>
 /* Driver.js v0.9.8 tour overrides.
    Overlay z-index=100002, Stage=100003, HighlightedElement=100004, Popover=1000000000.
@@ -960,9 +964,10 @@
 
 
 {% block extra_js %}
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-<script src="https://unpkg.com/georaster@1.6.0"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="anonymous"></script>
+<!-- html2canvas hanya dipakai saat ekspor peta; async aman karena tidak ada script lain yang bergantung padanya saat load -->
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" async crossorigin="anonymous"></script>
+<script src="https://unpkg.com/georaster@1.6.0" crossorigin="anonymous"></script>
 
 <!-- Kirim role admin ke script.js -->
 <script id="user-role" type="application/json">

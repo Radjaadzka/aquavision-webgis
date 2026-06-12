@@ -138,6 +138,7 @@ DATABASES = {
         'PASSWORD': os.environ.get('DB_PASSWORD', ''),
         'HOST':     os.environ.get('DB_HOST',     'localhost'),
         'PORT':     os.environ.get('DB_PORT',     '5432'),
+        'CONN_MAX_AGE': int(os.environ.get('DB_CONN_MAX_AGE', '60')),
     }
 }
 
@@ -254,9 +255,13 @@ CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
         'LOCATION': 'aquavision-cache',
-        'TIMEOUT': 60,
+        'TIMEOUT': 300,
     }
 }
+
+# Session via cache-then-DB: baca dari cache, tulis ke cache + DB.
+# Aman untuk multi-worker: sesi tetap valid setelah restart (DB sebagai sumber kebenaran).
+SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
 
 # ================================================================
 # DEFAULT AUTO FIELD

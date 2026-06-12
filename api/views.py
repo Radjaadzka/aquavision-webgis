@@ -712,8 +712,12 @@ def data_list(request):
     if query:
         datasets = [d for d in datasets if query.lower() in d['name'].lower()]
 
+    _counts = cache.get('dataset_counts')
+    if _counts is None:
+        _counts = {d['slug']: d['model'].objects.count() for d in ALL_DATASETS}
+        cache.set('dataset_counts', _counts, 300)
     for d in datasets:
-        d['count'] = d['model'].objects.count()
+        d['count'] = _counts.get(d['slug'], 0)
 
     return render(request, 'data_list.html', {
         'datasets': datasets,

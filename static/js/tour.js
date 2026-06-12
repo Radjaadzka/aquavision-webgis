@@ -447,13 +447,32 @@
         }
     }
 
+    /* ── Lazy-load driver.js CSS (removed from <head> to avoid render-blocking) ── */
+
+    var _driverCssLoaded = false;
+    function ensureDriverCss(callback) {
+        if (_driverCssLoaded) { callback(); return; }
+        if (document.querySelector('link[href*="driver.min.css"]')) {
+            _driverCssLoaded = true; callback(); return;
+        }
+        var link = document.createElement('link');
+        link.rel  = 'stylesheet';
+        link.href = 'https://cdn.jsdelivr.net/npm/driver.js@0.9.8/dist/driver.min.css';
+        link.crossOrigin = 'anonymous';
+        link.onload = function () { _driverCssLoaded = true; callback(); };
+        link.onerror = function () { _driverCssLoaded = true; callback(); }; // still try tour
+        document.head.appendChild(link);
+    }
+
     /* ── Public API ───────────────────────────────────────────────── */
 
     window.startTour = function () {
-        cleanupDriverArtifacts();
-        waitForElement('#sidebar', function () {
-            setTimeout(runTour, 300);
-        }, 5000);
+        ensureDriverCss(function () {
+            cleanupDriverArtifacts();
+            waitForElement('#sidebar', function () {
+                setTimeout(runTour, 300);
+            }, 5000);
+        });
     };
 
     // Always restarts the tour, regardless of localStorage state.
@@ -482,10 +501,12 @@
             console.log('[AQUAVISION Tour] waiting for Hero Dashboard to be dismissed.');
             return;
         }
-        waitForElement('#sidebar', function () {
-            console.log('[AQUAVISION Tour] auto-start triggered');
-            setTimeout(runTour, 600);
-        }, 5000);
+        ensureDriverCss(function () {
+            waitForElement('#sidebar', function () {
+                console.log('[AQUAVISION Tour] auto-start triggered');
+                setTimeout(runTour, 600);
+            }, 5000);
+        });
     }
 
     function autoStart() {
