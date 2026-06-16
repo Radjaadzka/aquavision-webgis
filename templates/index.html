@@ -3,10 +3,12 @@
 {% block title %}Dashboard — AQUAVISION{% endblock %}
 
 {% block extra_css %}
-<!-- Preconnect ke CDN & OSM tile server untuk mempercepat koneksi awal -->
+<!-- Preconnect ke CDN & OSM tile server (a/b/c subdomain sharding: 18 koneksi paralel) -->
 <link rel="preconnect" href="https://unpkg.com" crossorigin>
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-<link rel="preconnect" href="https://tile.openstreetmap.org">
+<link rel="preconnect" href="https://a.tile.openstreetmap.org">
+<link rel="preconnect" href="https://b.tile.openstreetmap.org">
+<link rel="preconnect" href="https://c.tile.openstreetmap.org">
 <!-- Leaflet CSS: critical untuk peta, tetap di head -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <!-- driver.js CSS dihapus dari head (render-blocking); diinjeksi dinamis oleh tour.js saat tour dimulai -->
