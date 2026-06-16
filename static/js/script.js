@@ -25,7 +25,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     L.tileLayer(
         "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-        { subdomains: 'abc', maxZoom: 19, attribution: "&copy; OpenStreetMap contributors" }
+        { subdomains: 'abc', maxZoom: 19, attribution: "&copy; OpenStreetMap contributors",
+          keepBuffer: 1, updateWhenIdle: true }
     ).addTo(map);
 
 

@@ -729,12 +729,18 @@
         </div>
 
         <!-- Mata angin -->
-        <img
-            src="{% static 'images/arah_mata_angin.png' %}"
-            id="northArrow"
-            class="north-arrow"
-            alt="Mata angin"
-        >
+        <picture>
+            <source srcset="{% static 'images/arah_mata_angin.webp' %}" type="image/webp">
+            <img
+                src="{% static 'images/arah_mata_angin.png' %}"
+                id="northArrow"
+                class="north-arrow"
+                alt="Mata angin"
+                width="120"
+                height="120"
+                decoding="async"
+            >
+        </picture>
 
         <!-- Info bar bawah -->
         <div class="map-info-bar">

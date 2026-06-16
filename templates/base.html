@@ -6,10 +6,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}AQUAVISION{% endblock %}</title>
 
-    <!-- Google Fonts: preconnect + stylesheet langsung (menggantikan @import di style.css yang render-blocking) -->
+    <!-- Google Fonts: async non-render-blocking (preload + onload trick) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" as="style"
+          href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,300;1,9..144,400&family=Inter:wght@300;400;500;600&display=swap"
+          onload="this.onload=null;this.rel='stylesheet'">
+    <noscript>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,300;1,9..144,400&family=Inter:wght@300;400;500;600&display=swap">
+    </noscript>
 
     <link rel="icon" type="image/png" href="{% static 'images/logo_webgis.png' %}">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
@@ -49,7 +54,7 @@ document.querySelectorAll('a[href^="#"]').forEach(function(a) {
 
         <!-- LEFT: Logo -->
         <a href="/" class="nav-logo">
-            <img src="{% static 'images/logo_webgis.png' %}" alt="Logo" class="nav-logo-img">
+            <img src="{% static 'images/logo_webgis.png' %}" alt="Logo" class="nav-logo-img" width="317" height="201">
             <span class="nav-logo-text">AQUAVISION</span>
         </a>
 
@@ -94,7 +99,7 @@ document.querySelectorAll('a[href^="#"]').forEach(function(a) {
 <div class="nav-drawer-overlay" id="navDrawerOverlay"></div>
 <div class="nav-drawer" id="navDrawer" role="dialog" aria-modal="true" aria-label="Menu navigasi">
     <div class="nav-drawer-head">
-        <img src="{% static 'images/logo_webgis.png' %}" alt="Logo" class="nav-logo-img">
+        <img src="{% static 'images/logo_webgis.png' %}" alt="Logo" class="nav-logo-img" width="317" height="201">
         <span class="nav-logo-text" style="color:white; font-size:14px; font-weight:600;">AQUAVISION</span>
         <button class="nav-drawer-close" id="navDrawerClose" aria-label="Tutup menu">✕</button>
     </div>
@@ -152,7 +157,7 @@ document.querySelectorAll('a[href^="#"]').forEach(function(a) {
         <!-- Kolom 1 — Tentang AQUAVISION -->
         <div class="footer-col">
             <div class="footer-brand">
-                <img src="{% static 'images/logo_itb.png' %}" alt="Logo ITB" class="footer-logo-itb" loading="lazy">
+                <img src="{% static 'images/logo_itb.png' %}" alt="Logo ITB" class="footer-logo-itb" loading="lazy" width="1600" height="1200">
                 <span class="footer-brand-name">AQUAVISION</span>
             </div>
             <p class="footer-about-text">Platform informasi sumber daya air berbasis WebGIS untuk mendukung pengelolaan sumber daya air dan pengambilan keputusan berbasis data di Desa Wonotoro, Kawasan Bromo Tengger Semeru.</p>
