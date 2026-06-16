@@ -6,15 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}AQUAVISION{% endblock %}</title>
 
+    <!-- Google Fonts: preconnect + stylesheet langsung (menggantikan @import di style.css yang render-blocking) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-    <!-- Prefetch halaman navigasi yang paling sering dikunjungi -->
-    <link rel="prefetch" href="/tentang/">
-    <link rel="prefetch" href="/bantuan/">
-    {% if user.is_authenticated %}
-    <link rel="prefetch" href="/data/">
-    {% endif %}
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,300;1,9..144,400&family=Inter:wght@300;400;500;600&display=swap">
 
     <link rel="icon" type="image/png" href="{% static 'images/logo_webgis.png' %}">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">

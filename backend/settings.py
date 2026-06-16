@@ -248,19 +248,23 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 52428800   # 50 MB
 FILE_UPLOAD_MAX_MEMORY_SIZE = 52428800   # 50 MB
 
 # ================================================================
-# CACHE — in-process memory cache; invalidated on server restart
+# CACHE — file-based cache (shared antar Gunicorn workers, persists restart)
+# Menggantikan LocMemCache yang per-process: mengurangi session DB lookup
 # ================================================================
 
 CACHES = {
     'default': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        'LOCATION': 'aquavision-cache',
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': os.path.join(BASE_DIR, 'cache'),
         'TIMEOUT': 300,
+        'OPTIONS': {
+            'MAX_ENTRIES': 2000,
+        }
     }
 }
 
-# Session via cache-then-DB: baca dari cache, tulis ke cache + DB.
-# Aman untuk multi-worker: sesi tetap valid setelah restart (DB sebagai sumber kebenaran).
+# Session via cache-then-DB: baca dari file cache (shared), tulis ke cache + DB.
+# File cache dibagi semua worker -> mengurangi session DB read per request.
 SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
 
 # ================================================================

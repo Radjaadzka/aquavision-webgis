@@ -18,8 +18,8 @@ document.addEventListener("DOMContentLoaded", function () {
     // ================================================================
 
     const map = L.map("map", {
-        center: [-7.9, 112.95],
-        zoom: 12,
+        center: [-7.88, 112.98],
+        zoom: 14,
         zoomControl: false
     });
 
@@ -27,11 +27,6 @@ document.addEventListener("DOMContentLoaded", function () {
         "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
         { maxZoom: 19, attribution: "&copy; OpenStreetMap contributors" }
     ).addTo(map);
-
-    // Gentle welcome zoom into Desa Wonotoro on every page load.
-    setTimeout(function () {
-        map.flyTo([-7.88, 112.98], 14, { duration: 1.5, easeLinearity: 0.4 });
-    }, 1200);
 
 
     // ================================================================
@@ -141,6 +136,46 @@ document.addEventListener("DOMContentLoaded", function () {
     var debitGeoJSONLayers = {};
     var debitGeoRasters    = {};
     var activeDebitBulan   = null;
+
+    // ── Lazy-load helpers ──────────────────────────────────────────
+    // georaster: dimuat hanya saat layer Debit Puncak pertama kali diaktifkan
+    var _georasterLoading = false;
+    var _georasterQueue   = [];
+    function withGeoraster(cb) {
+        if (typeof parseGeoraster !== "undefined") { cb(); return; }
+        _georasterQueue.push(cb);
+        if (_georasterLoading) return;
+        _georasterLoading = true;
+        var s = document.createElement("script");
+        s.src = "https://unpkg.com/georaster@1.6.0";
+        s.onload = function () {
+            var q = _georasterQueue.splice(0);
+            q.forEach(function (fn) { fn(); });
+        };
+        document.head.appendChild(s);
+    }
+
+    // html2canvas: dimuat hanya saat tombol Ekspor Peta diklik
+    var _h2cLoading  = false;
+    var _h2cQueue    = [];
+    function withHtml2canvas(cb) {
+        if (typeof html2canvas !== "undefined") { cb(); return; }
+        _h2cQueue.push(cb);
+        if (_h2cLoading) return;
+        _h2cLoading = true;
+        var s = document.createElement("script");
+        s.src = "https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js";
+        s.onload = function () {
+            var q = _h2cQueue.splice(0);
+            q.forEach(function (fn) { fn(); });
+        };
+        s.onerror = function () {
+            _h2cLoading = false;
+            _h2cQueue   = [];
+            window.print();
+        };
+        document.head.appendChild(s);
+    }
 
 
     // ================================================================
@@ -361,17 +396,19 @@ document.addEventListener("DOMContentLoaded", function () {
             })
             .catch(function (err) { console.log("Debit GeoJSON error:", kode, err); });
 
-        // GeoRaster TIFF (untuk tooltip nilai piksel)
-        if (typeof parseGeoraster !== "undefined") {
-            fetch("/static/data/DebitPuncak_" + kode + ".tif")
-                .then(function (r) { return r.arrayBuffer(); })
-                .then(function (buf) {
-                    parseGeoraster(buf).then(function (georaster) {
-                        debitGeoRasters[kode] = georaster;
-                        console.log("Debit TIFF loaded:", kode);
-                    });
-                })
-                .catch(function (err) { console.log("Debit TIFF error:", kode, err); });
+        // GeoRaster TIFF — lazy-load georaster library lalu parse (memory cache per bulan)
+        if (!debitGeoRasters[kode]) {
+            withGeoraster(function () {
+                fetch("/static/data/DebitPuncak_" + kode + ".tif")
+                    .then(function (r) { return r.arrayBuffer(); })
+                    .then(function (buf) {
+                        parseGeoraster(buf).then(function (georaster) {
+                            debitGeoRasters[kode] = georaster;
+                            console.log("Debit TIFF loaded:", kode);
+                        });
+                    })
+                    .catch(function (err) { console.log("Debit TIFF error:", kode, err); });
+            });
         }
     }
 
@@ -1282,7 +1319,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     document.addEventListener("click", function (e) {
         if (e.target.id === "btnPrintMap" || e.target.closest("#btnPrintMap")) {
-            if (typeof html2canvas !== "undefined") {
+            showNotif("Memuat", "Menyiapkan ekspor peta...", "warning");
+            withHtml2canvas(function () {
                 html2canvas(document.getElementById("map"), { useCORS: true, allowTaint: true })
                     .then(function (canvas) {
                         var link      = document.createElement("a");
@@ -1290,9 +1328,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         link.href     = canvas.toDataURL("image/png");
                         link.click();
                     });
-            } else {
-                window.print();
-            }
+            });
         }
     });
 
