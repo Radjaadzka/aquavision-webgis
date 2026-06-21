@@ -944,23 +944,6 @@ a   { text-decoration: none; color: inherit; }
 .accordion-body       { display: none; padding: 0 9px 9px; }
 .accordion-body.open  { display: block; }
 
-/* Stats grid */
-.stats-compact {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 4px;
-}
-.stat-mini {
-    text-align: center;
-    padding: 10px 3px;
-    border-radius: 8px;
-    background: rgba(255,255,255,.05);
-    border: 1px solid rgba(255,255,255,.09);
-}
-.stat-mini-icon  { font-size: 24px; line-height: 1; margin-bottom: 4px; }
-.stat-mini-num   { font-size: 16px; font-weight: 700; color: #7EC8FD; margin: 2px 0; }
-.stat-mini-label { font-size: 10px; color: rgba(255,255,255,.45); }
-
 /* Debit boxes */
 .debit-info {
     display: grid;

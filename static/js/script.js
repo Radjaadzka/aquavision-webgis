@@ -1013,66 +1013,6 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
 
-    // ================================================================
-    // 21. GAUGE CHART NERACA AIR
-    // ================================================================
-
-    function renderChart(supply, demand, apiPersen) {
-        var CX = 130, CY = 130, R = 100, SA = Math.PI;
-        var svg = document.getElementById("gaugeSVG");
-        if (!svg) return;
-
-        // Use server-provided persen to match status label exactly.
-        // Fall back to local calculation only if not provided.
-        var persen = (apiPersen !== undefined)
-            ? apiPersen
-            : (supply > 0 ? (demand / supply) * 100 : 0);
-
-        // Cap gauge fill arc at 100% visually, but use real persen for color/label
-        var displayPct = Math.min(persen, 100);
-
-        function polar(a, r)      { return [CX + r * Math.cos(a), CY + r * Math.sin(a)]; }
-        function arcPath(sA, eA, r) {
-            var s = polar(sA, r), e = polar(eA, r);
-            var large = (eA - sA) > Math.PI ? 1 : 0;
-            return "M " + s[0] + " " + s[1] + " A " + r + " " + r + " 0 " + large + " 1 " + e[0] + " " + e[1];
-        }
-
-        var color     = getStatusColor(persen);
-        var fillAngle = SA + (displayPct / 100) * Math.PI;
-
-        svg.querySelector("#arcBg").setAttribute("d",            arcPath(SA, 2 * Math.PI, R));
-        svg.querySelector("#arcBg").setAttribute("stroke",       "rgba(255,255,255,.08)");
-        svg.querySelector("#arcBg").setAttribute("stroke-width", "14");
-
-        svg.querySelector("#arcFill").setAttribute("d",            arcPath(SA, fillAngle, R));
-        svg.querySelector("#arcFill").setAttribute("stroke",       color);
-        svg.querySelector("#arcFill").setAttribute("stroke-width", "14");
-
-        var tip    = polar(fillAngle, R - 20);
-        var needle = svg.querySelector("#gaugeNeedle");
-        needle.setAttribute("x2",     tip[0]);
-        needle.setAttribute("y2",     tip[1]);
-        needle.setAttribute("stroke", color);
-
-        svg.querySelector("#needleHub").setAttribute("fill", color);
-        svg.querySelector("#pctText").textContent = displayPct.toFixed(1) + "%";
-        svg.querySelector("#pctText").setAttribute("fill", color);
-        svg.querySelector("#statusText").textContent = getStatusLabel(persen);
-
-        var sisa = supply - demand;
-        var cs   = document.getElementById("cardSupply");
-        var cd   = document.getElementById("cardDemand");
-        var cr   = document.getElementById("cardSisa");
-
-        if (cs) cs.textContent = supply.toLocaleString("id-ID");
-        if (cd) cd.textContent = demand.toLocaleString("id-ID");
-        if (cr) {
-            cr.textContent = (sisa < 0 ? '' : '') + sisa.toLocaleString("id-ID");
-            cr.style.color = sisa >= 0 ? color : '#F87171';
-        }
-    }
-
     function loadDebit() {
         fetch("/api/informasi-debit/")
             .then(function (r) { return r.json(); })
@@ -1085,7 +1025,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 document.getElementById("statusPersen").textContent = Math.min(Math.round(persen), 100) + "% terpakai";
                 document.getElementById("statusDot").style.background = getStatusColor(persen);
                 document.getElementById("statusBar").style.background = getStatusBg(persen);
-                renderChart(data.ketersediaan_m3, data.kebutuhan_m3, persen);
             })
             .catch(function () { console.warn("Informasi debit gagal dimuat."); });
     }
@@ -1114,7 +1053,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 document.getElementById("statusPersen").textContent = Math.min(Math.round(p), 100) + "% terpakai";
                 document.getElementById("statusDot").style.background = getStatusColor(p);
                 document.getElementById("statusBar").style.background = getStatusBg(p);
-                renderChart(data.ketersediaan_m3, data.kebutuhan_m3, p);
 
                 // Show inline result in simulasi panel
                 var resultEl = document.getElementById('simResult');

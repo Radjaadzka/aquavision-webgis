@@ -624,31 +624,6 @@
                     </div>
                 </div>
 
-                <!-- Grafik Ketersediaan Air -->
-                <div class="card">
-                    <div class="accordion-header" id="chartHeader" data-target="chartBody">
-                        <h3>Grafik Ketersediaan Air</h3>
-                        <span class="accordion-arrow">▼</span>
-                    </div>
-                    <div class="accordion-body" id="chartBody">
-                        <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:4px; margin:6px 0 4px;">
-                            <div class="stat-mini"><div class="stat-mini-label" style="color:rgba(255,255,255,.3);">Supply</div><div class="stat-mini-num" id="cardSupply"  style="font-size:13px;">—</div></div>
-                            <div class="stat-mini"><div class="stat-mini-label" style="color:rgba(255,255,255,.3);">Demand</div><div class="stat-mini-num" id="cardDemand"  style="font-size:13px;">—</div></div>
-                            <div class="stat-mini"><div class="stat-mini-label" style="color:rgba(255,255,255,.3);">Sisa</div>  <div class="stat-mini-num" id="cardSisa"    style="font-size:13px;">—</div></div>
-                        </div>
-                        <svg id="gaugeSVG" viewBox="0 0 260 160" width="100%" style="display:block; margin:auto;">
-                            <path   id="arcBg"       fill="none" stroke-linecap="round"/>
-                            <path   id="arcFill"     fill="none" stroke-linecap="round"/>
-                            <line   id="gaugeNeedle" x1="130" y1="130" x2="130" y2="130" stroke-width="3" stroke-linecap="round"/>
-                            <circle id="needleHub"   cx="130" cy="130" r="6"/>
-                            <text   id="pctText"     x="130" y="118" text-anchor="middle" font-size="32" font-weight="400" font-family="Inter,sans-serif"></text>
-                            <text   id="statusText"  x="130" y="136" text-anchor="middle" font-size="11"  fill="rgba(255,255,255,.4)" font-family="Inter,sans-serif"></text>
-                            <text x="18"  y="150" text-anchor="middle" font-size="10" fill="rgba(255,255,255,.2)" font-family="Inter,sans-serif">0%</text>
-                            <text x="242" y="150" text-anchor="middle" font-size="10" fill="rgba(255,255,255,.2)" font-family="Inter,sans-serif">100%</text>
-                        </svg>
-                    </div>
-                </div>
-
                 {% if is_admin %}
                 <!-- Status Sistem — admin/superadmin only -->
                 <div class="card">
@@ -1053,7 +1028,7 @@
         })
         .catch(function() {
             // Remove skeleton on error so UI doesn't stay animated
-            document.querySelectorAll('.stat-mini-num.skel').forEach(function(el) {
+            document.querySelectorAll('.dc-num.skel').forEach(function(el) {
                 el.classList.remove('skel'); el.textContent = '—';
             });
         });

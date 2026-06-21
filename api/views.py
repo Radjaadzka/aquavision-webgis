@@ -51,6 +51,15 @@ from .models import (
     Reservoir,
     SumberAir,
 )
+from .ai_knowledge import (
+    FAQ_ENTRIES,
+    GENERIC_FALLBACK_ENTRY,
+    check_critical_disambiguation,
+    classify_question,
+    lookup_glossary_term,
+    match_faq,
+    normalize_aliases,
+)
 
 # ================================================================
 # CONSTANTS
@@ -367,14 +376,34 @@ def create_reservoir(request):
 
 @login_required
 def edit_data(request, model_name, pk):
-    if request.method != 'PUT':
-        return JsonResponse({'error': 'Method not allowed'}, status=405)
     if not is_admin_user(request.user):
         return JsonResponse({'error': 'Unauthorized'}, status=403)
 
     model = MODEL_MAP.get(model_name)
     if not model:
         return JsonResponse({'error': 'Dataset tidak ditemukan'}, status=404)
+
+    # GET: kembalikan nilai field saat ini untuk pre-populate form edit
+    if request.method == 'GET':
+        try:
+            obj       = model.objects.get(pk=pk)
+            result    = {}
+            geo_field = get_geo_field(model)
+            for f in model._meta.fields:
+                if hasattr(f, 'geom_type'):
+                    continue
+                result[f.name] = getattr(obj, f.name)
+            if geo_field:
+                geom = getattr(obj, geo_field, None)
+                if geom and geom.geom_type == 'Point':
+                    ll, _ = latlon_from_geom(geom)
+                    result.update(ll)
+            return JsonResponse(result)
+        except model.DoesNotExist:
+            return JsonResponse({'error': 'Data tidak ditemukan'}, status=404)
+
+    if request.method != 'PUT':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
 
     try:
         obj  = model.objects.get(pk=pk)
@@ -1052,56 +1081,9 @@ def feedback_list(request):
 # ================================================================
 
 # ── AI FAQ responder (rule-based, no external API needed) ────────
-_FAQ = [
-    # Format: (keywords_tuple, answer_string)
-    (('aquavision', 'apa itu', 'tentang', 'platform', 'sistem'),
-     "AQUAVISION adalah platform WebGIS (Web Geographic Information System) untuk pemantauan dan pengelolaan sumber daya air di Desa Wonotoro, Kecamatan Sukapura, Kabupaten Probolinggo. Platform ini dikembangkan sebagai Capstone Design Project Teknik Geodesi dan Geomatika ITB 2026."),
-
-    (('dashboard', 'peta', 'cara buka', 'cara akses', 'bagaimana masuk'),
-     "Dashboard AQUAVISION dapat diakses dari menu utama atau melalui tombol 'Buka Dashboard'. Dashboard menampilkan peta interaktif dengan berbagai lapisan data spasial sumber daya air Desa Wonotoro."),
-
-    (('layer', 'lapisan', 'daftar layer', 'aktifkan layer', 'tampilkan layer'),
-     "Untuk mengelola layer, klik tombol 'Daftar Layer' di sidebar kiri Dashboard. Anda dapat mengaktifkan atau menonaktifkan lapisan data seperti Potensi Air Tanah, Debit Puncak Aliran, Infrastruktur Air, dan lainnya secara bersamaan."),
-
-    (('potensi air tanah', 'recharge', 'resapan', 'zonasi', 'ahp'),
-     "Layer Daerah Potensi Air Tanah menampilkan zonasi resapan air tanah dengan resolusi 10m × 10m. Data dihasilkan menggunakan metode AHP (Analytical Hierarchy Process) berdasarkan tutupan lahan, kemiringan lereng, jenis tanah, dan curah hujan. Warna menunjukkan tingkat potensi dari rendah hingga sangat tinggi."),
-
-    (('debit puncak', 'catchment', 'aliran', 'curah hujan', 'bulan'),
-     "Layer Debit Puncak Aliran menampilkan peta debit puncak (m³/s) dengan resolusi 30m × 30m. Data tersedia untuk 12 bulan (Januari–Desember). Pilih bulan dari dropdown di panel layer, kemudian klik area pada peta untuk membaca nilai debit di lokasi tersebut."),
-
-    (('infrastruktur', 'sumber air', 'pipa', 'tandon', 'reservoir', 'fasilitas'),
-     "Layer Infrastruktur Air menampilkan lokasi sumber mata air, jaringan pipa distribusi, tandon air, permukiman, dan fasilitas wisata (hotel, restoran, jasa). Klik titik atau garis di peta untuk melihat atribut detail setiap objek."),
-
-    (('neraca air', 'ketersediaan', 'kebutuhan air', 'status aman', 'status kritis', 'waspada'),
-     "Ketersediaan Air membandingkan total ketersediaan air dari sumber dengan kebutuhan harian. Status AMAN berarti pemanfaatan di bawah 50% dari ketersediaan, WASPADA berarti 50–80%, dan KRITIS berarti 80% ke atas. Data diperbarui secara berkala dari sistem AQUAVISION."),
-
-    (('simulasi', 'skenario', 'proyeksi', 'hitung kebutuhan', 'penduduk', 'hotel'),
-     "Fitur Simulasi Skenario memungkinkan Anda memasukkan parameter hipotetis — jumlah penduduk, kamar hotel, kursi restoran, atau luas pertanian — untuk menghitung proyeksi kebutuhan air. Berguna untuk perencanaan pengembangan wisata dan infrastruktur."),
-
-    (('data portal', 'unduh', 'download', 'ekspor', 'csv', 'geojson', 'shapefile', 'kml'),
-     "Data Portal AQUAVISION menyediakan akses ke seluruh dataset spasial. Anda dapat mengunduh data dalam format CSV, GeoJSON, KML, atau Shapefile untuk analisis lanjutan di perangkat lunak GIS desktop atau spreadsheet. Kunjungi menu 'Data Portal' di navbar."),
-
-    (('akun', 'login', 'daftar', 'register', 'password', 'lupa password', 'username'),
-     "Untuk mengakses fitur lengkap AQUAVISION, buat akun melalui halaman Daftar. Gunakan username dan password yang Anda buat untuk masuk. Jika lupa password, hubungi admin AQUAVISION melalui pesan ini."),
-
-    (('bantuan', 'faq', 'panduan', 'cara menggunakan', 'tutorial', 'petunjuk'),
-     "Pusat Bantuan AQUAVISION tersedia di menu navbar dan sidebar. Di sana terdapat FAQ lengkap dalam 6 kategori: Tentang AQUAVISION, Dashboard, Data & Layer, Ketersediaan Air, Akun & Akses, dan Teknis. Gunakan fitur pencarian untuk menemukan jawaban dengan cepat."),
-
-    (('wonotoro', 'desa', 'lokasi', 'bromo', 'probolinggo', 'sukapura'),
-     "Desa Wonotoro terletak di Kecamatan Sukapura, Kabupaten Probolinggo, Jawa Timur. Desa ini berada di kawasan penyangga KSPN (Kawasan Strategis Pariwisata Nasional) Bromo Tengger Semeru, koordinat sekitar 7°53' LS dan 112°59' BT (WGS84/EPSG:4326)."),
-
-    (('health', 'status sistem', 'sistem online', 'database status', 'layer status'),
-     "Panel Status Sistem di sidebar Dashboard menampilkan kondisi komponen utama AQUAVISION secara langsung: koneksi data, ketersediaan layer GIS, dan penyimpanan file. Status hijau berarti semua berjalan normal. Jika ada komponen berwarna merah, silakan hubungi tim pengelola melalui menu Hubungi Admin."),
-
-    (('riwayat download', 'log download', 'siapa yang download', 'rekam jejak unduh'),
-     "Setiap unduhan data di AQUAVISION dicatat secara otomatis. Tim pengelola dapat memantau riwayat unduhan untuk menjaga keamanan dan penggunaan data. Jika Anda memiliki pertanyaan tentang data yang pernah diunduh, silakan hubungi tim pengelola melalui menu Hubungi Admin."),
-
-    (('panduan dashboard', 'tour', 'lihat panduan', 'cara mulai', 'onboarding', 'mulai dari mana'),
-     "AQUAVISION menyediakan “Panduan Dashboard” interaktif yang dapat diakses melalui tombol “ⓘ Lihat Panduan Dashboard” di bagian bawah panel kiri. Panduan ini akan menjelaskan semua fitur utama satu per satu. Klik tombol tersebut untuk memulai atau mengulang panduan kapan saja."),
-
-    (('jumlah sungai', 'berapa sungai', 'jaringan sungai', 'daerah aliran sungai', 'segmen sungai', 'sungai'),
-     "AQUAVISION memetakan jaringan Daerah Aliran Sungai (DAS) di Desa Wonotoro pada layer 'Sungai'. Aktifkan layer tersebut di Dashboard untuk melihat seluruh segmen sungai secara interaktif beserta atribut tipe, kelas, dan DAS-nya."),
-]
+# Knowledge base (FAQ, alias, glosarium, metadata layer) dipindahkan & diperluas
+# ke api/ai_knowledge.py — lihat modul tersebut untuk sumber & detail isinya.
+_FAQ = FAQ_ENTRIES
 
 
 def _idnum(value):
@@ -1142,37 +1124,54 @@ def _dynamic_ai_answer(intent):
 
 def _ai_respond(message):
     """
-    Jawab pertanyaan berdasarkan data aktual sistem (intent dinamis) atau FAQ
-    rule-based. Kembalikan string jawaban jika yakin, atau None jika tidak tahu
-    — AI tidak boleh berhalusinasi/mengarang jawaban.
+    Jawab pertanyaan berdasarkan data aktual sistem (intent dinamis), FAQ
+    rule-based, atau glosarium. Kembalikan string jawaban jika yakin, atau
+    None jika tidak tahu — AI tidak boleh berhalusinasi/mengarang jawaban.
+
+    Urutan tier (lihat api/ai_knowledge.py untuk detail tiap fungsi):
+      0. classify_question()            -> Kategori B (bug/data error/akun) selalu di-skip ke eskalasi
+      1. check_critical_disambiguation() -> kasus kritis ("wonotoro" sbg konteks, bukan topik)
+      2. _DYNAMIC_INTENTS                -> jawaban dihitung langsung dari database
+      3. match_faq(_FAQ)                 -> entri spesifik (lihat aturan confidence di match_faq)
+      4. match_faq([GENERIC_FALLBACK])   -> fallback generik, HANYA jika tidak ada entri spesifik yang cocok
+      5. lookup_glossary_term()          -> definisi istilah teknis, hanya jika istilah = subjek pertanyaan
     """
-    msg_lower = message.lower()
+    if classify_question(message) == 'B':
+        return None
+
+    # Normalisasi alias/typo (cth. "debet puncak" -> "debit puncak") sebelum
+    # matching — hanya menambah kecocokan baru, tidak mengubah istilah yang
+    # sudah dikenali sebelumnya.
+    msg_lower = normalize_aliases(message)
+
+    disambiguated = check_critical_disambiguation(msg_lower)
+    if disambiguated:
+        return disambiguated
 
     # 1) Intent dinamis — jawaban dihitung langsung dari database/data sistem
     for keywords, intent in _DYNAMIC_INTENTS:
         if any(kw in msg_lower for kw in keywords):
             return _dynamic_ai_answer(intent)
 
-    # 2) FAQ rule-based — pilih entri dengan jumlah kata kunci cocok terbanyak;
-    #    jika seri, menangkan kata kunci yang lebih spesifik (lebih panjang)
-    best_score  = 0
-    best_weight = 0
-    best_answer = None
-    for keywords, answer in _FAQ:
-        matched = [kw for kw in keywords if kw in msg_lower]
-        if not matched:
-            continue
-        score  = len(matched)
-        weight = sum(len(kw) for kw in matched)
-        if score > best_score or (score == best_score and weight > best_weight):
-            best_score  = score
-            best_weight = weight
-            best_answer = answer
+    # 2) FAQ rule-based — entri spesifik dulu; fallback generik HANYA jika
+    #    tidak ada entri spesifik yang cukup percaya diri (lihat match_faq)
+    answer = match_faq(msg_lower, _FAQ)
+    if answer:
+        return answer
 
-    # Confident if at least 2 keywords matched, or 1 keyword in a short message (<= 5 words)
-    word_count = len(msg_lower.split())
-    threshold = 1 if word_count <= 5 else 2
-    return best_answer if best_score >= threshold else None
+    answer = match_faq(msg_lower, [GENERIC_FALLBACK_ENTRY])
+    if answer:
+        return answer
+
+    # 3) Glosarium — jawab definisi istilah teknis hanya jika istilah tsb
+    #    adalah subjek pertanyaan ("apa itu X" / "X itu apa"), bukan kata
+    #    apapun yang kebetulan ada di kalimat
+    hit = lookup_glossary_term(msg_lower)
+    if hit:
+        term, definition = hit
+        return f"{term.upper()}: {definition}"
+
+    return None
 
 
 # ── Eskalasi ke Admin: hanya dilakukan setelah konfirmasi eksplisit ─────────

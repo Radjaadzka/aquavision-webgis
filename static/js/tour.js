@@ -28,7 +28,7 @@
 (function () {
     var TOUR_KEY    = 'aquavision_dashboard_tour_completed';
     var TOUR_Z      = '100004';   // Above Driver.js overlay (100002) and stage (100003)
-    var ACCORDION_BODIES = ['statsBody', 'debitBody', 'simBody', 'chartBody'];
+    var ACCORDION_BODIES = ['statsBody', 'debitBody', 'simBody'];
 
     var activeDriver  = null;
     var currentSteps  = [];
