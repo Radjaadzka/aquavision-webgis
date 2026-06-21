@@ -5,6 +5,7 @@ django-filter==25.2
 djangorestframework==3.16.1
 djangorestframework-gis==1.2.0
 GDAL==3.8.4
+google-genai==2.9.0
 gunicorn==26.0.0
 numpy==2.4.4
 packaging==26.2

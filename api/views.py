@@ -56,10 +56,13 @@ from .ai_knowledge import (
     GENERIC_FALLBACK_ENTRY,
     check_critical_disambiguation,
     classify_question,
+    format_db_context_text,
+    get_db_context,
     lookup_glossary_term,
     match_faq,
     normalize_aliases,
 )
+from .ai_gemini import GEMINI_SOURCE_MARKER, ask_gemini, is_configured as gemini_is_configured
 
 # ================================================================
 # CONSTANTS
@@ -1128,13 +1131,18 @@ def _ai_respond(message):
     rule-based, atau glosarium. Kembalikan string jawaban jika yakin, atau
     None jika tidak tahu — AI tidak boleh berhalusinasi/mengarang jawaban.
 
-    Urutan tier (lihat api/ai_knowledge.py untuk detail tiap fungsi):
+    Urutan tier (lihat api/ai_knowledge.py & api/ai_gemini.py untuk detail tiap fungsi):
       0. classify_question()            -> Kategori B (bug/data error/akun) selalu di-skip ke eskalasi
       1. check_critical_disambiguation() -> kasus kritis ("wonotoro" sbg konteks, bukan topik)
       2. _DYNAMIC_INTENTS                -> jawaban dihitung langsung dari database
       3. match_faq(_FAQ)                 -> entri spesifik (lihat aturan confidence di match_faq)
       4. match_faq([GENERIC_FALLBACK])   -> fallback generik, HANYA jika tidak ada entri spesifik yang cocok
       5. lookup_glossary_term()          -> definisi istilah teknis, hanya jika istilah = subjek pertanyaan
+      6. ask_gemini()                    -> Tahap 9: fallback Gemini 2.5 Flash, HANYA jika Tier 0-5 di atas
+                                            semuanya gagal. Tidak aktif (dilewati) jika GEMINI_API_KEY
+                                            tidak diset — sistem tetap berjalan normal di Tier 1-5.
+    Tier 7 (eskalasi ke Admin) ditangani di hubungi_send(), bukan di sini:
+    fungsi ini mengembalikan None jika Tier 0-6 semuanya tidak menjawab.
     """
     if classify_question(message) == 'B':
         return None
@@ -1170,6 +1178,15 @@ def _ai_respond(message):
     if hit:
         term, definition = hit
         return f"{term.upper()}: {definition}"
+
+    # 4) Tahap 9 — Gemini 2.5 Flash, fallback Tier 6: hanya dipanggil jika
+    #    seluruh layer di atas gagal menjawab. Dilewati sepenuhnya (tanpa
+    #    query DB) jika GEMINI_API_KEY tidak diset.
+    if gemini_is_configured():
+        db_context_text = format_db_context_text(get_db_context(_compute_water_status()))
+        gemini_answer = ask_gemini(message, db_context_text)
+        if gemini_answer:
+            return GEMINI_SOURCE_MARKER + gemini_answer
 
     return None
 

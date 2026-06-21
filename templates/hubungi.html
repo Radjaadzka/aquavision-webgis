@@ -176,6 +176,7 @@
 .src-unsure   { background: rgba(234,179,8,.1);  color: #92400E; border: 1px solid rgba(245,158,11,.2); }
 .src-escalated{ background: rgba(234,179,8,.1);  color: #92400E; border: 1px solid rgba(245,158,11,.2); }
 .src-admin    { background: rgba(59,130,246,.1); color: #1D4ED8; border: 1px solid rgba(59,130,246,.2); }
+.src-gemini   { background: rgba(124,58,237,.1); color: #6D28D9; border: 1px solid rgba(124,58,237,.25); }
 
 /* Pertanyaan Populer (quick questions) */
 .quick-questions {
@@ -292,6 +293,9 @@
 
     // Harus sama persis dengan _AI_UNSURE_TEXT di api/views.py
     var AI_UNSURE_MARKER = "Saya belum memiliki informasi yang cukup untuk menjawab pertanyaan tersebut secara akurat.";
+    // Harus sama persis dengan GEMINI_SOURCE_MARKER di api/ai_gemini.py (zero-width space,
+    // disisipkan di awal jawaban Gemini agar bisa dibedakan dari jawaban rule-based)
+    var GEMINI_SOURCE_MARKER = "​";
 
     function updateStatusDisplay(status, ticketId, queueCount) {
         var badge = document.getElementById('statusSbadge');
@@ -334,7 +338,9 @@
         // Determine source badge for non-user messages
         var sourceBadge = '';
         if (isAI) {
-            if (m.content.indexOf(AI_UNSURE_MARKER) !== -1) {
+            if (m.content.indexOf(GEMINI_SOURCE_MARKER) === 0) {
+                sourceBadge = ' <span class="src-badge src-gemini">🧠 Gemini</span>';
+            } else if (m.content.indexOf(AI_UNSURE_MARKER) !== -1) {
                 sourceBadge = ' <span class="src-badge src-unsure">🟡 Butuh Admin</span>';
             } else if (m.content.indexOf('🟡 Pertanyaan Anda telah diteruskan') !== -1) {
                 sourceBadge = ' <span class="src-badge src-escalated">🟡 Diteruskan ke Admin</span>';
