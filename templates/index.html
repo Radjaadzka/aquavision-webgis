@@ -74,21 +74,21 @@
     border-radius:16px; padding:32px 36px;
     max-width:480px; width:100%;
     box-shadow:0 20px 60px rgba(0,0,0,.55);
-    font-family:'Inter',sans-serif; text-align:center;
+    font-family:var(--font-body); text-align:center;
 }
 .hero-card-title {
-    font-family:'Fraunces',serif;
+    font-family:var(--font-display);
     font-size:clamp(28px,5vw,40px); font-weight:300; letter-spacing:1px;
     color:#E2E8F0; margin:0 0 6px;
 }
 .hero-card-sub { font-size:13px; color:rgba(255,255,255,.55); margin:0 0 20px; font-weight:300; }
 .hero-stats { display:flex; flex-direction:column; gap:8px; margin-bottom:24px; }
 .hero-stat { display:flex; align-items:baseline; justify-content:center; gap:6px; font-size:13px; color:rgba(255,255,255,.6); }
-.hero-stat strong { font-size:20px; font-weight:600; color:#93C5FD; font-family:'Fraunces',serif; }
+.hero-stat strong { font-size:20px; font-weight:600; color:#93C5FD; font-family:var(--font-display); }
 .hero-actions { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
 .hero-btn {
     padding:10px 22px; border-radius:8px; font-size:13px; font-weight:500;
-    font-family:'Inter',sans-serif; cursor:pointer; border:1px solid transparent; transition:all .15s;
+    font-family:var(--font-body); cursor:pointer; border:1px solid transparent; transition:all .15s;
 }
 .hero-btn-primary { background:#3B82F6; color:#fff; border-color:#3B82F6; }
 .hero-btn-primary:hover { background:#2563EB; }
@@ -115,9 +115,9 @@
     display: flex; align-items: center; gap: 6px;
     padding: 12px 20px;
     background: linear-gradient(135deg, #3B82F6, #60A5FA);
-    color: #fff; border: none; border-radius: 30px;
+    color: #fff; border: none; border-radius: var(--r-lg);
     font-size: 13px; font-weight: 600;
-    font-family: 'Inter', sans-serif; cursor: pointer;
+    font-family: var(--font-body); cursor: pointer;
     box-shadow: 0 6px 20px rgba(59,130,246,.45);
     transition: transform .15s ease, box-shadow .15s ease;
     animation: ftbPulse 3s ease-in-out infinite;
@@ -754,7 +754,7 @@
                     border-radius:50%;
                     animation:spin .7s linear infinite;
                     margin:0 auto 12px;"></div>
-                <p style="font-size:12px; color:rgba(255,255,255,.35); font-family:'Inter',sans-serif;">Memuat peta...</p>
+                <p style="font-size:12px; color:rgba(255,255,255,.35); font-family:var(--font-body);">Memuat peta...</p>
             </div>
         </div>
 
@@ -833,7 +833,7 @@
             </div>
             <!-- CTA actions -->
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-                <button id="mobileBsOpenLayers" style="padding:11px 8px;background:rgba(59,130,246,.15);border:1px solid rgba(59,130,246,.3);border-radius:9px;color:#93C5FD;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">🗺️ Buka Layer</button>
+                <button id="mobileBsOpenLayers" style="padding:11px 8px;background:rgba(59,130,246,.15);border:1px solid rgba(59,130,246,.3);border-radius:9px;color:#93C5FD;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font-body);">🗺️ Buka Layer</button>
                 <a href="/data/" style="padding:11px 8px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:9px;color:rgba(255,255,255,.65);font-size:12px;font-weight:600;text-decoration:none;display:flex;align-items:center;justify-content:center;box-sizing:border-box;">📊 Data Portal</a>
             </div>
         </div>

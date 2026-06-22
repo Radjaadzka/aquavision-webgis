@@ -12,7 +12,7 @@
     margin-bottom: 28px;
 }
 .hubungi-head h1 {
-    font-family: 'Fraunces', serif;
+    font-family: var(--font-display);
     font-size: clamp(28px, 5vw, 42px);
     font-weight: 300; letter-spacing: -1.5px;
     color: #0F172A; margin-bottom: 8px;
@@ -86,7 +86,7 @@
 .chat-input-area textarea {
     flex: 1; resize: none; min-height: 44px; max-height: 120px;
     border: 1.5px solid #E2E8F0; border-radius: 10px;
-    padding: 10px 12px; font-size: 14px; font-family: 'Inter', sans-serif;
+    padding: 10px 12px; font-size: 14px; font-family: var(--font-body);
     color: #0F172A; background: white; transition: border-color .15s;
     overflow-y: auto;
 }
@@ -95,7 +95,7 @@
     padding: 10px 20px; height: 44px;
     background: #3B82F6; color: white; border: none;
     border-radius: 10px; font-size: 14px; font-weight: 500;
-    font-family: 'Inter', sans-serif; cursor: pointer; transition: all .15s;
+    font-family: var(--font-body); cursor: pointer; transition: all .15s;
     white-space: nowrap; flex-shrink: 0;
 }
 .chat-send-btn:hover { background: #2563EB; }
@@ -189,7 +189,7 @@
 .qq-btn {
     font-size: 12.5px; padding: 6px 12px; border-radius: 20px;
     border: 1px solid #BFDBFE; background: #EFF6FF; color: #1D4ED8;
-    cursor: pointer; transition: all .15s; font-family: 'Inter', sans-serif;
+    cursor: pointer; transition: all .15s; font-family: var(--font-body);
     white-space: nowrap;
 }
 .qq-btn:hover { background: #DBEAFE; border-color: #93C5FD; }
@@ -200,7 +200,7 @@
 .confirm-btn {
     font-size: 12.5px; padding: 7px 14px; border-radius: 20px;
     border: 1px solid #E2E8F0; background: white; color: #0F172A;
-    cursor: pointer; transition: all .15s; font-family: 'Inter', sans-serif;
+    cursor: pointer; transition: all .15s; font-family: var(--font-body);
 }
 .confirm-btn.confirm-yes { border-color: #16A34A; color: #15803D; }
 .confirm-btn.confirm-yes:hover { background: rgba(22,163,74,.08); }

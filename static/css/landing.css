@@ -58,7 +58,7 @@ body { background: #07111F; }
 .hero-eyebrow::before { content:''; width: 24px; height: 1px; background: rgba(59,130,246,.5); }
 
 .hero-h1 {
-  font-family: 'Fraunces', serif;
+  font-family: var(--font-display);
   font-size: clamp(52px, 8vw, 96px);
   font-weight: 200; line-height: .9;
   letter-spacing: -3px; color: rgba(255,255,255,.95);
@@ -105,7 +105,7 @@ body { background: #07111F; }
   padding: 13px 30px; border-radius: 8px;
   background: #3B82F6; color: white;
   font-size: 14px; font-weight: 500;
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-body);
   text-decoration: none; border: none; cursor: pointer;
   transition: all .2s; display: inline-flex; align-items: center; gap: 7px;
 }
@@ -114,7 +114,7 @@ body { background: #07111F; }
   padding: 13px 30px; border-radius: 8px;
   background: transparent; color: rgba(255,255,255,.5);
   font-size: 14px; font-weight: 400;
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-body);
   text-decoration: none;
   border: 1px solid rgba(255,255,255,.12);
   transition: all .2s; display: inline-block;
@@ -142,7 +142,7 @@ body { background: #07111F; }
   background: rgba(255,255,255,.05);
   border-radius: 5px; padding: 4px 10px;
   font-size: 11px; color: rgba(255,255,255,.28);
-  font-family: 'Inter', sans-serif; letter-spacing: .3px;
+  font-family: var(--font-body); letter-spacing: .3px;
 }
 .hero-product-img {
   width: 100%; display: block;
@@ -164,7 +164,7 @@ body { background: #07111F; }
 .hb-item:last-child { border-right: none; }
 .hb-item:hover { background: rgba(59,130,246,.04); }
 .hb-num-stat {
-  font-family: 'Fraunces', serif;
+  font-family: var(--font-display);
   font-size: 44px; font-weight: 200; color: rgba(255,255,255,.9);
   display: block; line-height: 1; margin-bottom: 4px;
 }
@@ -199,7 +199,7 @@ body { background: #07111F; }
 .lbl-lt::before { background: rgba(59,130,246,.5); }
 
 .sec-h {
-  font-family: 'Fraunces', serif;
+  font-family: var(--font-display);
   font-size: clamp(28px, 4vw, 48px);
   font-weight: 300; letter-spacing: -1.5px; line-height: 1.08;
   margin-bottom: 12px;
@@ -285,7 +285,7 @@ body { background: #07111F; }
 }
 .prob-cell:hover .prob-line { height: 100%; }
 .prob-n {
-  font-family: 'Fraunces', serif;
+  font-family: var(--font-display);
   font-size: 48px; font-weight: 200; line-height: 1;
   color: rgba(59,130,246,.45); margin-bottom: 16px;
   transition: color .3s;
@@ -393,7 +393,7 @@ body { background: #07111F; }
   padding: 10px 14px;
   border-radius: 12px;
   font-size: 13px; line-height: 1.7; font-weight: 300;
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-body);
 }
 .chat-bubble-user {
   background: #1E3A8A;
@@ -417,7 +417,7 @@ body { background: #07111F; }
   border: 1px solid rgba(255,255,255,.08);
   border-radius: 8px; padding: 9px 14px;
   font-size: 12px; color: rgba(255,255,255,.2);
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-body);
 }
 .chat-send-btn {
   width: 34px; height: 34px; border-radius: 8px;
@@ -508,7 +508,7 @@ body { background: #07111F; }
   background: linear-gradient(135deg, #0D2236 0%, #0e2a45 50%, #0D2236 100%);
   display: flex; align-items: center; justify-content: center;
   color: rgba(255,255,255,.15); font-size: 13px;
-  font-family: 'Inter',sans-serif; letter-spacing: .5px;
+  font-family: var(--font-body); letter-spacing: .5px;
 }
 .prev-bar {
   background: linear-gradient(90deg, #0A1B2E, #0D2236);
@@ -523,7 +523,7 @@ body { background: #07111F; }
   padding: 11px 24px; border-radius: 8px;
   background: #3B82F6; color: white;
   font-size: 13px; font-weight: 600;
-  font-family: 'Inter', sans-serif; text-decoration: none;
+  font-family: var(--font-body); text-decoration: none;
   transition: all .2s; white-space: nowrap;
   box-shadow: 0 4px 16px rgba(59,130,246,.4);
 }
@@ -575,7 +575,7 @@ body { background: #07111F; }
   padding: 14px 36px; border-radius: 8px;
   background: #1a5276; color: white;
   font-size: 15px; font-weight: 500;
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-body);
   text-decoration: none; border: none; cursor: pointer; transition: all .2s;
 }
 .btn-cta-fill:hover { background: #0E2238; }
@@ -583,7 +583,7 @@ body { background: #07111F; }
   padding: 14px 36px; border-radius: 8px;
   background: transparent; color: #1a5276;
   font-size: 15px; font-weight: 400;
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-body);
   text-decoration: none;
   border: 1.5px solid rgba(26,82,118,.22);
   transition: all .2s;
@@ -600,7 +600,7 @@ body { background: #07111F; }
   width: 100%; padding: 12px 14px;
   background: white; border: 1.5px solid #E2E8F0;
   border-radius: 8px; font-size: 14px;
-  font-family: 'Inter', sans-serif; color: #0F172A;
+  font-family: var(--font-body); color: #0F172A;
   transition: border-color .15s; margin-bottom: 12px;
   box-sizing: border-box;
 }
@@ -609,7 +609,7 @@ body { background: #07111F; }
   width: 100%; padding: 13px;
   background: #1a5276; color: white; border: none;
   border-radius: 8px; font-size: 14px; font-weight: 500;
-  cursor: pointer; font-family: 'Inter', sans-serif; transition: all .2s;
+  cursor: pointer; font-family: var(--font-body); transition: all .2s;
 }
 .fb-btn:hover { background: #0E2238; }
 .fb-btn:disabled { opacity: .4; cursor: not-allowed; }
@@ -649,7 +649,7 @@ body { background: #07111F; }
 .tc-avatar {
   width: 64px; height: 64px; border-radius: 16px;
   background: linear-gradient(135deg, #1a5276, #2e86c1);
-  color: white; font-family: 'Fraunces', serif;
+  color: white; font-family: var(--font-display);
   font-size: 22px; font-weight: 300; font-style: italic;
   display: flex; align-items: center; justify-content: center;
   margin: 0 auto 14px; transition: transform .25s;
