@@ -57,16 +57,16 @@ A: Klik objek (titik, garis, atau area) di peta, maka akan muncul popup informas
 ## POTENSI AIR TANAH
 
 **Q: Apa itu Potensi Air Tanah di AQUAVISION?**
-A: Layer Potensi Air Tanah menampilkan hasil pemodelan Groundwater Potential Zone (GWP) yang menunjukkan tingkat potensi relatif suatu wilayah untuk mendukung keberadaan dan penyimpanan air tanah. Kelas: Low, Moderate, High, Very High.
+A: Layer Potensi Air Tanah menampilkan hasil pemodelan Groundwater Potential Zone (GWP) yang menunjukkan tingkat potensi relatif suatu wilayah untuk mendukung keberadaan dan penyimpanan air tanah. Kelas: Rendah, Sedang, Tinggi, Sangat Tinggi.
 
-**Q: Apa arti kelas "Very High" pada peta potensi air tanah?**
-A: Area dengan kelas Very High memiliki kombinasi kondisi fisik (curah hujan tinggi, litologi permeabel, kemiringan lereng rendah, dan kondisi lain) yang paling mendukung infiltrasi dan penyimpanan air tanah. Wilayah ini adalah prioritas untuk konservasi dan pencarian sumber air baru.
+**Q: Apa arti kelas "Sangat Tinggi" pada peta potensi air tanah?**
+A: Area dengan kelas Sangat Tinggi memiliki kombinasi kondisi fisik (curah hujan tinggi, litologi permeabel, kemiringan lereng rendah, dan kondisi lain) yang paling mendukung infiltrasi dan penyimpanan air tanah. Wilayah ini adalah prioritas untuk konservasi dan pencarian sumber air baru.
 
 **Q: Apakah peta potensi air tanah berarti pasti ada air di sana?**
 A: TIDAK. Peta GWP adalah potensi relatif berdasarkan analisis faktor fisik, bukan bukti langsung keberadaan air tanah. Untuk memastikan ada air tanah di titik tertentu, tetap diperlukan survei lapangan (sumur bor, geolistrik, atau verifikasi mata air).
 
 **Q: Berapa persen wilayah Wonotoro yang memiliki potensi air tanah tinggi?**
-A: Berdasarkan hasil analisis: Low 11%, Moderate 29%, High 43%, Very High 17%. Jadi sekitar 60% wilayah studi berada di kelas High atau Very High.
+A: Berdasarkan hasil analisis: Rendah 12,4%, Sedang 43,5%, Tinggi 33,4%, Sangat Tinggi 10,6%. Jadi sekitar 44% wilayah studi berada di kelas Tinggi atau Sangat Tinggi.
 
 ---
 

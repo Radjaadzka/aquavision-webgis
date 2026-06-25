@@ -62,7 +62,7 @@ AQUAVISION adalah sistem informasi sumber daya air berbasis WebGIS (Web-based Ge
 
 | Komponen | Hasil |
 |---|---|
-| Groundwater Potential Zone | Low: 11%, Moderate: 29%, High: 43%, Very High: 17% dari wilayah studi |
+| Groundwater Potential Zone | Rendah: 12,4%, Sedang: 43,5%, Tinggi: 33,4%, Sangat Tinggi: 10,6% dari wilayah studi |
 | Debit Puncak Tertinggi | Rata-rata Februari 14,942 m³/s; nilai maks Desember 40,828 m³/s |
 | Debit Puncak Terendah | Rata-rata September 0,138 m³/s (musim kemarau) |
 | Ketercapaian Fitur WebGIS | 85,7% dari rancangan; 11 dari 14 fitur berhasil penuh atau diperluas |

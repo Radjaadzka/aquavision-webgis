@@ -33,7 +33,7 @@
 | **GeoTIFF** | Format file raster geospasial yang menyimpan informasi koordinat di dalam file TIFF; digunakan untuk data debit puncak bulanan. |
 | **GIS (Geographic Information System)** | Sistem Informasi Geografis; sistem untuk mengelola, menganalisis, dan memvisualisasikan data yang memiliki referensi geografis. |
 | **GIS-MCDM** | Geographic Information System – Multi Criteria Decision Making; pendekatan pengambilan keputusan multikriteria berbasis GIS. |
-| **Groundwater Potential Zone (GWP)** | Model spasial yang menunjukkan tingkat potensi relatif wilayah dalam mendukung keberadaan dan pengisian air tanah. Kelas: Low, Moderate, High, Very High. |
+| **Groundwater Potential Zone (GWP)** | Model spasial yang menunjukkan tingkat potensi relatif wilayah dalam mendukung keberadaan dan pengisian air tanah. Kelas: Rendah, Sedang, Tinggi, Sangat Tinggi. |
 | **Initial Abstraction (Ia)** | Kehilangan awal air hujan sebelum limpasan permukaan terbentuk; meliputi infiltrasi awal, intersepsi vegetasi, dan tampungan permukaan. Ia = 0,2 × S. |
 | **Intensitas Hujan (I)** | Besarnya curah hujan per satuan waktu (mm/jam). |
 | **ISO/IEC 25010:2011** | Standar kualitas perangkat lunak internasional; mencakup 8 karakteristik termasuk functional suitability, performance efficiency, compatibility, dan usability. |

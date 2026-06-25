@@ -723,7 +723,7 @@ def data_list(request):
         {'name': 'Fasilitas Wisata',             'slug': 'fasilitas',    'model': FasilitasWisata,
          'description': 'Data hotel, restoran, dan jasa'},
         {'name': 'Daerah Potensi Air Tanah Desa Wonotoro', 'slug': 'recharge',  'model': RechargeArea,
-         'description': 'Peta zonasi potensi air tanah metode AHP (resolusi 10m×10m)'},
+         'description': 'Peta zonasi potensi air tanah metode AHP — klasifikasi Rendah, Sedang, Tinggi, Sangat Tinggi'},
         {'name': 'Debit Puncak Aliran Desa Wonotoro',    'slug': 'catchment', 'model': CatchmentArea,
          'description': 'Peta debit puncak aliran metode Rasional (resolusi 30m×30m)'},
         {'name': 'Jaringan Pipa',                        'slug': 'pipa',      'model': JaringanPipa,

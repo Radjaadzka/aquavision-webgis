@@ -8,20 +8,15 @@
 
 /* Hero header */
 .portal-hero {
+    /* Header solid, tanpa glow radial — radial-gradient blob warna adalah
+       motif hero halaman produk AI/SaaS modern, bukan konvensi header
+       Geoportal/Open Data Portal pemerintah. */
     background: linear-gradient(135deg, #07111F 0%, #0E2238 60%, #0D2236 100%);
-    border-radius: 16px;
-    padding: 40px 40px 36px;
+    border-radius: var(--r-md);
+    padding: 36px 40px 32px;
     margin-bottom: 28px;
     border: 1px solid rgba(255,255,255,.07);
     position: relative;
-    overflow: hidden;
-}
-.portal-hero::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(ellipse 60% 80% at 90% 50%, rgba(59,130,246,.08) 0%, transparent 60%);
-    pointer-events: none;
 }
 .portal-hero-inner { position: relative; z-index: 1; }
 .portal-hero-label {
@@ -35,7 +30,7 @@
     color: rgba(59,130,246,.8);
     background: rgba(59,130,246,.1);
     border: 1px solid rgba(59,130,246,.18);
-    border-radius: 20px;
+    border-radius: var(--r-sm);
     padding: 4px 12px;
     margin-bottom: 12px;
 }
@@ -145,27 +140,19 @@
 .dataset-card {
     background: white;
     border: 1px solid #E8ECF4;
-    border-radius: 14px;
+    border-radius: var(--r-md);
     overflow: hidden;
-    transition: box-shadow .2s, transform .2s, border-color .2s;
+    transition: box-shadow .2s, border-color .2s;
     display: flex;
     flex-direction: column;
-    animation: dcFadeIn .3s ease both;
 }
-@keyframes dcFadeIn {
-    from { opacity: 0; transform: translateY(8px); }
-    to   { opacity: 1; transform: translateY(0); }
-}
-.dataset-card:nth-child(2) { animation-delay: .05s; }
-.dataset-card:nth-child(3) { animation-delay: .10s; }
-.dataset-card:nth-child(4) { animation-delay: .15s; }
-.dataset-card:nth-child(5) { animation-delay: .20s; }
-.dataset-card:nth-child(6) { animation-delay: .25s; }
-.dataset-card:nth-child(7) { animation-delay: .30s; }
-.dataset-card:nth-child(8) { animation-delay: .35s; }
+/* Staggered fade-in per kartu (sebelumnya) dihapus — animasi "reveal satu
+   per satu" pada grid kartu adalah pola showcase fitur produk SaaS/AI,
+   bukan konvensi listing data pada portal/geoportal. Hover lift
+   (translateY) juga dihapus; highlight border sudah cukup menandakan
+   interaktivitas tanpa kartu "mengambang". */
 .dataset-card:hover {
-    box-shadow: 0 8px 28px rgba(0,0,0,.09);
-    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0,0,0,.07);
     border-color: rgba(59,130,246,.25);
 }
 

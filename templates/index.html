@@ -71,9 +71,12 @@
     pointer-events:auto;
     background:linear-gradient(135deg,rgba(9,18,34,.97) 0%,rgba(13,27,52,.97) 100%);
     border:1px solid rgba(59,130,246,.25);
-    border-radius:16px; padding:32px 36px;
-    max-width:480px; width:100%;
-    box-shadow:0 20px 60px rgba(0,0,0,.55);
+    /* Radius/shadow diperkecil & dipadatkan — kartu intro sebelumnya
+       melayang dengan shadow 60px sangat dramatis ala kartu sambutan
+       SaaS/AI; sekarang lebih terasa sebagai panel info dashboard. */
+    border-radius:10px; padding:26px 30px;
+    max-width:420px; width:100%;
+    box-shadow:0 8px 28px rgba(0,0,0,.4);
     font-family:var(--font-body); text-align:center;
 }
 .hero-card-title {
@@ -100,7 +103,7 @@
     .hero-card { max-width:100%; padding:24px 22px; }
 }
 @media (max-width:480px) {
-    .hero-card { padding:20px 16px; border-radius:12px; }
+    .hero-card { padding:20px 16px; border-radius:9px; }
     .hero-card-title { font-size:26px; }
     .hero-stats { gap:6px; }
     .hero-stat strong { font-size:17px; }
@@ -195,10 +198,8 @@
         display: none !important;
         position: fixed !important;
         inset: 0 !important;
-        background: rgba(0,0,0,.55) !important;
+        background: rgba(0,0,0,.65) !important;
         z-index: 1059 !important;
-        -webkit-backdrop-filter: blur(2px) !important;
-        backdrop-filter: blur(2px) !important;
     }
     #mobileSidebarOverlay.open { display: block !important; }
 
@@ -278,8 +279,6 @@
         right: 0 !important;
         z-index: 690 !important;
         background: rgba(7,18,33,.97) !important;
-        -webkit-backdrop-filter: blur(20px) !important;
-        backdrop-filter: blur(20px) !important;
         border-radius: 20px 20px 0 0 !important;
         border-top: 1px solid rgba(255,255,255,.12) !important;
         transform: translateY(calc(100% - 54px)) !important;
@@ -378,7 +377,7 @@
                     </a>
                     {% if user.is_authenticated %}
                     <a href="/hubungi/" class="qa-btn">
-                        <span>🤖</span><span>Tanya AI</span>
+                        <span>💬</span><span>Bantuan</span>
                     </a>
                     {% else %}
                     <a href="/login/?next=/" class="qa-btn">

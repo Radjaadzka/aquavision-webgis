@@ -88,7 +88,7 @@ JANGAN:
 - `20_layer_dan_metadata.md` → section Potensi Air Tanah
 
 **Jawaban Inti:**
-> 43% wilayah studi berpotensi Tinggi (High), 17% Sangat Tinggi (Very High), 29% Sedang (Moderate), 11% Rendah (Low). Zona Very High umumnya berada di area batuan vulkanik berpori tinggi dengan curah hujan lebat.
+> 33,4% wilayah studi berpotensi Tinggi, 10,6% Sangat Tinggi, 43,5% Sedang, 12,4% Rendah. Zona Sangat Tinggi umumnya berada di area batuan vulkanik berpori tinggi dengan curah hujan lebat.
 
 ---
 

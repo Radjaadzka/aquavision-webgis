@@ -112,9 +112,9 @@ a   { text-decoration: none; color: inherit; }
     top: 0; left: 0; right: 0;
     z-index: 1000;
     height: 56px;
-    background: rgba(7,17,31,.85);
-    backdrop-filter: blur(16px) saturate(180%);
-    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    /* Solid navy, bukan frosted-glass — navbar Geoportal/ArcGIS pemerintah
+       umumnya solid, bukan translucent blur ala dashboard SaaS/AI modern. */
+    background: var(--ocean);
     border-bottom: 1px solid rgba(255,255,255,.06);
 }
 
@@ -629,9 +629,7 @@ a   { text-decoration: none; color: inherit; }
 
 .map-ctrl-topleft input {
     padding: 7px 12px;
-    background: rgba(7,17,31,.88);
-    -webkit-backdrop-filter: blur(12px);
-    backdrop-filter: blur(12px);
+    background: rgba(7,17,31,.96);
     border: 1px solid rgba(255,255,255,.12);
     color: rgba(255,255,255,.8);
     border-radius: 8px;
@@ -644,9 +642,7 @@ a   { text-decoration: none; color: inherit; }
 
 .map-ctrl-topleft button {
     padding: 7px 11px;
-    background: rgba(7,17,31,.88);
-    -webkit-backdrop-filter: blur(12px);
-    backdrop-filter: blur(12px);
+    background: rgba(7,17,31,.96);
     border: 1px solid rgba(255,255,255,.12);
     color: rgba(255,255,255,.7);
     border-radius: 8px;
@@ -673,9 +669,7 @@ a   { text-decoration: none; color: inherit; }
 .map-ctrl-zoom button {
     width: 28px !important;
     height: 28px !important;
-    background: rgba(7,17,31,.88) !important;
-    -webkit-backdrop-filter: blur(12px);
-    backdrop-filter: blur(12px);
+    background: rgba(7,17,31,.96) !important;
     border: 1px solid rgba(255,255,255,.15) !important;
     color: rgba(255,255,255,.8) !important;
     font-size: 16px !important;
@@ -740,15 +734,16 @@ a   { text-decoration: none; color: inherit; }
     bottom: 44px;
     width: 280px;
     z-index: 500;
-    background: rgba(10,22,42,.94);
-    backdrop-filter: blur(20px) saturate(160%);
-    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    /* Panel solid + radius/shadow moderat — kesan "panel alat GIS yang
+       terpasang" (docked tool panel ala ArcGIS), bukan kartu kaca melayang
+       ala dashboard AI/SaaS modern (blur(20px) + shadow 40px/100px). */
+    background: rgba(10,22,42,.97);
     border: 1px solid rgba(255,255,255,.12);
-    border-radius: 16px;
+    border-radius: var(--r-md);
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    box-shadow: var(--s-xl);
+    box-shadow: var(--s-md);
     transition: transform .25s ease, opacity .25s ease;
 }
 
@@ -765,9 +760,7 @@ a   { text-decoration: none; color: inherit; }
     left: 14px;
     top: 50%;
     transform: translateY(-50%);
-    background: rgba(7,17,31,.9);
-    -webkit-backdrop-filter: blur(12px);
-    backdrop-filter: blur(12px);
+    background: rgba(7,17,31,.96);
     color: rgba(255,255,255,.6);
     border: 1px solid rgba(255,255,255,.1);
     width: 26px;
@@ -1004,11 +997,9 @@ a   { text-decoration: none; color: inherit; }
 ================================================================ */
 
 .legend {
-    background: rgba(7,17,31,.9);
-    -webkit-backdrop-filter: blur(12px);
-    backdrop-filter: blur(12px);
+    background: rgba(7,17,31,.96);
     border: 1px solid rgba(255,255,255,.08);
-    border-radius: 10px;
+    border-radius: 8px;
     padding: 10px 12px;
     font-size: 11px;
     max-height: 200px;
@@ -1032,9 +1023,7 @@ a   { text-decoration: none; color: inherit; }
     display: flex;
     align-items: center;
     padding: 0 14px;
-    background: rgba(7,17,31,.8);
-    -webkit-backdrop-filter: blur(12px);
-    backdrop-filter: blur(12px);
+    background: rgba(7,17,31,.94);
     border-top: 1px solid rgba(255,255,255,.05);
     font-size: 11px;
     font-family: var(--font-body);
@@ -1057,9 +1046,11 @@ a   { text-decoration: none; color: inherit; }
 .modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,.65);
-    -webkit-backdrop-filter: blur(12px);
-    backdrop-filter: blur(12px);
+    /* Scrim gelap polos, tanpa blur konten di belakangnya — pola
+       "blur seluruh layar di belakang modal" identik dengan
+       sheet/dialog ala app workspace modern (Notion/Linear), bukan
+       konvensi dialog form pada portal pemerintah/ilmiah. */
+    background: rgba(0,0,0,.72);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1069,12 +1060,12 @@ a   { text-decoration: none; color: inherit; }
 .modal-box {
     background: #0E2238;
     border: 1px solid rgba(255,255,255,.08);
-    border-radius: 20px;
+    border-radius: var(--r-lg);
     width: 100%;
     max-width: 460px;
     max-height: 90vh;
     overflow-y: auto;
-    box-shadow: var(--s-xl);
+    box-shadow: var(--s-lg);
 }
 
 .modal-header {
@@ -1579,12 +1570,10 @@ a   { text-decoration: none; color: inherit; }
 .nav-drawer-overlay {
     display: none;
     position: fixed; inset: 0;
-    background: rgba(0,0,0,.5);
+    background: rgba(0,0,0,.6);
     z-index: 1098;
     opacity: 0;
     transition: opacity .25s;
-    -webkit-backdrop-filter: blur(2px);
-    backdrop-filter: blur(2px);
 }
 .nav-drawer-overlay.open { display: block; opacity: 1; }
 

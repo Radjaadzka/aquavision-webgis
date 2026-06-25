@@ -2,7 +2,7 @@
 
 ## Pengertian
 
-Groundwater Potential Zone (GWP) adalah model spasial yang menunjukkan tingkat potensi relatif suatu wilayah dalam mendukung keberadaan, pergerakan, dan pengisian air tanah. Hasilnya berupa peta klasifikasi zona potensi dari Low hingga Very High.
+Groundwater Potential Zone (GWP) adalah model spasial yang menunjukkan tingkat potensi relatif suatu wilayah dalam mendukung keberadaan, pergerakan, dan pengisian air tanah. Hasilnya berupa peta klasifikasi zona potensi dari Rendah hingga Sangat Tinggi (sumber data terkini: `static/data/DaerahResapan.geojson`).
 
 **Penting:** GWP adalah **potensi relatif**, bukan bukti langsung keberadaan air tanah. Validasi menggunakan data sumur, titik mata air, atau survei geolistrik tetap diperlukan.
 
@@ -158,14 +158,14 @@ GWP = (0,40 × R_rainfall) + (0,23 × R_geology/lithology) + (0,13 × R_lineamen
 
 ### 4. Klasifikasi Indeks GWP
 
-Metode Equal Interval Classification (nilai indeks minimum 1,61 – maksimum 4,90; interval 0,8225):
+Metode Equal Interval Classification (nilai indeks minimum 1,74 – maksimum 4,42; interval 0,67):
 
 | Kelas | Rentang Nilai Indeks |
 |---|---|
-| Low | 1,61–2,43 |
-| Moderate | 2,43–3,26 |
-| High | 3,26–4,08 |
-| Very High | 4,08–4,90 |
+| Rendah | 1,74–2,41 |
+| Sedang | 2,41–3,08 |
+| Tinggi | 3,08–3,75 |
+| Sangat Tinggi | 3,75–4,42 |
 
 ### 5. Verifikasi
 - Idealnya menggunakan data borehole/well log (tidak tersedia untuk wilayah studi).
@@ -177,12 +177,12 @@ Metode Equal Interval Classification (nilai indeks minimum 1,61 – maksimum 4,9
 
 | Kelas | Rentang Nilai | Luas (km²) | Persentase (%) |
 |---|---|---|---|
-| Low | 1,61–2,43 | 20 | 11% |
-| Moderate | 2,43–3,26 | 50 | 29% |
-| High | 3,26–4,08 | 76 | 43% |
-| Very High | 4,08–4,90 | 29 | 17% |
+| Rendah | 1,74–2,41 | 43,2 | 12,4% |
+| Sedang | 2,41–3,08 | 151,6 | 43,5% |
+| Tinggi | 3,08–3,75 | 116,5 | 33,4% |
+| Sangat Tinggi | 3,75–4,42 | 37,0 | 10,6% |
 
-**Interpretasi:** Area Desa Wonotoro didominasi kelas High dan Very High, menunjukkan kondisi fisik yang mendukung infiltrasi dan penyimpanan air tanah. Kelas High dan Very High dapat dijadikan **zona prioritas** untuk konservasi sumber daya air dan investigasi lanjutan (survei geolistrik, verifikasi sumur).
+**Interpretasi:** Area Desa Wonotoro didominasi kelas Sedang dan Tinggi, menunjukkan kondisi fisik yang cukup mendukung infiltrasi dan penyimpanan air tanah. Kelas Tinggi dan Sangat Tinggi dapat dijadikan **zona prioritas** untuk konservasi sumber daya air dan investigasi lanjutan (survei geolistrik, verifikasi sumur).
 
 ---
 

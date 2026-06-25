@@ -72,7 +72,7 @@ A: Ya. Desa Wonotoro berada di kawasan pegunungan sekitar Taman Nasional Bromo T
 Q: "wonotoro air tanah"
 INTENT: I02 – Potensi Air Tanah
 TOPIK: air tanah | KONTEKS: Wonotoro
-A: Berdasarkan pemodelan Groundwater Potential (GWP) AQUAVISION, Desa Wonotoro memiliki potensi air tanah yang cukup baik: 43% wilayah berpotensi Tinggi (High) dan 17% Sangat Tinggi (Very High). Zona dengan potensi tertinggi umumnya berada di area batuan vulkanik berpori dengan curah hujan tinggi. Hanya 11% wilayah yang berpotensi Rendah (Low).
+A: Berdasarkan pemodelan Groundwater Potential (GWP) AQUAVISION, Desa Wonotoro memiliki potensi air tanah yang cukup baik: 33,4% wilayah berpotensi Tinggi dan 10,6% Sangat Tinggi. Zona dengan potensi tertinggi umumnya berada di area batuan vulkanik berpori dengan curah hujan tinggi. Hanya 12,4% wilayah yang berpotensi Rendah.
 *[Catatan AI: "wonotoro" di sini adalah konteks wilayah, bukan pertanyaan lokasi.]*
 
 ---
@@ -166,7 +166,7 @@ A: Di AQUAVISION, Anda bisa beralih ke tampilan citra satelit dengan memilih bas
 Q: "arti warna di peta apa?"
 INTENT: I14 – Cara Penggunaan
 TOPIK: legenda | KONTEKS: —
-A: Setiap layer memiliki legenda warna yang berbeda. Untuk melihat arti warna: aktifkan layer yang diinginkan, kemudian lihat panel legenda yang tersedia di peta. Misalnya, pada layer Potensi Air Tanah: hijau tua = Very High, hijau muda = High, kuning = Moderate, merah = Low.
+A: Setiap layer memiliki legenda warna yang berbeda. Untuk melihat arti warna: aktifkan layer yang diinginkan, kemudian lihat panel legenda yang tersedia di peta. Misalnya, pada layer Potensi Air Tanah: hijau = Sangat Tinggi, kuning = Tinggi, oranye = Sedang, merah = Rendah.
 
 ---
 
@@ -186,15 +186,15 @@ A: Potensi air tanah adalah perkiraan seberapa besar kemungkinan suatu area memi
 Q: "potensi air tanah wonotoro bagaimana?"
 INTENT: I02 – Potensi Air Tanah
 TOPIK: hasil GWP | KONTEKS: Wonotoro
-A: Berdasarkan pemodelan AQUAVISION, potensi air tanah di wilayah studi Wonotoro terbagi menjadi 4 kelas: Very High (17%), High (43%), Moderate (29%), dan Low (11%). Sebagian besar wilayah (60%) memiliki potensi air tanah yang tinggi, terutama di area dengan batuan vulkanik berpori dan curah hujan tinggi.
+A: Berdasarkan pemodelan AQUAVISION, potensi air tanah di wilayah studi Wonotoro terbagi menjadi 4 kelas: Sangat Tinggi (10,6%), Tinggi (33,4%), Sedang (43,5%), dan Rendah (12,4%). Sebagian besar wilayah memiliki potensi air tanah sedang hingga tinggi, terutama di area dengan batuan vulkanik berpori dan curah hujan tinggi.
 
 ---
 
 **[C03]** Zona terbaik
 Q: "air tanah paling bagus dimana?"
 INTENT: I02 – Potensi Air Tanah
-TOPIK: zona Very High | KONTEKS: —
-A: Zona potensi air tanah tertinggi (Very High) mencakup 17% wilayah studi dan umumnya berada di area dengan kombinasi: curah hujan tinggi, batuan vulkanik berpori, dan kelerengan sedang yang mendukung infiltrasi. Detail lokasi spesifik dapat dilihat pada layer Potensi Air Tanah di peta AQUAVISION.
+TOPIK: zona Sangat Tinggi | KONTEKS: —
+A: Zona potensi air tanah tertinggi (Sangat Tinggi) mencakup 10,6% wilayah studi dan umumnya berada di area dengan kombinasi: curah hujan tinggi, batuan vulkanik berpori, dan kelerengan sedang yang mendukung infiltrasi. Detail lokasi spesifik dapat dilihat pada layer Potensi Air Tanah di peta AQUAVISION.
 
 ---
 
@@ -210,7 +210,7 @@ A: Potensi air tanah Wonotoro cukup baik. Sekitar 43% wilayah berpotensi Tinggi 
 Q: "pontensi airtanah wonotoro"
 INTENT: I02 – Potensi Air Tanah (via alias: "pontensi airtanah" = "potensi air tanah")
 TOPIK: air tanah | KONTEKS: Wonotoro
-A: Potensi air tanah Desa Wonotoro: 17% Very High, 43% High, 29% Moderate, 11% Low. Mayoritas wilayah memiliki potensi tinggi. Lihat layer GWP di peta untuk detail lokasinya.
+A: Potensi air tanah Desa Wonotoro: 10,6% Sangat Tinggi, 33,4% Tinggi, 43,5% Sedang, 12,4% Rendah. Mayoritas wilayah memiliki potensi sedang hingga tinggi. Lihat layer GWP di peta untuk detail lokasinya.
 
 ---
 
@@ -226,7 +226,7 @@ A: Potensi air tanah di AQUAVISION dihitung menggunakan metode AHP (Analytical H
 Q: "gwp itu apa?"
 INTENT: I02 – Potensi Air Tanah
 TOPIK: definisi GWP | KONTEKS: —
-A: GWP adalah singkatan dari Groundwater Potential, atau dalam Bahasa Indonesia: Potensi Air Tanah. Dalam AQUAVISION, GWP merujuk pada peta hasil pemodelan yang menunjukkan zona potensi air tanah di wilayah studi Wonotoro, diklasifikasikan ke dalam 4 kelas: Low, Moderate, High, dan Very High.
+A: GWP adalah singkatan dari Groundwater Potential, atau dalam Bahasa Indonesia: Potensi Air Tanah. Dalam AQUAVISION, GWP merujuk pada peta hasil pemodelan yang menunjukkan zona potensi air tanah di wilayah studi Wonotoro, diklasifikasikan ke dalam 4 kelas: Rendah, Sedang, Tinggi, dan Sangat Tinggi.
 
 ---
 
@@ -238,19 +238,19 @@ A: Ya, curah hujan adalah faktor paling berpengaruh dalam menentukan potensi air
 
 ---
 
-**[C09]** Very High vs High
+**[C09]** Sangat Tinggi vs Tinggi
 Q: "apa bedanya zona high dan very high di peta air tanah?"
 INTENT: I02 – Potensi Air Tanah
 TOPIK: interpretasi kelas GWP | KONTEKS: —
-A: Zona Very High menunjukkan potensi tertinggi untuk menemukan air tanah dalam jumlah signifikan, dengan kondisi sangat mendukung resapan (batuan sangat berpori, curah hujan sangat tinggi, lereng landai). Zona High memiliki potensi tinggi namun satu atau lebih faktor tidak seoptimal Very High. Secara praktis, kedua zona ini adalah prioritas utama untuk mencari sumber air baru atau sumur bor.
+A: Zona Sangat Tinggi menunjukkan potensi tertinggi untuk menemukan air tanah dalam jumlah signifikan, dengan kondisi sangat mendukung resapan (batuan sangat berpori, curah hujan sangat tinggi, lereng landai). Zona Tinggi memiliki potensi tinggi namun satu atau lebih faktor tidak seoptimal Sangat Tinggi. Secara praktis, kedua zona ini adalah prioritas utama untuk mencari sumber air baru atau sumur bor.
 
 ---
 
-**[C10]** Zona Low
+**[C10]** Zona Rendah
 Q: "kalau zona low air tanah artinya apa?"
 INTENT: I02 – Potensi Air Tanah
-TOPIK: interpretasi kelas Low | KONTEKS: —
-A: Zona Low berarti area tersebut memiliki potensi kecil untuk menyimpan air tanah yang signifikan. Biasanya karena kombinasi: lereng curam (air mengalir, tidak meresap), batuan kedap air, atau curah hujan rendah. Zona Low mencakup 11% wilayah studi Wonotoro.
+TOPIK: interpretasi kelas Rendah | KONTEKS: —
+A: Zona Rendah berarti area tersebut memiliki potensi kecil untuk menyimpan air tanah yang signifikan. Biasanya karena kombinasi: lereng curam (air mengalir, tidak meresap), batuan kedap air, atau curah hujan rendah. Zona Rendah mencakup 12,4% wilayah studi Wonotoro.
 
 ---
 
@@ -760,7 +760,7 @@ INTENT: Ambigu (Neraca Air 40% | GWP 35% | Sumber Air 25%)
 TOPIK: tidak jelas | KONTEKS: Wonotoro
 A: Pertanyaan ini bisa merujuk ke beberapa topik tentang air di Wonotoro. Berikut ringkasannya:
 - **Ketersediaan air:** Lihat Neraca Air di Dashboard (status Aman/Waspada/Kritis)
-- **Potensi air tanah:** 43% High, 17% Very High – cukup baik
+- **Potensi air tanah:** 33,4% Tinggi, 10,6% Sangat Tinggi – cukup baik
 - **Sumber air:** Lihat layer Sumber Air di peta untuk lokasi mata air
 Ingin saya jelaskan salah satunya lebih detail?
 

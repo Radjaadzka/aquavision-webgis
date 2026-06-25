@@ -326,7 +326,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         var color = getPotensiColor(dn);
 
                         l.bindPopup(
-                            '<div style="font-family:\'Inter\',sans-serif;padding:2px 0;min-width:160px;">' +
+                            '<div style="font-family:var(--font-body);padding:2px 0;min-width:160px;">' +
                                 '<div style="font-weight:700;font-size:13px;color:' + color + ';margin-bottom:8px;border-bottom:1px solid rgba(0,0,0,.08);padding-bottom:6px;">💧 Potensi Air Tanah</div>' +
                                 '<div style="font-size:22px;font-weight:700;color:' + color + ';letter-spacing:-.3px;">' + label + '</div>' +
                             '</div>'
@@ -508,7 +508,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function makePopup(accentColor, typeLabel, name, rows) {
         var html =
-            '<div style="font-family:\'Inter\',sans-serif;min-width:170px;font-size:13px;line-height:1.65;">' +
+            '<div style="font-family:var(--font-body);min-width:170px;font-size:13px;line-height:1.65;">' +
             '<div style="font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;' +
             'color:' + accentColor + ';margin-bottom:3px;">' + typeLabel + '</div>' +
             '<div style="font-weight:700;font-size:14px;color:#111827;margin-bottom:7px;' +

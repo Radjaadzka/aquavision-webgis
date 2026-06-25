@@ -98,10 +98,10 @@ POTENSI AIR TANAH
 │   ├── Drainage Density (bobot 0,04) → dari DEMNAS
 │   └── Soil Type / Jenis Tanah (bobot 0,03) → dari FAO DSMW
 ├── menghasilkan kelas:
-│   ├── Very High (17% luas)
-│   ├── High (43% luas)
-│   ├── Moderate (29% luas)
-│   └── Low (11% luas)
+│   ├── Sangat Tinggi (10,6% luas)
+│   ├── Tinggi (33,4% luas)
+│   ├── Sedang (43,5% luas)
+│   └── Rendah (12,4% luas)
 ├── berlokasi di → Wilayah Studi Wonotoro
 ├── ditampilkan sebagai → Layer Peta AQUAVISION
 └── berkaitan dengan → Ketersediaan Air (supply)
@@ -297,7 +297,7 @@ FASILITAS WISATA
 AHP
 ├── digunakan untuk → Menghitung Potensi Air Tanah (GWP)
 ├── menggunakan → 7 parameter dengan bobot berbeda
-├── menghasilkan → Peta GWP (Low/Moderate/High/Very High)
+├── menghasilkan → Peta GWP (Rendah/Sedang/Tinggi/Sangat Tinggi)
 ├── referensi → Tesfa & Sewnet (2025)
 └── bagian dari → Analisis GIS-MCDM
 ```

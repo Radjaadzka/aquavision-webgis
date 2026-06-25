@@ -115,8 +115,8 @@ GLOSSARY = {
     'geodjango': 'Ekstensi Django (django.contrib.gis) yang mendukung pengelolaan data spasial dan interaksi dengan PostGIS.',
     'geotiff': 'Format file raster geospasial yang menyimpan informasi koordinat di dalam file TIFF, dipakai untuk data debit puncak bulanan.',
     'gis': 'Geographic Information System — sistem untuk mengelola, menganalisis, dan memvisualisasikan data yang memiliki referensi geografis.',
-    'groundwater potential zone': 'Model spasial yang menunjukkan tingkat potensi relatif wilayah dalam mendukung keberadaan dan pengisian air tanah. Kelas: Low, Moderate, High, Very High.',
-    'gwp': 'Groundwater Potential (Potensi Air Tanah) — hasil pemodelan zona potensi air tanah AQUAVISION, diklasifikasikan Low/Moderate/High/Very High.',
+    'groundwater potential zone': 'Model spasial yang menunjukkan tingkat potensi relatif wilayah dalam mendukung keberadaan dan pengisian air tanah. Kelas: Rendah, Sedang, Tinggi, Sangat Tinggi.',
+    'gwp': 'Groundwater Potential (Potensi Air Tanah) — hasil pemodelan zona potensi air tanah AQUAVISION, diklasifikasikan Rendah/Sedang/Tinggi/Sangat Tinggi.',
     'initial abstraction': 'Kehilangan awal air hujan sebelum limpasan permukaan terbentuk (infiltrasi awal, intersepsi vegetasi, tampungan permukaan). Ia = 0,2 × S.',
     'kml': 'Keyhole Markup Language — format file berbasis XML untuk data geospasial yang dapat dibuka di Google Earth.',
     'leaflet': 'Pustaka JavaScript open-source untuk peta interaktif berbasis web. AQUAVISION memakai versi 1.9.',
@@ -209,8 +209,8 @@ LAYER_METADATA = {
     'potensi_air_tanah': {
         'nama': 'Potensi Air Tanah (Groundwater Potential Zone)',
         'tipe_geometri': 'MultiPolygon (Vektor)',
-        'deskripsi': 'Peta zonasi potensi air tanah hasil analisis AHP berbasis 7 parameter fisik berbobot.',
-        'kelas': 'Low (11%, 20 km²) | Moderate (29%, 50 km²) | High (43%, 76 km²) | Very High (17%, 29 km²)',
+        'deskripsi': 'Peta zonasi potensi air tanah hasil analisis AHP berbasis parameter fisik berbobot (sumber data: DaerahResapan.geojson).',
+        'kelas': 'Rendah (12,4%, ~43,2 km²) | Sedang (43,5%, ~151,6 km²) | Tinggi (33,4%, ~116,5 km²) | Sangat Tinggi (10,6%, ~37,0 km²)',
         'akses': 'Login required',
     },
     'debit_puncak': {
@@ -369,8 +369,8 @@ FAQ_ENTRIES = [
     (('rumus debit puncak', 'formula debit', 'qp = 0.278'),
      "Debit puncak dihitung dengan Metode Rasional: Qp = 0,278 × C × I × A, di mana C = koefisien limpasan (dari SCS-CN), I = intensitas hujan (mm/jam), dan A = luas DAS (km²). Koefisien limpasan C diperoleh dari perhitungan SCS-CN berdasarkan jenis tanah dan tutupan lahan."),
 
-    (('kelas very high', 'kelas high gwp', 'persentase potensi air tanah', 'luas zona potensi'),
-     "Hasil pemodelan Potensi Air Tanah AQUAVISION: Low 11% (20 km²), Moderate 29% (50 km²), High 43% (76 km²) — kelas dominan, dan Very High 17% (29 km²). Sekitar 60% wilayah studi berada pada kelas High atau Very High."),
+    (('kelas sangat tinggi', 'kelas tinggi gwp', 'persentase potensi air tanah', 'luas zona potensi'),
+     "Hasil pemodelan Potensi Air Tanah AQUAVISION (DaerahResapan.geojson): Rendah 12,4% (~43,2 km²), Sedang 43,5% (~151,6 km²) — kelas dominan, Tinggi 33,4% (~116,5 km²), dan Sangat Tinggi 10,6% (~37,0 km²). Sekitar 44% wilayah studi berada pada kelas Tinggi atau Sangat Tinggi."),
 
     (('debit tertinggi', 'debit terendah', 'musim hujan debit', 'musim kemarau debit'),
      "Debit puncak tertinggi terjadi Februari (rata-rata 14,942 m³/s), diikuti Januari (14,477 m³/s) dan Desember (13,595 m³/s) — periode puncak musim hujan. Debit terendah terjadi September (0,138 m³/s) dan Agustus (0,143 m³/s) — puncak musim kemarau."),
@@ -385,7 +385,7 @@ FAQ_ENTRIES = [
      "AQUAVISION dibuat untuk menjawab masalah krisis air bersih Desa Wonotoro: lokasi sumber air yang sulit diakses, jaringan pipa tidak terstruktur (sempat tertelusur manual belasan kilometer pasca kebakaran Bromo 2023), penurunan debit saat kemarau, dan data sumber daya air yang tersebar tidak terintegrasi."),
 
     (('legenda', 'arti warna peta', 'arti warna layer', 'simbol peta'),
-     "Setiap layer memiliki legenda warna berbeda. Aktifkan layer yang diinginkan, lalu lihat panel legenda di peta. Misalnya pada layer Potensi Air Tanah: hijau tua = Very High, hijau muda = High, kuning = Moderate, merah = Low."),
+     "Setiap layer memiliki legenda warna berbeda. Aktifkan layer yang diinginkan, lalu lihat panel legenda di peta. Misalnya pada layer Potensi Air Tanah: merah = Rendah, oranye = Sedang, kuning = Tinggi, hijau = Sangat Tinggi."),
 
     (('basemap', 'citra satelit', 'peta dasar', 'topografi', 'ganti tampilan peta'),
      "AQUAVISION menyediakan tiga pilihan basemap (peta dasar): OpenStreetMap (peta jalan standar), Citra Satelit ESRI (foto udara), dan Topografi ESRI (kontur ketinggian). Pilih basemap melalui selector di pojok kanan peta pada Dashboard."),
@@ -394,7 +394,7 @@ FAQ_ENTRIES = [
      "Gunakan kolom pencarian di Data Portal untuk menemukan dataset, sumber air, dusun, atau fasilitas tertentu secara cepat tanpa perlu menelusuri seluruh peta atau daftar data."),
 
     (('ai assistant', 'asisten ai', 'apakah ai bisa jawab semua', 'batas kemampuan ai', 'ai assistant bisa apa'),
-     "AI Assistant AQUAVISION menjawab pertanyaan seputar fitur, data, dan informasi sumber daya air Desa Wonotoro berdasarkan basis pengetahuan sistem. Untuk pertanyaan di luar topik ini, laporan bug, masalah akun, atau permintaan data spesifik, AI akan menawarkan untuk meneruskan pertanyaan Anda ke Admin."),
+     "Pusat Bantuan AQUAVISION menjawab pertanyaan seputar fitur, data, dan informasi sumber daya air Desa Wonotoro berdasarkan basis pengetahuan sistem. Untuk pertanyaan di luar topik ini, laporan bug, masalah akun, atau permintaan data spesifik, sistem akan menawarkan untuk meneruskan pertanyaan Anda ke Admin."),
 
     (('cara menghubungi admin', 'menghubungi admin', 'kontak admin'),
      "Untuk menghubungi Admin AQUAVISION: login ke akun Anda, lalu klik menu 'Hubungi Admin'. Tulis pesan Anda — AI akan mencoba menjawab dahulu, dan jika diperlukan, pesan akan diteruskan ke Admin (lengkap dengan nomor tiket dan estimasi waktu respons)."),
@@ -426,7 +426,7 @@ FAQ_ENTRIES = [
 # dokumentasi sumber, untuk dua kasus berikut.
 CRITICAL_DISAMBIGUATION = (
     (('air tanah wonotoro', 'wonotoro air tanah', 'gwp wonotoro', 'wonotoro gwp'),
-     "Berdasarkan pemodelan Groundwater Potential (GWP) AQUAVISION, Desa Wonotoro memiliki potensi air tanah yang cukup baik: 43% wilayah berpotensi High dan 17% Very High (sekitar 60% wilayah studi). Lihat layer 'Potensi Air Tanah' di peta untuk detail persebaran zonanya."),
+     "Berdasarkan pemodelan Groundwater Potential (GWP) AQUAVISION, potensi air tanah Desa Wonotoro didominasi kelas Sedang (43,5% wilayah), diikuti Tinggi (33,4%), Rendah (12,4%), dan Sangat Tinggi (10,6%) — sekitar 44% wilayah studi berkategori Tinggi atau Sangat Tinggi. Lihat layer 'Potensi Air Tanah' di peta untuk detail persebaran zonanya."),
 
     (('hotel wonotoro', 'wonotoro hotel'),
      "Informasi hotel dan penginapan di Wonotoro tersedia melalui layer 'Hotel/Akomodasi' di AQUAVISION — menampilkan lokasi, jumlah kamar, kapasitas, dan kebutuhan air harian setiap fasilitas. Aktifkan layer tersebut di panel layer control Dashboard."),

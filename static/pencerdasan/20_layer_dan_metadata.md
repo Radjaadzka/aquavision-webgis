@@ -28,7 +28,7 @@ GIS-MCDM berbasis AHP (Analytical Hierarchy Process); Weighted Overlay; Equal In
 30 × 30 m (resolusi analisis)
 
 ## Format Data
-Vektor MultiPolygon (GeoJSON)
+Vektor MultiPolygon (GeoJSON) — sumber: `static/data/DaerahResapan.geojson`
 
 ## Kegunaan bagi Pengguna
 - Identifikasi lokasi potensial untuk eksplorasi air tanah.
@@ -44,15 +44,15 @@ Vektor MultiPolygon (GeoJSON)
 
 | Kelas | Rentang Indeks | Luas (km²) | % | Makna |
 |---|---|---|---|---|
-| Low | 1,61–2,43 | 20 | 11% | Kondisi fisik kurang mendukung infiltrasi dan penyimpanan air tanah |
-| Moderate | 2,43–3,26 | 50 | 29% | Kondisi fisik cukup mendukung; area penyangga |
-| High | 3,26–4,08 | 76 | 43% | Kondisi fisik mendukung; zona prioritas konservasi |
-| Very High | 4,08–4,90 | 29 | 17% | Kondisi fisik sangat mendukung; zona prioritas tertinggi |
+| Rendah | 1,74–2,41 | 43,2 | 12,4% | Kondisi fisik kurang mendukung infiltrasi dan penyimpanan air tanah |
+| Sedang | 2,41–3,08 | 151,6 | 43,5% | Kondisi fisik cukup mendukung; area penyangga |
+| Tinggi | 3,08–3,75 | 116,5 | 33,4% | Kondisi fisik mendukung; zona prioritas konservasi |
+| Sangat Tinggi | 3,75–4,42 | 37,0 | 10,6% | Kondisi fisik sangat mendukung; zona prioritas tertinggi |
 
 ## Pertanyaan yang Sering Muncul
-- **"Apakah ada air tanah di zona High?"** → Zona High menunjukkan potensi yang baik, tetapi bukan jaminan pasti ada air. Survei lapangan tetap diperlukan.
-- **"Berapa luas zona very high?"** → ~29 km² atau 17% dari total wilayah studi.
-- **"Zona mana yang paling bagus untuk sumur bor?"** → Zona High dan Very High adalah prioritas untuk eksplorasi.
+- **"Apakah ada air tanah di zona Tinggi?"** → Zona Tinggi menunjukkan potensi yang baik, tetapi bukan jaminan pasti ada air. Survei lapangan tetap diperlukan.
+- **"Berapa luas zona sangat tinggi?"** → ~37 km² atau 10,6% dari total wilayah studi.
+- **"Zona mana yang paling bagus untuk sumur bor?"** → Zona Tinggi dan Sangat Tinggi adalah prioritas untuk eksplorasi.
 - **"Data ini dari kapan?"** → Rainfall dari rata-rata 2016–2025; tutupan lahan 2021; geologi tidak berperiodisasi (statis).
 
 ---

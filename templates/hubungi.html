@@ -45,13 +45,10 @@
 }
 .msg-avatar.user-av  { background: linear-gradient(135deg,#1a5276,#3B82F6); }
 .msg-avatar.admin-av { background: linear-gradient(135deg,#15803D,#16A34A); }
-.msg-avatar.ai-av    { background: linear-gradient(135deg,#7C3AED,#A78BFA); }
-.ai-badge {
-    display: inline-block; font-size: 10px; font-weight: 600;
-    background: rgba(124,58,237,.1); color: #7C3AED;
-    border: 1px solid rgba(124,58,237,.2); border-radius: 4px;
-    padding: 1px 5px; margin-left: 4px; vertical-align: middle; letter-spacing: .3px;
-}
+/* Sebelumnya ungu (#7C3AED) — warna yang lazim dipakai produk AI (Notion AI,
+   Copilot, dll). Diganti tone air/teal agar selaras identitas AQUAVISION,
+   bukan "warna AI". */
+.msg-avatar.ai-av    { background: linear-gradient(135deg,#0E7490,#22D3EE); }
 
 .msg-bubble {
     max-width: 72%; padding: 10px 14px;
@@ -176,7 +173,6 @@
 .src-unsure   { background: rgba(234,179,8,.1);  color: #92400E; border: 1px solid rgba(245,158,11,.2); }
 .src-escalated{ background: rgba(234,179,8,.1);  color: #92400E; border: 1px solid rgba(245,158,11,.2); }
 .src-admin    { background: rgba(59,130,246,.1); color: #1D4ED8; border: 1px solid rgba(59,130,246,.2); }
-.src-gemini   { background: rgba(124,58,237,.1); color: #6D28D9; border: 1px solid rgba(124,58,237,.25); }
 
 /* Pertanyaan Populer (quick questions) */
 .quick-questions {
@@ -224,7 +220,7 @@
 
     <div class="ticket-bar" id="ticketBar" {% if not conversation.ticket_id %}style="display:none;"{% endif %}>
         <span class="ticket-num">🎫 Tiket: <strong id="ticketNum">{{ conversation.ticket_id|default:"—" }}</strong></span>
-        <span class="status-sbadge" id="statusSbadge">{% if conversation.status == 'ai_answered' %}🟢 Dijawab AI{% elif conversation.status == 'waiting_admin' or conversation.status == 'WAITING_FOR_ADMIN' %}🟡 Menunggu Admin{% elif conversation.status == 'reviewing' %}🔵 Sedang Ditinjau{% elif conversation.status == 'closed' %}✅ Selesai{% else %}💬 Aktif{% endif %}</span>
+        <span class="status-sbadge" id="statusSbadge">{% if conversation.status == 'ai_answered' %}✅ Terjawab Otomatis{% elif conversation.status == 'waiting_admin' or conversation.status == 'WAITING_FOR_ADMIN' %}🟡 Menunggu Admin{% elif conversation.status == 'reviewing' %}🔵 Sedang Ditinjau{% elif conversation.status == 'closed' %}✅ Selesai{% else %}💬 Aktif{% endif %}</span>
     </div>
 
     <div class="queue-info" id="queueInfo" {% if conversation.status != 'waiting_admin' and conversation.status != 'WAITING_FOR_ADMIN' %}style="display:none;"{% endif %}>
@@ -245,18 +241,18 @@
     <div class="chat-box">
         <div class="chat-messages" id="chatMessages">
             <div class="msg-row other" id="chatEmpty">
-                <div class="msg-avatar ai-av">🤖</div>
+                <div class="msg-avatar ai-av">💧</div>
                 <div>
-                    <div class="msg-sender">AQUAVISION Assistant <span class="ai-badge">AI</span></div>
+                    <div class="msg-sender">AQUAVISION</div>
                     <div class="msg-bubble">
-                        Halo! 👋<br><br>
-                        Saya dapat membantu menjelaskan:<br>
+                        Selamat datang di Pusat Bantuan AQUAVISION.<br><br>
+                        Anda dapat menanyakan seputar:<br>
                         • Potensi sumber daya air<br>
                         • Ketersediaan air<br>
                         • Simulasi kebutuhan air<br>
                         • Dataset yang tersedia<br>
                         • Cara mengunduh data<br><br>
-                        Silakan tanyakan apa saja.
+                        Ketik pertanyaan Anda di bawah ini.
                     </div>
                 </div>
             </div>
@@ -283,7 +279,7 @@
     var pollTimer = null;
 
     var _STATUS_LABELS = {
-        'ai_answered':       '🟢 Dijawab AI',
+        'ai_answered':       '✅ Terjawab Otomatis',
         'waiting_admin':     '🟡 Menunggu Admin',
         'WAITING_FOR_ADMIN': '🟡 Menunggu Admin',
         'reviewing':         '🔵 Sedang Ditinjau',
@@ -293,9 +289,11 @@
 
     // Harus sama persis dengan _AI_UNSURE_TEXT di api/views.py
     var AI_UNSURE_MARKER = "Saya belum memiliki informasi yang cukup untuk menjawab pertanyaan tersebut secara akurat.";
-    // Harus sama persis dengan GEMINI_SOURCE_MARKER di api/ai_gemini.py (zero-width space,
-    // disisipkan di awal jawaban Gemini agar bisa dibedakan dari jawaban rule-based)
-    var GEMINI_SOURCE_MARKER = "​";
+    // Catatan: backend (api/ai_gemini.py) tetap menyisipkan marker zero-width
+    // di awal jawaban yang dijawab Gemini untuk keperluan internal/diagnostik,
+    // namun frontend SENGAJA tidak lagi membedakannya secara visual ke
+    // pengguna — lihat audit brand identity (pengguna tidak boleh merasa
+    // sedang berbicara dengan model AI tertentu).
 
     function updateStatusDisplay(status, ticketId, queueCount) {
         var badge = document.getElementById('statusSbadge');
@@ -333,28 +331,28 @@
         var isAI    = m.is_ai_response;
         var side    = (!m.is_admin) ? 'me' : 'other';
         var avClass = isAI ? 'ai-av' : (m.is_admin ? 'admin-av' : 'user-av');
-        var initial = isAI ? '🤖' : (m.sender || '?')[0].toUpperCase();
+        var initial = isAI ? '💧' : (m.sender || '?')[0].toUpperCase();
 
-        // Determine source badge for non-user messages
+        // Badge sumber jawaban — sengaja TIDAK menyebut "AI"/"Gemini" ke
+        // pengguna (lihat audit brand identity): pengguna cukup tahu apakah
+        // jawaban otomatis atau sudah ditangani langsung oleh Admin manusia.
         var sourceBadge = '';
         if (isAI) {
-            if (m.content.indexOf(GEMINI_SOURCE_MARKER) === 0) {
-                sourceBadge = ' <span class="src-badge src-gemini">🧠 Gemini</span>';
-            } else if (m.content.indexOf(AI_UNSURE_MARKER) !== -1) {
+            if (m.content.indexOf(AI_UNSURE_MARKER) !== -1) {
                 sourceBadge = ' <span class="src-badge src-unsure">🟡 Butuh Admin</span>';
             } else if (m.content.indexOf('🟡 Pertanyaan Anda telah diteruskan') !== -1) {
                 sourceBadge = ' <span class="src-badge src-escalated">🟡 Diteruskan ke Admin</span>';
             } else if (m.content.indexOf('Baik, tidak masalah') !== -1) {
-                sourceBadge = ' <span class="src-badge src-ok">🟢 AI Menjawab</span>';
+                sourceBadge = ' <span class="src-badge src-ok">✅ Terjawab Otomatis</span>';
             } else {
-                sourceBadge = ' <span class="src-badge src-ok">🟢 Dijawab AI</span>';
+                sourceBadge = ' <span class="src-badge src-ok">✅ Terjawab Otomatis</span>';
             }
         } else if (m.is_admin) {
             sourceBadge = ' <span class="src-badge src-admin">💬 Balasan Admin</span>';
         }
 
         var senderLabel = isAI
-            ? 'AQUAVISION AI <span class="ai-badge">AI</span>' + sourceBadge
+            ? 'AQUAVISION' + sourceBadge
             : escHtml(m.sender) + (m.is_admin ? ' 🛡️' + sourceBadge : '');
 
         var row = document.createElement('div');
@@ -387,7 +385,7 @@
         confirmRow.id = 'confirmRow';
         confirmRow.className = 'msg-row other';
         confirmRow.innerHTML =
-            '<div class="msg-avatar ai-av" style="visibility:hidden;">🤖</div>' +
+            '<div class="msg-avatar ai-av" style="visibility:hidden;">💧</div>' +
             '<div class="confirm-btns">' +
                 '<button type="button" class="confirm-btn confirm-yes">Ya, hubungkan ke Admin</button>' +
                 '<button type="button" class="confirm-btn confirm-no">Tidak, terima kasih</button>' +

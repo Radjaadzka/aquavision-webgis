@@ -53,7 +53,7 @@ Layer AQUAVISION
 │   └── digunakan untuk → batas referensi wilayah
 │
 ├── Potensi Air Tanah (MultiPolygon)
-│   └── atribut → kelas_potensi (Low/Moderate/High/Very High), luas_ha
+│   └── atribut → kelas_potensi (Rendah/Sedang/Tinggi/Sangat Tinggi), luas_ha
 │   └── dihasilkan dari → Pemodelan GWP (AHP + Weighted Overlay)
 │
 └── Debit Puncak Aliran (Raster GeoTIFF, 12 layer)
@@ -94,13 +94,13 @@ Potensi Air Tanah (GWP)
     │
     ├── proses → Pre-Processing → Reklasifikasi → Weighted Overlay → Klasifikasi
     │
-    ├── menghasilkan kelas → Low | Moderate | High | Very High
+    ├── menghasilkan kelas → Rendah | Sedang | Tinggi | Sangat Tinggi
     │
     ├── hasil wilayah studi →
-    │   ├── Low: 11% (20 km²)
-    │   ├── Moderate: 29% (50 km²)
-    │   ├── High: 43% (76 km²) ← dominan
-    │   └── Very High: 17% (29 km²)
+    │   ├── Rendah: 12,4% (43,2 km²)
+    │   ├── Sedang: 43,5% (151,6 km²) ← dominan
+    │   ├── Tinggi: 33,4% (116,5 km²)
+    │   └── Sangat Tinggi: 10,6% (37,0 km²)
     │
     └── referensi → Tesfa & Sewnet (2025)
 ```

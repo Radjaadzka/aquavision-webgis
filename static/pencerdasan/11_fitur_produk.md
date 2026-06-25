@@ -64,7 +64,7 @@ Mengatur tampilan data di peta; pengguna dapat menampilkan atau menyembunyikan l
 | Fasilitas Wisata (Jasa) | Titik (Point) | Lokasi fasilitas jasa wisata |
 | Jaringan Pipa | Garis (MultiLineString) | Jalur distribusi air |
 | Administrasi Desa | Poligon (MultiPolygon) | Batas wilayah desa |
-| Potensi Air Tanah | Poligon Tematik (MultiPolygon) | Zona potensi air tanah (Low/Moderate/High/Very High) |
+| Potensi Air Tanah | Poligon Tematik (MultiPolygon) | Zona potensi air tanah (Rendah/Sedang/Tinggi/Sangat Tinggi) |
 | Debit Puncak Aliran | Raster (GeoTIFF) | Peta debit puncak bulanan (12 layer, Jan–Des) |
 
 ### Cara Penggunaan
@@ -79,7 +79,7 @@ Mengatur tampilan data di peta; pengguna dapat menampilkan atau menyembunyikan l
 Menjelaskan arti simbol, warna, dan kelas yang digunakan pada peta.
 
 ### Cara Membaca
-- **Warna merah/oranye/kuning/hijau** pada layer Potensi Air Tanah: menunjukkan kelas dari Low (rendah) hingga Very High (sangat tinggi).
+- **Warna merah/oranye/kuning/hijau** pada layer Potensi Air Tanah: menunjukkan kelas dari Rendah hingga Sangat Tinggi.
 - **Gradasi warna** pada layer Debit Puncak: menunjukkan nilai debit dari rendah hingga tinggi.
 - **Ikon berbeda** untuk setiap jenis fasilitas wisata dan sumber air.
 
