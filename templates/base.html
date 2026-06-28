@@ -14,10 +14,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preload" as="style"
-          href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,300;1,9..144,400&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
           onload="this.onload=null;this.rel='stylesheet'">
     <noscript>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,300;1,9..144,400&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
     </noscript>
 
     <link rel="icon" type="image/png" href="{% static 'images/logo_webgis.png' %}">
@@ -34,7 +34,7 @@
 </head>
 <body>
 <div id="aq-progress"></div>
-<button id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" style="display:none;position:fixed;bottom:24px;right:24px;z-index:999;background:var(--primary,#1a5276);color:white;border:none;width:44px;height:44px;border-radius:50%;font-size:20px;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,0.2);">↑</button>
+<button id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" style="display:none;position:fixed;bottom:20px;right:20px;z-index:999;background:var(--ocean,#07111F);color:white;border:1px solid rgba(255,255,255,.15);width:36px;height:36px;border-radius:var(--r-md,6px);font-size:16px;cursor:pointer;box-shadow:var(--s-md);">↑</button>
 <script>
 window.addEventListener("scroll",function(){
     document.getElementById("scrollTop").style.display=window.scrollY>300?"block":"none";
@@ -215,7 +215,7 @@ document.querySelectorAll('a[href^="#"]').forEach(function(a) {
 
 <!-- Floating CTA — "Buka Dashboard" pada halaman non-dashboard -->
 <a href="/" class="floating-cta-btn" id="floatingCTA" aria-label="Buka Dashboard">
-    🚀 Buka Dashboard
+    Buka Dashboard →
 </a>
 
 {% block extra_js %}{% endblock %}

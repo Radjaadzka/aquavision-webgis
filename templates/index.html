@@ -58,40 +58,38 @@
 .lyrinfo-label { color:#64748B; min-width:100px; font-weight:500; flex-shrink:0; }
 .lyrinfo-val { color:#334155; line-height:1.5; }
 
-/* Hero Dashboard — floating intro overlay on the map */
+/* Hero Dashboard — panel info di pojok atas peta, BUKAN kartu sambutan
+   terpusat-melayang ala splash screen produk SaaS/AI. */
 .hero-dashboard {
     position:absolute; inset:0; z-index:480;
-    display:flex; align-items:center; justify-content:center;
-    padding:24px 24px 24px 320px;
+    display:flex; align-items:flex-start; justify-content:flex-start;
+    padding:24px 24px 24px 336px;
     pointer-events:none;
     transition:opacity .35s ease, visibility .35s ease;
 }
 .hero-dashboard.hero-hidden { opacity:0; visibility:hidden; }
 .hero-card {
     pointer-events:auto;
-    background:linear-gradient(135deg,rgba(9,18,34,.97) 0%,rgba(13,27,52,.97) 100%);
-    border:1px solid rgba(59,130,246,.25);
-    /* Radius/shadow diperkecil & dipadatkan — kartu intro sebelumnya
-       melayang dengan shadow 60px sangat dramatis ala kartu sambutan
-       SaaS/AI; sekarang lebih terasa sebagai panel info dashboard. */
-    border-radius:10px; padding:26px 30px;
-    max-width:420px; width:100%;
-    box-shadow:0 8px 28px rgba(0,0,0,.4);
-    font-family:var(--font-body); text-align:center;
+    background: rgba(10,22,42,.97);
+    border:1px solid rgba(255,255,255,.12);
+    border-radius: var(--r-lg); padding:20px 24px;
+    max-width:340px; width:100%;
+    box-shadow: var(--s-md);
+    font-family:var(--font-body); text-align:left;
 }
 .hero-card-title {
     font-family:var(--font-display);
-    font-size:clamp(28px,5vw,40px); font-weight:300; letter-spacing:1px;
-    color:#E2E8F0; margin:0 0 6px;
+    font-size:22px; font-weight:500; letter-spacing:.3px;
+    color:#E2E8F0; margin:0 0 4px;
 }
-.hero-card-sub { font-size:13px; color:rgba(255,255,255,.55); margin:0 0 20px; font-weight:300; }
-.hero-stats { display:flex; flex-direction:column; gap:8px; margin-bottom:24px; }
-.hero-stat { display:flex; align-items:baseline; justify-content:center; gap:6px; font-size:13px; color:rgba(255,255,255,.6); }
-.hero-stat strong { font-size:20px; font-weight:600; color:#93C5FD; font-family:var(--font-display); }
-.hero-actions { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+.hero-card-sub { font-size:12.5px; color:rgba(255,255,255,.5); margin:0 0 16px; font-weight:300; }
+.hero-stats { display:flex; flex-direction:column; gap:6px; margin-bottom:18px; }
+.hero-stat { display:flex; align-items:baseline; justify-content:flex-start; gap:6px; font-size:12.5px; color:rgba(255,255,255,.55); }
+.hero-stat strong { font-size:15px; font-weight:600; color:#93C5FD; font-family:var(--font-mono); }
+.hero-actions { display:flex; gap:8px; justify-content:flex-start; flex-wrap:wrap; }
 .hero-btn {
-    padding:10px 22px; border-radius:8px; font-size:13px; font-weight:500;
-    font-family:var(--font-body); cursor:pointer; border:1px solid transparent; transition:all .15s;
+    padding:9px 18px; border-radius: var(--r-md); font-size:13px; font-weight:500;
+    font-family:var(--font-body); cursor:pointer; border:1px solid transparent; transition:background .15s;
 }
 .hero-btn-primary { background:#3B82F6; color:#fff; border-color:#3B82F6; }
 .hero-btn-primary:hover { background:#2563EB; }
@@ -103,35 +101,31 @@
     .hero-card { max-width:100%; padding:24px 22px; }
 }
 @media (max-width:480px) {
-    .hero-card { padding:20px 16px; border-radius:9px; }
-    .hero-card-title { font-size:26px; }
+    .hero-card { padding:18px 16px; border-radius: var(--r-lg); }
+    .hero-card-title { font-size:20px; }
     .hero-stats { gap:6px; }
-    .hero-stat strong { font-size:17px; }
+    .hero-stat strong { font-size:14px; }
     .hero-btn { flex:1; padding:10px 12px; }
 }
 
-/* Floating CTA — "Jelajahi Dashboard" (replay Guided Tour) */
+/* Floating CTA — "Jelajahi Dashboard" (replay Guided Tour). Datar, tanpa
+   pulsing glow — animasi glow infinite adalah pola "coba fitur AI" khas
+   onboarding produk SaaS/AI (mis. sparkle Notion AI/Copilot). */
 .floating-tour-btn {
     position: fixed;
-    bottom: 24px; right: 24px;
+    bottom: 20px; right: 20px;
     z-index: 950;
     display: flex; align-items: center; gap: 6px;
-    padding: 12px 20px;
-    background: linear-gradient(135deg, #3B82F6, #60A5FA);
-    color: #fff; border: none; border-radius: var(--r-lg);
-    font-size: 13px; font-weight: 600;
+    padding: 9px 16px;
+    background: var(--ocean);
+    color: #fff; border: 1px solid rgba(255,255,255,.15); border-radius: var(--r-md);
+    font-size: 13px; font-weight: 500;
     font-family: var(--font-body); cursor: pointer;
-    box-shadow: 0 6px 20px rgba(59,130,246,.45);
-    transition: transform .15s ease, box-shadow .15s ease;
-    animation: ftbPulse 3s ease-in-out infinite;
+    box-shadow: var(--s-md);
+    transition: border-color .15s ease;
 }
 .floating-tour-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 26px rgba(59,130,246,.6);
-}
-@keyframes ftbPulse {
-    0%, 100% { box-shadow: 0 6px 20px rgba(59,130,246,.45); }
-    50%      { box-shadow: 0 6px 26px rgba(59,130,246,.7); }
+    border-color: rgba(255,255,255,.35);
 }
 /* Sembunyikan CTA selama overlay Hero Dashboard masih tampil */
 #heroDashboard:not(.hero-hidden) ~ .floating-tour-btn { display: none; }
@@ -279,7 +273,7 @@
         right: 0 !important;
         z-index: 690 !important;
         background: rgba(7,18,33,.97) !important;
-        border-radius: 20px 20px 0 0 !important;
+        border-radius: 8px 8px 0 0 !important;
         border-top: 1px solid rgba(255,255,255,.12) !important;
         transform: translateY(calc(100% - 54px)) !important;
         transition: transform .3s cubic-bezier(.4,0,.2,1) !important;
@@ -618,7 +612,7 @@
                                 <div style="font-size:11px; color:rgba(255,255,255,.35);">Selisih</div>
                                 <div style="font-size:13px; font-weight:600;" id="simSisaVal">—</div>
                             </div>
-                            <div id="simStatusBadge" style="display:inline-block; font-size:11px; font-weight:700; padding:3px 10px; border-radius:20px; letter-spacing:.8px;"></div>
+                            <div id="simStatusBadge" style="display:inline-block; font-size:11px; font-weight:700; padding:3px 10px; border-radius:4px; letter-spacing:.8px; font-family:var(--font-mono);"></div>
                         </div>
                     </div>
                 </div>
@@ -778,7 +772,7 @@
 
     <!-- ── Floating CTA: jalankan Guided Tour ─────────────────────── -->
     <button id="floatingTourBtn" class="floating-tour-btn" onclick="window.resetTour && window.resetTour();">
-        ✨ Jelajahi Dashboard
+        Jelajahi Dashboard
     </button>
 
     <!-- ── Mobile: Sidebar Overlay ──────────────────────────────── -->
@@ -800,7 +794,7 @@
             <!-- Status badge -->
             <div style="text-align:center;padding:8px 0 14px;">
                 <span style="font-size:10px;color:rgba(255,255,255,.35);letter-spacing:1.5px;text-transform:uppercase;display:block;margin-bottom:8px;">Status Ketersediaan Air</span>
-                <span style="display:inline-block;font-size:13px;font-weight:700;letter-spacing:1px;padding:5px 20px;border-radius:20px;background:rgba(255,255,255,.07);color:rgba(255,255,255,.5);" id="mobileBsBadge">Memuat…</span>
+                <span style="display:inline-block;font-size:13px;font-weight:700;letter-spacing:1px;padding:5px 16px;border-radius:4px;background:rgba(255,255,255,.07);color:rgba(255,255,255,.5);font-family:var(--font-mono);" id="mobileBsBadge">Memuat…</span>
             </div>
             <!-- Supply / Demand grid -->
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
