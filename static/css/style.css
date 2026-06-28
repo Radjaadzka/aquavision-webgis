@@ -340,6 +340,7 @@ a   { text-decoration: none; color: inherit; }
     display: flex; align-items: center; justify-content: space-between;
     font-size: 12px; color: rgba(255,255,255,.38);
 }
+.footer-status-item span:first-child { display: inline-flex; align-items: center; gap: 6px; }
 .footer-status-val { color: rgba(255,255,255,.65); font-weight: 500; }
 .footer-status-badge {
     display: inline-flex; align-items: center; gap: 5px;
@@ -448,6 +449,7 @@ a   { text-decoration: none; color: inherit; }
 /* ── Sidebar Section Headers (new hierarchy) ─────────────────── */
 .sb-section { margin: 0 0 2px; }
 .sb-section-title {
+    display: flex; align-items: center; gap: 6px;
     font-size: 10px; font-weight: 700;
     color: rgba(255,255,255,.32);
     letter-spacing: 1.2px; text-transform: uppercase;
@@ -455,18 +457,19 @@ a   { text-decoration: none; color: inherit; }
     border-top: 1px solid rgba(255,255,255,.07);
     margin-top: 2px;
 }
+.sb-section-title .ic { color: rgba(255,255,255,.4); }
 
 /* ── Akses Cepat grid ────────────────────────────────────────── */
 .qa-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 6px;
-    margin-bottom: 2px;
+    gap: 8px;
+    margin-bottom: 4px;
 }
 .qa-btn {
     display: flex; flex-direction: column;
     align-items: center; justify-content: center;
-    gap: 4px; padding: 9px 4px;
+    gap: 4px; padding: 10px 4px;
     background: rgba(255,255,255,.05);
     border: 1px solid rgba(255,255,255,.1);
     border-radius: var(--r-md);
@@ -495,7 +498,7 @@ a   { text-decoration: none; color: inherit; }
 }
 .dc-card {
     display: flex; align-items: center; justify-content: space-between;
-    text-align: left; padding: 7px 10px;
+    text-align: left; padding: 9px 12px;
     background: rgba(255,255,255,.03);
     border-bottom: 1px solid rgba(255,255,255,.06);
     border-radius: 0; transition: background .15s;
@@ -506,8 +509,10 @@ a   { text-decoration: none; color: inherit; }
     color: #7EC8FD; line-height: 1.3; order: 2;
 }
 .dc-label {
+    display: flex; align-items: center; gap: 6px;
     font-size: 11px; color: rgba(255,255,255,.55); line-height: 1.3; order: 1;
 }
+.dc-label .ic { color: rgba(255,255,255,.4); }
 .dc-wide { grid-column: unset; }
 
 /* ── Sidebar Hero Block ─────────────────────────────────────── */
@@ -653,8 +658,13 @@ a   { text-decoration: none; color: inherit; }
     font-size: 12px;
     width: 190px;
     outline: none;
+    transition: border-color .15s, box-shadow .15s;
 }
 .map-ctrl-topleft input::placeholder { color: rgba(255,255,255,.3); }
+.map-ctrl-topleft input:focus {
+    border-color: rgba(59,130,246,.5);
+    box-shadow: 0 0 0 2px rgba(59,130,246,.1);
+}
 
 .map-ctrl-topleft button {
     padding: 7px 11px;
@@ -1849,21 +1859,6 @@ a   { text-decoration: none; color: inherit; }
     }
 }
 
-/* Layer info modal — full-width on mobile */
-@media (max-width: 600px) {
-    #modalLayerInfo .modal-box {
-        margin: 12px;
-        width: calc(100% - 24px);
-    }
-    .lyrinfo-row {
-        flex-direction: column;
-        gap: 2px;
-    }
-    .lyrinfo-label {
-        min-width: unset;
-    }
-}
-
 /* Health rows — comfortable spacing */
 .health-row {
     min-height: 28px;
@@ -2000,3 +1995,91 @@ html { scroll-behavior: smooth; }
     .auth-right { padding: 24px 16px; }
     .afw-title  { font-size: 22px; }
 }
+
+/* ================================================================
+   20. GUIDED TOUR — Driver.js v1 popover restyle
+   Library default theme is generic/purple; these overrides bring it
+   in line with AQUAVISION tokens (font, radius, single accent) so it
+   reads as part of the product, not a bolted-on widget.
+================================================================ */
+
+.driver-popover.aq-tour-popover {
+    background: #FFFFFF;
+    color: #1E293B;
+    border-radius: var(--r-md);
+    border: 1px solid #E2E8F0;
+    box-shadow: var(--s-lg);
+    font-family: var(--font-body);
+    max-width: 320px;
+    padding: 16px 18px;
+}
+.aq-tour-popover .driver-popover-title {
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: 500;
+    color: #0F172A;
+    margin-bottom: 6px;
+}
+.aq-tour-popover .driver-popover-description {
+    font-size: 13px;
+    line-height: 1.55;
+    color: #475569;
+}
+.aq-tour-popover .driver-popover-progress-text {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: #94A3B8;
+}
+.aq-tour-popover .driver-popover-footer {
+    margin-top: 14px;
+}
+.aq-tour-popover button {
+    font-family: var(--font-body);
+    font-size: 13px;
+    border-radius: var(--r-sm);
+    box-shadow: none;
+    text-shadow: none;
+}
+.aq-tour-popover .driver-popover-navigation-btns {
+    gap: 8px;
+}
+.aq-tour-popover .driver-popover-prev-btn,
+.aq-tour-popover .driver-popover-next-btn {
+    border: 1px solid #CBD5E1;
+    background: #FFFFFF;
+    color: #1E293B;
+    padding: 6px 12px;
+}
+.aq-tour-popover .driver-popover-next-btn {
+    background: var(--water);
+    border-color: var(--water);
+    color: #FFFFFF;
+}
+.aq-tour-popover .driver-popover-prev-btn:disabled {
+    opacity: .4;
+}
+.aq-tour-popover .driver-popover-close-btn {
+    color: #94A3B8;
+}
+.aq-tour-popover .driver-popover-arrow {
+    border-color: #FFFFFF;
+}
+.driver-overlay {
+    background: #07111F;
+}
+
+/* ================================================================
+   21. ICON SYSTEM — monoline outline SVG (Feather-style), pengganti
+   emoji di seluruh UI. viewBox 0 0 24 24, stroke=currentColor,
+   stroke-width 1.75, fill:none — senada dengan bobot visual SVG
+   marker peta yang sudah ada di script.js.
+================================================================ */
+.ic {
+    width: 1em; height: 1em;
+    display: inline-block;
+    vertical-align: -0.15em;
+    flex-shrink: 0;
+}
+.ic-sm { width: 14px; height: 14px; }
+.ic-md { width: 18px; height: 18px; }
+.ic-lg { width: 24px; height: 24px; }

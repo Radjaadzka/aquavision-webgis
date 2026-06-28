@@ -35,6 +35,37 @@
             radial-gradient(ellipse 60% 50% at 80% 70%, rgba(99,102,241,.04) 0%, transparent 50%);
     }
 
+    /* Fragmen screenshot dashboard — focal point nyata (bukan ilustrasi),
+       opacity rendah & memudar ke arah teks supaya terasa "jendela data"
+       di balik panel, bukan mockup produk. */
+    .auth-left-photo {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background-image: url('{% static "images/webgis_preview.jpg" %}');
+        background-size: cover;
+        background-position: 75% 35%;
+        opacity: .16;
+        -webkit-mask-image: linear-gradient(100deg, transparent 0%, transparent 28%, black 65%);
+        mask-image: linear-gradient(100deg, transparent 0%, transparent 28%, black 65%);
+    }
+
+    /* Motif kontur — pola garis topografi CSS murni (sama dengan teknik
+       .hero-topo di landing.css), bukan foto/ilustrasi AI. */
+    .auth-left-contour {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        opacity: .07;
+        background-image:
+            repeating-radial-gradient(ellipse 180% 70% at 80% 100%,
+                transparent 0px, transparent 34px,
+                rgba(255,255,255,.7) 35px, transparent 36px,
+                transparent 69px, rgba(255,255,255,.5) 70px,
+                transparent 71px, transparent 104px,
+                rgba(255,255,255,.35) 105px, transparent 106px);
+    }
+
     .auth-left-grid {
         position: absolute;
         inset: 0;
@@ -48,6 +79,15 @@
     }
 
     .auth-left-content { position: relative; z-index: 2; }
+
+    .auth-left-eyebrow {
+        display: inline-flex; align-items: center; gap: 8px;
+        font-family: var(--font-mono);
+        font-size: 10.5px; font-weight: 500; letter-spacing: 2px;
+        text-transform: uppercase; color: rgba(59,130,246,.75);
+        margin-bottom: 16px;
+    }
+    .auth-left-eyebrow::before { content:''; width: 20px; height: 1px; background: rgba(59,130,246,.5); }
 
     .auth-left-brand {
         font-family: var(--font-display);
@@ -82,12 +122,13 @@
         gap: 12px;
         margin-bottom: 14px;
     }
-    .af-dot {
-        width: 6px;
-        height: 6px;
-        border-radius: 50%;
-        background: #3B82F6;
-        margin-top: 6px;
+    .af-ic {
+        width: 26px; height: 26px;
+        border-radius: 6px;
+        background: rgba(59,130,246,.1);
+        border: 1px solid rgba(59,130,246,.2);
+        color: rgba(59,130,246,.8);
+        display: flex; align-items: center; justify-content: center;
         flex-shrink: 0;
     }
     .af p        { font-size: 13px; color: rgba(255,255,255,.38); font-weight: 300; line-height: 1.6; }
@@ -252,9 +293,12 @@
     <!-- Kiri: branding -->
     <div class="auth-left">
         <div class="auth-left-bg"></div>
+        <div class="auth-left-photo"></div>
+        <div class="auth-left-contour"></div>
         <div class="auth-left-grid"></div>
         <div class="auth-left-content">
 
+            <span class="auth-left-eyebrow">Sistem Informasi Geospasial</span>
             <div class="auth-left-brand">AQUA<em>VISION</em></div>
             <p class="auth-left-sub">Platform Informasi Sumber Daya Air · Desa Wonotoro</p>
 
@@ -262,10 +306,10 @@
                 Sistem WebGIS terintegrasi untuk pemantauan dan pengelolaan sumber daya air berbasis data spasial.
             </p>
 
-            <div class="af"><div class="af-dot"></div><p><strong>Peta interaktif</strong> dengan 8 lapisan data yang dapat dikombinasikan</p></div>
-            <div class="af"><div class="af-dot"></div><p><strong>Ketersediaan air real-time</strong> dengan indikator status dan simulasi skenario</p></div>
-            <div class="af"><div class="af-dot"></div><p><strong>Data terbuka</strong> dalam format CSV, GeoJSON, KML, dan Shapefile</p></div>
-            <div class="af"><div class="af-dot"></div><p><strong>Standar OGC</strong> — WMS/WFS, RFC 7946, ISO/IEC 25010</p></div>
+            <div class="af"><div class="af-ic"><svg class="ic ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg></div><p><strong>Peta interaktif</strong> dengan 8 lapisan data yang dapat dikombinasikan</p></div>
+            <div class="af"><div class="af-ic"><svg class="ic ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg></div><p><strong>Ketersediaan air real-time</strong> dengan indikator status dan simulasi skenario</p></div>
+            <div class="af"><div class="af-ic"><svg class="ic ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div><p><strong>Data terbuka</strong> dalam format CSV, GeoJSON, KML, dan Shapefile</p></div>
+            <div class="af"><div class="af-ic"><svg class="ic ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg></div><p><strong>Standar OGC</strong> — WMS/WFS, RFC 7946, ISO/IEC 25010</p></div>
 
         </div>
     </div>
@@ -299,7 +343,7 @@
                     <label>Password</label>
                     <div class="pw-wrap">
                         <input type="password" name="password" id="loginPw" placeholder="Masukkan password" autocomplete="current-password">
-                        <button type="button" class="pw-toggle" id="loginPwToggle" aria-label="Tampilkan password">👁</button>
+                        <button type="button" class="pw-toggle" id="loginPwToggle" aria-label="Tampilkan password"><svg class="ic ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
                     </div>
                 </div>
                 <input type="hidden" name="next" value="{{ next }}">
@@ -338,11 +382,13 @@
 (function () {
     var btn = document.getElementById('loginPwToggle');
     var fld = document.getElementById('loginPw');
+    var EYE = '<svg class="ic ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
+    var EYE_OFF = '<svg class="ic ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A10.94 10.94 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/><path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"/></svg>';
     if (btn && fld) {
         btn.addEventListener('click', function () {
             var show = fld.type === 'password';
             fld.type = show ? 'text' : 'password';
-            btn.textContent = show ? '🙈' : '👁';
+            btn.innerHTML = show ? EYE_OFF : EYE;
         });
     }
 })();

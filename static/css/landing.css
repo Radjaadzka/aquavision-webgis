@@ -21,7 +21,7 @@ body { background: #07111F; }
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");
   opacity: .5;
 }
-.hero-aurora {
+.hero-vignette {
   position: absolute; inset: 0; pointer-events: none; z-index: 0;
   background: radial-gradient(ellipse 80% 60% at 10% 80%, rgba(14,45,71,.5) 0%, transparent 50%);
 }
@@ -178,6 +178,13 @@ body { background: #07111F; }
 }
 .sec-sub-lt { color: rgba(255,255,255,.38); }
 
+/* Layout editorial 2-kolom — label sempit di kiri (ala catatan pinggir
+   jurnal/laporan) + konten lebar di kanan, dipakai pada satu section
+   (Mengapa AQUAVISION) supaya ritme halaman tidak monoton tanpa
+   menambah elemen dekoratif baru. */
+.sec-editorial { display: grid; grid-template-columns: 130px 1fr; gap: 32px; align-items: start; }
+.sec-editorial .ed-margin { position: sticky; top: 88px; }
+
 /* ══════════════════════════════════════════════
    MENGAPA AQUAVISION
 ══════════════════════════════════════════════ */
@@ -187,9 +194,9 @@ body { background: #07111F; }
 .why-card {
   background: #F8FAFC; border: 1px solid #E2E8F0;
   border-radius: var(--r-lg); padding: 24px 20px;
-  transition: border-color .15s; display: flex; flex-direction: column; gap: 12px;
+  transition: border-color .2s, box-shadow .2s; display: flex; flex-direction: column; gap: 12px;
 }
-.why-card:hover { border-color: rgba(59,130,246,.3); }
+.why-card:hover { border-color: rgba(59,130,246,.3); box-shadow: 0 4px 16px rgba(15,23,42,.06); }
 .why-icon {
   width: 40px; height: 40px; border-radius: var(--r-md);
   background: rgba(59,130,246,.08);
@@ -236,6 +243,25 @@ body { background: #07111F; }
 .prob-cell p  { font-size: 13px; font-weight: 300; color: #64748B; line-height: 1.85; }
 
 /* ══════════════════════════════════════════════
+   ALUR KERJA — timeline horizontal, dibangun dari garis+nomor
+   (bukan ilustrasi), agar terasa "hidup" tanpa ornamen baru.
+══════════════════════════════════════════════ */
+.wf-timeline {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 0;
+}
+.wf-step {
+  position: relative;
+  padding: 20px 20px 0 0;
+  border-top: 2px solid #3B82F6;
+}
+.wf-num {
+  font-family: var(--font-mono); font-size: 22px; font-weight: 500;
+  color: rgba(59,130,246,.5); margin-bottom: 10px;
+}
+.wf-step h4 { font-size: 14px; font-weight: 600; color: #0F172A; margin-bottom: 6px; }
+.wf-step p  { font-size: 12.5px; font-weight: 300; color: #64748B; line-height: 1.75; padding-right: 16px; }
+
+/* ══════════════════════════════════════════════
    FITUR UTAMA
 ══════════════════════════════════════════════ */
 .feat-layout {
@@ -244,10 +270,15 @@ body { background: #07111F; }
 .fc {
   background: #fff; border: 1px solid #E2E8F0;
   border-radius: var(--r-lg); padding: 22px 20px;
-  transition: border-color .15s; display: flex; flex-direction: column; gap: 10px;
+  transition: border-color .2s, box-shadow .2s; display: flex; flex-direction: column; gap: 10px;
 }
 .fc.span2 { grid-column: span 2; }
-.fc:hover { border-color: rgba(59,130,246,.3); }
+.fc:hover { border-color: rgba(59,130,246,.3); box-shadow: 0 4px 16px rgba(15,23,42,.06); }
+.fc-top { display: flex; align-items: center; justify-content: space-between; }
+.fc-n {
+  font-family: var(--font-mono); font-size: 12px; font-weight: 600;
+  color: rgba(59,130,246,.4); letter-spacing: .5px;
+}
 .fc-icon {
   width: 36px; height: 36px; border-radius: var(--r-md);
   background: rgba(59,130,246,.07);
@@ -366,10 +397,10 @@ body { background: #07111F; }
 .proof-card {
   background: #fff; border: 1px solid #E2E8F0;
   border-radius: var(--r-lg); padding: 24px 18px;
-  text-align: center; transition: border-color .15s;
+  text-align: center; transition: border-color .2s, box-shadow .2s;
   display: flex; flex-direction: column; align-items: center; gap: 10px;
 }
-.proof-card:hover { border-color: rgba(59,130,246,.3); }
+.proof-card:hover { border-color: rgba(59,130,246,.3); box-shadow: 0 4px 16px rgba(15,23,42,.06); }
 .proof-icon {
   font-size: 26px; line-height: 1;
   width: 48px; height: 48px; border-radius: var(--r-md);
@@ -446,9 +477,9 @@ body { background: #07111F; }
 .team-card {
   background: white; border: 1px solid #E2E8F0;
   border-radius: var(--r-lg); padding: 24px 18px 20px;
-  text-align: center; transition: border-color .15s;
+  text-align: center; transition: border-color .2s, box-shadow .2s;
 }
-.team-card:hover { border-color: rgba(59,130,246,.3); }
+.team-card:hover { border-color: rgba(59,130,246,.3); box-shadow: 0 4px 16px rgba(15,23,42,.06); }
 .tc-avatar {
   width: 56px; height: 56px; border-radius: var(--r-md);
   background: #1a5276;
@@ -500,9 +531,13 @@ body { background: #07111F; }
   .prob-cell      { border-right: none !important; }
   .feat-layout    { grid-template-columns: 1fr; }
   .fc.span2       { grid-column: span 1; }
+  .wf-timeline    { grid-template-columns: 1fr; gap: 18px; }
+  .wf-step        { padding: 16px 0 0; }
   .lokasi-wrap    { grid-template-columns: 1fr; gap: 28px; }
   .sec            { padding: 48px 6%; }
   .team-grid      { grid-template-columns: repeat(2, 1fr); }
+  .sec-editorial  { grid-template-columns: 1fr; gap: 12px; }
+  .sec-editorial .ed-margin { position: static; }
 }
 @media (max-width: 640px) {
   .why-grid       { grid-template-columns: 1fr; }

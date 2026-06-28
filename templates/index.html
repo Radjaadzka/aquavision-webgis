@@ -13,22 +13,11 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <!-- driver.js CSS dihapus dari head (render-blocking); diinjeksi dinamis oleh tour.js saat tour dimulai -->
 <style>
-/* Driver.js v0.9.8 tour overrides.
-   Overlay z-index=100002, Stage=100003, HighlightedElement=100004, Popover=1000000000.
-   Containers visible during tour are elevated to 100004 via tour.js lockSidebar/lockNavbar/lockMapControls.
-   The stage #FFF background creates a "white box" on dark elements — override to transparent. */
-#driver-highlighted-element-stage { background-color: transparent !important; }
-/* Layer info button */
-.lyr-info {
-    display:inline-flex; align-items:center; justify-content:center;
-    width:16px; height:16px; border-radius:50%;
-    background:rgba(59,130,246,.2); color:rgba(99,179,237,.8);
-    font-size:10px; font-weight:700; cursor:pointer; margin-left:4px;
-    border:1px solid rgba(59,130,246,.25); flex-shrink:0;
-    transition:background .15s; vertical-align:middle;
-}
-.lyr-info:hover { background:rgba(59,130,246,.4); }
-
+/* Driver.js v1 tour: spotlight cutout is drawn via an SVG overlay mask
+   (no separate white "stage" div like v0.9), so no override is needed
+   here — popover styling lives in style.css under "GUIDED TOUR".
+   Containers that must stay visible above the overlay are elevated via
+   tour.js lockSidebar/lockNavbar/lockMapControls. */
 /* Legend items */
 .legend-item {
     display:flex; align-items:center; gap:8px;
@@ -52,12 +41,6 @@
 .health-label { color:rgba(255,255,255,.5); flex:1; }
 .health-val   { color:rgba(255,255,255,.3); font-size:11px; }
 
-/* Layer info modal */
-#modalLayerInfo .modal-box { max-width:520px; }
-.lyrinfo-row { display:flex; gap:8px; margin-bottom:10px; font-size:13px; }
-.lyrinfo-label { color:#64748B; min-width:100px; font-weight:500; flex-shrink:0; }
-.lyrinfo-val { color:#334155; line-height:1.5; }
-
 /* Hero Dashboard — panel info di pojok atas peta, BUKAN kartu sambutan
    terpusat-melayang ala splash screen produk SaaS/AI. */
 .hero-dashboard {
@@ -72,15 +55,21 @@
     pointer-events:auto;
     background: rgba(10,22,42,.97);
     border:1px solid rgba(255,255,255,.12);
-    border-radius: var(--r-lg); padding:20px 24px;
-    max-width:340px; width:100%;
-    box-shadow: var(--s-md);
+    border-left: 3px solid var(--water);
+    border-radius: var(--r-lg); padding:20px 26px;
+    max-width:380px; width:100%;
+    box-shadow: 0 8px 24px rgba(0,0,0,.28), 0 2px 6px rgba(0,0,0,.2);
     font-family:var(--font-body); text-align:left;
+}
+.hero-card-eyebrow {
+    font-family:var(--font-mono); font-size:10.5px; font-weight:500;
+    letter-spacing:1px; text-transform:uppercase;
+    color:#60A5FA; margin:0 0 8px;
 }
 .hero-card-title {
     font-family:var(--font-display);
-    font-size:22px; font-weight:500; letter-spacing:.3px;
-    color:#E2E8F0; margin:0 0 4px;
+    font-size:25px; font-weight:500; letter-spacing:.2px;
+    color:#F1F5F9; margin:0 0 4px;
 }
 .hero-card-sub { font-size:12.5px; color:rgba(255,255,255,.5); margin:0 0 16px; font-weight:300; }
 .hero-stats { display:flex; flex-direction:column; gap:6px; margin-bottom:18px; }
@@ -339,7 +328,7 @@
 
         <div class="sidebar-head">
             <h2>Fitur Peta</h2>
-            <button class="btn-collapse-sidebar" id="btnHideSidebar">✕</button>
+            <button class="btn-collapse-sidebar" id="btnHideSidebar"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
         </div>
 
         <div class="sidebar-scroll">
@@ -349,7 +338,7 @@
             ════════════════════════════════════════════════════ -->
             <div class="water-status-card" id="waterStatusCard">
                 <div class="wsc-head">
-                    <span class="wsc-icon">🌊</span>
+                    <span class="wsc-icon"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span>
                     <span class="wsc-title">Status Air Desa Wonotoro</span>
                 </div>
                 <div class="wsc-badge" id="wscBadge">Memuat...</div>
@@ -361,25 +350,25 @@
                  2. AKSES CEPAT
             ════════════════════════════════════════════════════ -->
             <div class="sb-section">
-                <div class="sb-section-title">⚡ Akses Cepat</div>
+                <div class="sb-section-title"><svg class="ic ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Akses Cepat</div>
                 <div class="qa-grid">
                     <button class="qa-btn" onclick="document.getElementById('btnLayer').click()">
-                        <span>🗺️</span><span>Layer</span>
+                        <span><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg></span><span>Layer</span>
                     </button>
                     <a href="{% url 'data_list' %}" class="qa-btn">
-                        <span>📥</span><span>Data</span>
+                        <span><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></span><span>Data</span>
                     </a>
                     {% if user.is_authenticated %}
                     <a href="/hubungi/" class="qa-btn">
-                        <span>💬</span><span>Bantuan</span>
+                        <span><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></span><span>Bantuan</span>
                     </a>
                     {% else %}
                     <a href="/login/?next=/" class="qa-btn">
-                        <span>🔑</span><span>Login</span>
+                        <span><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="5.5"/><path d="M21 2l-9.6 9.6"/><path d="M15.5 7.5l3 3L22 7l-3-3"/></svg></span><span>Login</span>
                     </a>
                     {% endif %}
                     <button class="qa-btn" onclick="window.resetTour && window.resetTour();">
-                        <span>📖</span><span>Panduan</span>
+                        <span><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></span><span>Panduan</span>
                     </button>
                 </div>
             </div>
@@ -388,45 +377,45 @@
                  3. DATA WONOTORO — Ringkasan selalu terlihat
             ════════════════════════════════════════════════════ -->
             <div class="sb-section">
-                <div class="sb-section-title">📊 Data Wonotoro</div>
+                <div class="sb-section-title"><svg class="ic ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> Data Wonotoro</div>
                 <div class="dc-grid">
                 {% if is_admin %}
                     <div class="dc-card">
                         <div class="dc-num skel" id="countAir">0</div>
-                        <div class="dc-label">💧 Sumber Air</div>
+                        <div class="dc-label"><svg class="ic ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg> Sumber Air</div>
                     </div>
                     <div class="dc-card">
                         <div class="dc-num skel" id="countReservoir">0</div>
-                        <div class="dc-label">🚰 Tandon Air</div>
+                        <div class="dc-label"><svg class="ic ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg> Tandon Air</div>
                     </div>
                     <div class="dc-card">
                         <div class="dc-num skel" id="statConv">0</div>
-                        <div class="dc-label">✉️ Percakapan</div>
+                        <div class="dc-label"><svg class="ic ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></svg> Percakapan</div>
                     </div>
                     <div class="dc-card">
                         <div class="dc-num skel" id="statDl">0</div>
-                        <div class="dc-label">📥 Download</div>
+                        <div class="dc-label"><svg class="ic ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Download</div>
                     </div>
                 {% else %}
                     <div class="dc-card">
                         <div class="dc-num skel" id="countAir">0</div>
-                        <div class="dc-label">💧 Sumber Air</div>
+                        <div class="dc-label"><svg class="ic ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg> Sumber Air</div>
                     </div>
                     <div class="dc-card">
                         <div class="dc-num skel" id="countReservoir">0</div>
-                        <div class="dc-label">🚰 Tandon Air</div>
+                        <div class="dc-label"><svg class="ic ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg> Tandon Air</div>
                     </div>
                     <div class="dc-card">
                         <div class="dc-num skel" id="countHotel">0</div>
-                        <div class="dc-label">🏨 Hotel</div>
+                        <div class="dc-label"><svg class="ic ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="1"/><line x1="9" y1="22" x2="9" y2="18"/><line x1="15" y1="22" x2="15" y2="18"/><line x1="8" y1="6" x2="8" y2="6.01"/><line x1="16" y1="6" x2="16" y2="6.01"/><line x1="8" y1="10" x2="8" y2="10.01"/><line x1="16" y1="10" x2="16" y2="10.01"/></svg> Hotel</div>
                     </div>
                     <div class="dc-card">
                         <div class="dc-num skel" id="countJasa">0</div>
-                        <div class="dc-label">🛠️ Jasa</div>
+                        <div class="dc-label"><svg class="ic ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg> Jasa</div>
                     </div>
                     <div class="dc-card dc-wide">
                         <div class="dc-num skel" id="statPenduduk">0</div>
-                        <div class="dc-label">👥 Total Penduduk</div>
+                        <div class="dc-label"><svg class="ic ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> Total Penduduk</div>
                     </div>
                 {% endif %}
                 </div>
@@ -444,14 +433,14 @@
                 <span id="countMakan">0</span>
                 <span id="countJasa">0</span>
                 <span id="statPenduduk">0</span>
-                <span id="statLayer">9</span>
+                <span id="statLayer">11</span>
                 <span id="statDataset">8</span>
             {% else %}
                 <span id="countMakan">0</span>
                 <span id="countPipa">0</span>
                 <span id="statConv">0</span>
                 <span id="statDl">0</span>
-                <span id="statLayer">9</span>
+                <span id="statLayer">11</span>
                 <span id="statDataset">8</span>
             {% endif %}
             </div>
@@ -460,23 +449,23 @@
                  4. EKSPLORASI PETA
             ════════════════════════════════════════════════════ -->
             <div class="sb-section">
-                <div class="sb-section-title">🗺️ Eksplorasi Peta</div>
+                <div class="sb-section-title"><svg class="ic ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg> Eksplorasi Peta</div>
 
                 <!-- Daftar Layer -->
                 <button class="menu-btn" id="btnLayer">Daftar Layer</button>
                 <div id="layerPanel" class="layer-panel">
                     <p>Batas &amp; Wilayah</p>
-                    <label title="Batas administrasi wilayah dan dusun-dusun di Desa Wonotoro."><input type="checkbox" id="chkAdminGab"> Administrasi Desa <span class="lyr-info" onclick="showLayerInfo('administrasi')">ℹ</span></label>
-                    <label title="Jaringan sungai dan daerah aliran sungai (DAS) di wilayah Desa Wonotoro."><input type="checkbox" id="chkSungaiVektor"> Daerah Aliran Sungai <span class="lyr-info" onclick="showLayerInfo('sungai')">ℹ</span></label>
+                    <label title="Batas administrasi wilayah dan dusun-dusun di Desa Wonotoro."><input type="checkbox" id="chkAdminGab"> Administrasi Desa</label>
+                    <label title="Jaringan sungai dan daerah aliran sungai (DAS) di wilayah Desa Wonotoro."><input type="checkbox" id="chkSungaiVektor"> Daerah Aliran Sungai</label>
                     <hr>
                     <p>Infrastruktur Air</p>
-                    <label title="Lokasi mata air dan sumber air minum aktif yang melayani penduduk Desa Wonotoro."><input type="checkbox" id="chkAir">       Sumber Air <span class="lyr-info" onclick="showLayerInfo('sumber_air')">ℹ</span></label>
-                    <label title="Lokasi bak penampungan dan tandon air yang mendistribusikan air ke permukiman."><input type="checkbox" id="chkReservoir"> Tandon Air <span class="lyr-info" onclick="showLayerInfo('reservoir')">ℹ</span></label>
-                    <label title="Jalur jaringan pipa distribusi air dari sumber ke tandon dan permukiman."><input type="checkbox" id="chkPipa">      Jaringan Pipa <span class="lyr-info" onclick="showLayerInfo('pipa')">ℹ</span></label>
+                    <label title="Lokasi mata air dan sumber air minum aktif yang melayani penduduk Desa Wonotoro."><input type="checkbox" id="chkAir">       Sumber Air</label>
+                    <label title="Lokasi bak penampungan dan tandon air yang mendistribusikan air ke permukiman."><input type="checkbox" id="chkReservoir"> Tandon Air</label>
+                    <label title="Jalur jaringan pipa distribusi air dari sumber ke tandon dan permukiman."><input type="checkbox" id="chkPipa">      Jaringan Pipa</label>
                     <hr>
-                    <p>Analisis Hidrologi</p>
-                    <label title="Area berpotensi menyimpan cadangan air tanah, hasil analisis AHP 5 kriteria. Resolusi Spasial: 30m × 30m."><input type="checkbox" id="chkPotensiAirTanah"> Daerah Potensi Air Tanah <small style="color:rgba(255,255,255,.25);font-size:10px;">30m×30m</small> <span class="lyr-info" onclick="showLayerInfo('potensi')">ℹ</span></label>
-                    <label title="Estimasi debit puncak aliran permukaan bulanan, tersedia untuk 12 bulan. Resolusi Spasial: 10m × 10m."><input type="checkbox" id="chkDebitPuncak">     Debit Puncak Aliran <small style="color:rgba(255,255,255,.25);font-size:10px;">10m×10m</small> <span class="lyr-info" onclick="showLayerInfo('debit')">ℹ</span></label>
+                    <p>Potensi Sumber Daya Air</p>
+                    <label title="Area berpotensi menyimpan cadangan air tanah, hasil analisis AHP 7 parameter berbobot. Resolusi Spasial: 30m × 30m."><input type="checkbox" id="chkPotensiAirTanah"> Daerah Potensi Air Tanah <small style="color:rgba(255,255,255,.25);font-size:10px;">30m×30m</small></label>
+                    <label title="Estimasi debit puncak aliran permukaan bulanan, tersedia untuk 12 bulan. Resolusi Spasial: 10m × 10m."><input type="checkbox" id="chkDebitPuncak">     Debit Puncak Aliran <small style="color:rgba(255,255,255,.25);font-size:10px;">10m×10m</small></label>
                     <div id="debitBulanPanel" style="display:none; margin:4px 0 4px 6px;">
                         <select id="selectDebitBulan" style="font-size:12px;">
                             <option value="">-- Pilih Bulan --</option>
@@ -496,10 +485,10 @@
                     </div>
                     <hr>
                     <p>Fasilitas &amp; Penduduk</p>
-                    <label title="Lokasi hotel dan penginapan di kawasan wisata sekitar Bromo."><input type="checkbox" id="chkHotel">      Hotel <span class="lyr-info" onclick="showLayerInfo('fasilitas')">ℹ</span></label>
+                    <label title="Lokasi hotel dan penginapan di kawasan wisata sekitar Bromo."><input type="checkbox" id="chkHotel">      Hotel</label>
                     <label title="Lokasi restoran dan warung makan yang beroperasi di kawasan wisata."><input type="checkbox" id="chkMakan">      Tempat Makan</label>
                     <label title="Lokasi usaha jasa (transportasi, sewa, dll.) yang mendukung pariwisata."><input type="checkbox" id="chkJasa">       Jasa</label>
-                    <label title="Lokasi permukiman penduduk Desa Wonotoro beserta data jumlah KK dan penduduk."><input type="checkbox" id="chkPermukiman"> Permukiman <span class="lyr-info" onclick="showLayerInfo('permukiman')">ℹ</span></label>
+                    <label title="Lokasi permukiman penduduk Desa Wonotoro beserta data jumlah KK dan penduduk."><input type="checkbox" id="chkPermukiman"> Permukiman</label>
                 </div><!-- /layerPanel -->
 
                 <!-- Legenda Peta -->
@@ -517,8 +506,8 @@
                 {% if user.is_authenticated %}
                 <button class="menu-btn" id="btnInputToggle">Input Data</button>
                 <div id="inputChoicePanel" class="layer-panel">
-                    <button class="menu-btn" id="btnInput"     style="font-size:12px; padding:8px;">✏️ Input Manual</button>
-                    <button class="menu-btn" id="btnUploadSHP" style="font-size:12px; padding:8px;">📁 Upload Shapefile</button>
+                    <button class="menu-btn" id="btnInput"     style="font-size:12px; padding:8px;"><svg class="ic ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"/></svg> Input Manual</button>
+                    <button class="menu-btn" id="btnUploadSHP" style="font-size:12px; padding:8px;"><svg class="ic ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> Upload Shapefile</button>
                 </div>
                 {% endif %}
 
@@ -544,7 +533,7 @@
                 <div class="polygon-stats-card">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
                         <span style="font-size:12px; font-weight:500; color:rgba(255,255,255,.7);" id="polygonStatsTitle">Info Wilayah</span>
-                        <button id="btnCloseStats" style="background:none; border:none; font-size:14px; cursor:pointer; color:rgba(255,255,255,.3); width:auto; margin:0; padding:2px;">✕</button>
+                        <button id="btnCloseStats" style="background:none; border:none; cursor:pointer; color:rgba(255,255,255,.3); width:auto; margin:0; padding:2px;"><svg class="ic ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
                     </div>
                     <div id="polygonStatsContent"></div>
                 </div>
@@ -554,7 +543,7 @@
                  5. ANALISIS
             ════════════════════════════════════════════════════ -->
             <div class="sb-section">
-                <div class="sb-section-title">📈 Analisis</div>
+                <div class="sb-section-title"><svg class="ic ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg> Analisis</div>
 
                 <!-- Ketersediaan Air -->
                 <div class="card">
@@ -601,7 +590,7 @@
                         <p style="font-size:10px; color:rgba(255,255,255,.2); margin:4px 0 8px; line-height:1.6;">
                             Asumsi: 120 L/org/hari · 250 L/kamar/hari · 25 L/kursi/hari · 86.4 m³/ha/hari
                         </p>
-                        <button id="btnSimulasi">⚡ Hitung Simulasi</button>
+                        <button id="btnSimulasi"><svg class="ic ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Hitung Simulasi</button>
                         <div id="simResult" style="display:none; margin-top:10px; padding:10px 12px; border-radius:8px; border:1px solid rgba(255,255,255,.08); background:rgba(255,255,255,.03);">
                             <div style="font-size:11px; color:rgba(255,255,255,.4); margin-bottom:6px;">Hasil Proyeksi Simulasi</div>
                             <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:8px;">
@@ -641,7 +630,7 @@
                  6. FAKTA AQUAVISION (was "Tahukah Anda?")
             ════════════════════════════════════════════════════ -->
             <div class="sb-section">
-                <div class="sb-section-title">💡 Fakta AQUAVISION</div>
+                <div class="sb-section-title"><svg class="ic ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 1 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Fakta AQUAVISION</div>
                 <p class="dyk-text" id="dykText">Memuat fakta menarik...</p>
             </div>
 
@@ -649,30 +638,30 @@
                  7. LAYANAN
             ════════════════════════════════════════════════════ -->
             <div class="sb-section">
-                <div class="sb-section-title">🛎️ Layanan</div>
+                <div class="sb-section-title"><svg class="ic ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg> Layanan</div>
                 <a href="{% url 'data_list' %}">
-                    <button class="menu-btn">📊 Data Portal</button>
+                    <button class="menu-btn"><svg class="ic ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> Data Portal</button>
                 </a>
                 {% if user.is_authenticated %}
                 <a href="/hubungi/" style="position:relative; display:block;">
                     <button class="menu-btn" style="position:relative;">
-                        ✉️ Hubungi Admin
+                        <svg class="ic ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></svg> Hubungi Admin
                         <span id="notifBadge" style="display:none; position:absolute; top:6px; right:10px; background:#EF4444; color:white; font-size:10px; font-weight:700; min-width:18px; height:18px; border-radius:9px; line-height:18px; text-align:center; padding:0 4px;">0</span>
                     </button>
                 </a>
                 {% endif %}
                 <a href="/bantuan/">
-                    <button class="menu-btn">❓ Pusat Bantuan</button>
+                    <button class="menu-btn"><svg class="ic ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 1 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Pusat Bantuan</button>
                 </a>
                 {% if not user.is_authenticated %}
                 <a href="/login/?next=/">
-                    <button class="menu-btn" style="border-color:rgba(59,130,246,.3); color:rgba(59,130,246,.8);">🔑 Masuk / Daftar</button>
+                    <button class="menu-btn" style="border-color:rgba(59,130,246,.3); color:rgba(59,130,246,.8);"><svg class="ic ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="5.5"/><path d="M21 2l-9.6 9.6"/><path d="M15.5 7.5l3 3L22 7l-3-3"/></svg> Masuk / Daftar</button>
                 </a>
                 {% endif %}
                 <button class="menu-btn" id="btnGuide"
                     onclick="window.resetTour && window.resetTour();"
                     style="border-color:rgba(99,179,237,.2); color:rgba(99,179,237,.55); font-size:12px; margin-top:4px;">
-                    ⓘ Lihat Panduan Dashboard
+                    <svg class="ic ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg> Lihat Panduan Dashboard
                 </button>
             </div><!-- /sb-section Layanan -->
 
@@ -687,7 +676,7 @@
         <!-- Kontrol kiri atas: search + export -->
         <div class="map-ctrl-topleft" id="mapCtrlTop">
             <input  type="text" id="mapSearchInput" placeholder="Cari lokasi...">
-            <button id="btnPrintMap">🖨️ Export</button>
+            <button id="btnPrintMap"><svg class="ic ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg> Export</button>
         </div>
 
         <!-- Kontrol kanan bawah: zoom -->
@@ -728,7 +717,7 @@
 
         <!-- Empty State (visible when no layers are active) -->
         <div id="mapEmptyState" class="map-empty-state">
-            <span class="mes-icon">🗺️</span>
+            <span class="mes-icon"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg></span>
             <span class="mes-title">Mulai Eksplorasi</span>
             <span class="mes-text">Aktifkan layer pada panel kiri untuk melihat informasi sumber daya air Desa Wonotoro.</span>
         </div>
@@ -756,6 +745,7 @@
     <!-- ── Hero Dashboard ──────────────────────────────────────── -->
     <div id="heroDashboard" class="hero-dashboard">
         <div class="hero-card">
+            <p class="hero-card-eyebrow">Panel Informasi GIS</p>
             <h1 class="hero-card-title">AQUAVISION</h1>
             <p class="hero-card-sub">Platform Informasi Sumber Daya Air Desa Wonotoro</p>
             <div class="hero-stats">
@@ -779,7 +769,7 @@
     <div id="mobileSidebarOverlay"></div>
 
     <!-- ── Mobile: Layer FAB ────────────────────────────────────── -->
-    <button class="mobile-fab-layers" id="mobileFabLayers" aria-label="Buka Panel Fitur Peta">🗺️</button>
+    <button class="mobile-fab-layers" id="mobileFabLayers" aria-label="Buka Panel Fitur Peta"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg></button>
 
     <!-- ── Mobile: Bottom Sheet (Ringkasan Dashboard) ──────────── -->
     <div class="mobile-bottom-sheet" id="mobileBottomSheet" role="region" aria-label="Ringkasan Dashboard">
@@ -826,8 +816,8 @@
             </div>
             <!-- CTA actions -->
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-                <button id="mobileBsOpenLayers" style="padding:11px 8px;background:rgba(59,130,246,.15);border:1px solid rgba(59,130,246,.3);border-radius:9px;color:#93C5FD;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font-body);">🗺️ Buka Layer</button>
-                <a href="/data/" style="padding:11px 8px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:9px;color:rgba(255,255,255,.65);font-size:12px;font-weight:600;text-decoration:none;display:flex;align-items:center;justify-content:center;box-sizing:border-box;">📊 Data Portal</a>
+                <button id="mobileBsOpenLayers" style="padding:11px 8px;background:rgba(59,130,246,.15);border:1px solid rgba(59,130,246,.3);border-radius:9px;color:#93C5FD;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font-body);display:flex;align-items:center;justify-content:center;gap:6px;"><svg class="ic ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg> Buka Layer</button>
+                <a href="/data/" style="padding:11px 8px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:9px;color:rgba(255,255,255,.65);font-size:12px;font-weight:600;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:6px;box-sizing:border-box;"><svg class="ic ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> Data Portal</a>
             </div>
         </div>
     </div>
@@ -842,7 +832,7 @@
     <div class="modal-box">
         <div class="modal-header">
             <h3>Input Data Manual</h3>
-            <button class="modal-close" onclick="document.getElementById('modalInput').style.display='none'">✕</button>
+            <button class="modal-close" onclick="document.getElementById('modalInput').style.display='none'"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
         </div>
         <div class="modal-body">
 
@@ -890,7 +880,7 @@
     <div class="modal-box">
         <div class="modal-header">
             <h3>Upload Shapefile</h3>
-            <button class="modal-close" onclick="document.getElementById('modalSHP').style.display='none'">✕</button>
+            <button class="modal-close" onclick="document.getElementById('modalSHP').style.display='none'"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
         </div>
         <div class="modal-body">
 
@@ -921,21 +911,6 @@
         </div>
     </div>
 </div>
-
-
-<!-- ================================================================
-     MODAL — Informasi Layer
-================================================================ -->
-<div class="modal-overlay" id="modalLayerInfo" style="display:none;">
-    <div class="modal-box">
-        <div class="modal-header">
-            <h3 id="liTitle">Informasi Layer</h3>
-            <button class="modal-close" onclick="document.getElementById('modalLayerInfo').style.display='none'">✕</button>
-        </div>
-        <div class="modal-body" id="liBody"></div>
-    </div>
-</div>
-
 
 {% endblock %}
 
@@ -969,7 +944,7 @@
 
 <script src="{% static 'js/script.js' %}"></script>
 <!-- driver.js + tour.js: defer — tidak blocking parse, tetap eksekusi in-order setelah parsing selesai -->
-<script defer src="https://cdn.jsdelivr.net/npm/driver.js@0.9.8/dist/driver.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/driver.js@1.3.1/dist/driver.js.iife.js"></script>
 <script defer src="{% static 'js/tour.js' %}"></script>
 
 <script>
@@ -985,7 +960,7 @@
             el.classList.remove('skel');
             if (val != null) el.textContent = val;
         }
-        set('statLayer',      d.layer_count   || 9);
+        set('statLayer',      d.layer_count   || 11);
         set('statDataset',    d.dataset_count || 8);
         set('countAir',       d.sumber_air);
         set('countReservoir', d.reservoir);
@@ -1089,7 +1064,7 @@ var LEGEND_DEFS = [
       svg:'<path d="M6 10c0-1.1 2.7-2 6-2s6 .9 6 2v8c0 1.1-2.7 2-6 2s-6-.9-6-2v-8z"/><path d="M6 10c0 1.1 2.7 2 6 2s6-.9 6-2" stroke="rgba(255,255,255,.5)" stroke-width="1.2" fill="none"/>',
       label:'Tandon Air', sublabel:'Bak penampungan' },
     { id:'chkPipa',      type:'line',    color:'#F59E0B', label:'Jaringan Pipa', sublabel:'Distribusi air' },
-    // Analisis Hidrologi
+    // Potensi Sumber Daya Air
     { id:'chkPotensiAirTanah', type:'gradient',
       colors:['#e74c3c','#e67e22','#f1c40f','#27ae60'],
       rangeMin:'Rendah', rangeMax:'S.Tinggi',
@@ -1156,40 +1131,6 @@ LEGEND_DEFS.forEach(function(d) {
     if (el) el.addEventListener('change', updateLegend);
 });
 
-// ── Layer Info Modal ───────────────────────────────────────────
-var LAYER_META = {
-    administrasi: { nama:'Administrasi Desa',       deskripsi:'Batas administrasi desa-desa di sekitar Desa Wonotoro, Kecamatan Sukapura.',                                                                                                                         metode:'Digitasi dari peta RBI skala 1:50.000',                                                                                     resolusi:'Poligon vektor',              sumber:'BIG (Badan Informasi Geospasial)',                       format:'GeoJSON / Shapefile' },
-    sumber_air:   { nama:'Sumber Air',               deskripsi:'Titik sumber mata air di Desa Wonotoro beserta debit dan kondisi fisik.',                                                                                                                              metode:'Survey lapangan GPS RTK',                                                                                                   resolusi:'Titik (Point)',               sumber:'Survey Primer Tim AQUAVISION',                          format:'GeoJSON / CSV / Shapefile' },
-    reservoir:    { nama:'Tandon Air',               deskripsi:'Lokasi dan kapasitas tandon distribusi air di Desa Wonotoro.',                                                                                                                                         metode:'Survey lapangan GPS',                                                                                                       resolusi:'Titik (Point)',               sumber:'Survey Primer Tim AQUAVISION',                          format:'GeoJSON / CSV / Shapefile' },
-    pipa:         { nama:'Jaringan Pipa',            deskripsi:'Jaringan pipa distribusi air dari sumber ke permukiman dan fasilitas wisata.',                                                                                                                         metode:'Digitasi dari survey lapangan',                                                                                             resolusi:'Garis (LineString)',          sumber:'Survey Primer Tim AQUAVISION',                          format:'GeoJSON / Shapefile' },
-    sungai:       { nama:'Daerah Aliran Sungai',    deskripsi:'Jaringan sungai dan aliran permukaan di wilayah studi Desa Wonotoro.',                                                                                                                                  metode:'Ekstraksi dari DEM SRTM 30m',                                                                                               resolusi:'Garis (LineString)',          sumber:'SRTM / BIG',                                            format:'GeoJSON / Shapefile' },
-    potensi:      { nama:'Daerah Potensi Air Tanah', deskripsi:'Zonasi potensi air tanah berdasarkan analisis multi-kriteria di Desa Wonotoro.',                                                                                                                      metode:'AHP (Analytical Hierarchy Process) — 5 kriteria: tutupan lahan, kemiringan lereng, jenis tanah, curah hujan, geologi.',    resolusi:'30m × 30m (Raster GeoTIFF)', sumber:'Analisis GIS AQUAVISION — BIG, BMKG, PVMBG',            format:'GeoTIFF / GeoJSON' },
-    debit:        { nama:'Debit Puncak Aliran',      deskripsi:'Peta debit puncak aliran permukaan bulanan di Desa Wonotoro.',                                                                                                                                         metode:'Metode Rasional: Q = 0.278 × C × I × A — koefisien aliran, intensitas hujan BMKG, luas DAS dari DEM.',                    resolusi:'10m × 10m (Raster GeoTIFF)', sumber:'Analisis GIS AQUAVISION — BMKG Probolinggo 2014–2023', format:'GeoTIFF (12 file bulanan)' },
-    fasilitas:    { nama:'Fasilitas Wisata',         deskripsi:'Lokasi hotel, restoran, homestay, dan jasa di kawasan wisata Desa Wonotoro.',                                                                                                                          metode:'Survey lapangan GPS + validasi Google Maps',                                                                                resolusi:'Titik (Point)',               sumber:'Survey Primer Tim AQUAVISION',                          format:'GeoJSON / CSV / Shapefile' },
-    permukiman:   { nama:'Permukiman',               deskripsi:'Lokasi permukiman penduduk dan data demografi per dusun di Desa Wonotoro.',                                                                                                                            metode:'Survey lapangan GPS + data monografi desa',                                                                                 resolusi:'Titik (Point)',               sumber:'Data Monografi Desa Wonotoro + Survey Primer',          format:'GeoJSON / CSV / Shapefile' },
-};
-
-window.showLayerInfo = function(key) {
-    var meta = LAYER_META[key];
-    if (!meta) return;
-    document.getElementById('liTitle').textContent = meta.nama;
-    document.getElementById('liBody').innerHTML = [
-        ['Deskripsi', meta.deskripsi],
-        ['Metode',    meta.metode],
-        ['Resolusi Spasial', meta.resolusi],
-        ['Sumber',    meta.sumber],
-        ['Format',    meta.format],
-    ].filter(function(r){ return r[1] !== undefined && r[1] !== null && r[1] !== ''; })
-    .map(function(r) {
-        return '<div class="lyrinfo-row"><span class="lyrinfo-label">' + r[0] + '</span><span class="lyrinfo-val">' + r[1] + '</span></div>';
-    }).join('');
-    document.getElementById('modalLayerInfo').style.display = 'flex';
-};
-
-document.getElementById('modalLayerInfo').addEventListener('click', function(e) {
-    if (e.target === this) this.style.display = 'none';
-});
-
 // ── Hero Dashboard ───────────────────────────────────────────────
 (function () {
     var hero = document.getElementById('heroDashboard');
@@ -1221,9 +1162,9 @@ document.getElementById('modalLayerInfo').addEventListener('click', function(e) 
 (function () {
     function getInsightText(status) {
         var s = (status || '').toUpperCase().trim();
-        if (s === 'AMAN')    return '✅ Ketersediaan air saat ini mencukupi kebutuhan penduduk dan fasilitas wisata. Kondisi sumber aktif dalam keadaan baik.';
-        if (s === 'WASPADA') return '⚠️ Ketersediaan air mulai mendekati batas wajar. Pertimbangkan efisiensi penggunaan air untuk mencegah defisit.';
-        if (s === 'KRITIS')  return '🔴 Ketersediaan air berada di tingkat kritis. Segera tinjau kondisi sumber air dan kurangi konsumsi.';
+        if (s === 'AMAN')    return 'Ketersediaan air saat ini mencukupi kebutuhan penduduk dan fasilitas wisata. Kondisi sumber aktif dalam keadaan baik.';
+        if (s === 'WASPADA') return 'Ketersediaan air mulai mendekati batas wajar. Pertimbangkan efisiensi penggunaan air untuk mencegah defisit.';
+        if (s === 'KRITIS')  return 'Ketersediaan air berada di tingkat kritis. Segera tinjau kondisi sumber air dan kurangi konsumsi.';
         return 'Memuat data ketersediaan air...';
     }
     function getWscDesc(status) {
@@ -1281,9 +1222,9 @@ document.getElementById('modalLayerInfo').addEventListener('click', function(e) 
 (function () {
     var facts = [
         'Layer Daerah Aliran Sungai (DAS) memetakan jaringan sungai di Desa Wonotoro yang mendukung kebutuhan air masyarakat dan pertanian di kawasan Bromo Tengger Semeru.',
-        'Data Potensi Air Tanah AQUAVISION memiliki resolusi spasial 30m × 30m, memetakan zonasi potensi dari kategori Sangat Rendah hingga Sangat Tinggi.',
+        'Data Potensi Air Tanah AQUAVISION memiliki resolusi spasial 30m × 30m, memetakan zonasi potensi dari kategori Rendah hingga Sangat Tinggi.',
         'Debit Puncak Aliran tersedia untuk 12 bulan. Ini membantu memahami variasi musiman ketersediaan air sepanjang tahun.',
-        'Zona Potensi Air Tanah dihitung menggunakan AHP (Analytical Hierarchy Process) dari 5 kriteria: tutupan lahan, lereng, tanah, curah hujan, dan geologi.',
+        'Zona Potensi Air Tanah dihitung menggunakan AHP (Analytical Hierarchy Process) dari 7 parameter berbobot: curah hujan (40%), geologi (23%), kepadatan kelurusan (13%), tutupan lahan (10%), kelerengan (7%), kerapatan drainase (4%), dan jenis tanah (3%).',
         'AQUAVISION menyediakan data dalam format CSV, GeoJSON, KML, dan Shapefile — bisa langsung dibuka di Excel, QGIS, atau Google Earth.',
         'Seluruh data spasial AQUAVISION menggunakan sistem referensi koordinat WGS 84 (EPSG:4326) — standar global untuk pemetaan digital.'
     ];

@@ -11,10 +11,13 @@ function getCsrfToken() {
 function showToast(title, message, type) {
     var existing = document.getElementById("toastNotif");
     if (existing) existing.remove();
+    var ICON_X_CIRCLE = '<svg class="ic ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>';
+    var ICON_CHECK    = '<svg class="ic ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>';
+    var ICON_ALERT    = '<svg class="ic ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>';
     var colors = {
-        error:   { bg: "#fdedec", border: "#e74c3c", icon: "\u{1F6AB}" },
-        success: { bg: "#e8f6f3", border: "#27ae60", icon: "✅" },
-        warning: { bg: "#fef9e7", border: "#e67e22", icon: "⚠️" },
+        error:   { bg: "#fdedec", border: "#e74c3c", icon: ICON_X_CIRCLE },
+        success: { bg: "#e8f6f3", border: "#27ae60", icon: ICON_CHECK },
+        warning: { bg: "#fef9e7", border: "#e67e22", icon: ICON_ALERT },
     };
     var c = colors[type] || colors.warning;
     var div = document.createElement("div");
@@ -26,7 +29,7 @@ function showToast(title, message, type) {
                 '<div style="font-size:14px;font-weight:600;color:#333;margin-bottom:4px;">' + c.icon + ' ' + title + '</div>' +
                 '<div style="font-size:13px;color:#555;line-height:1.5;">' + message + '</div>' +
             '</div>' +
-            '<button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;font-size:18px;cursor:pointer;color:#aaa;padding:0;width:auto;">✕</button>' +
+            '<button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;cursor:pointer;color:#aaa;padding:0;width:auto;"><svg class="ic ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>' +
         '</div>';
     document.body.appendChild(div);
     setTimeout(function() { if (div.parentElement) div.remove(); }, 5000);
@@ -40,7 +43,7 @@ function showConfirm(title, message, onYes) {
     overlay.className = "confirm-overlay";
     overlay.innerHTML =
         '<div class="confirm-box">' +
-            '<h4>🗑️ ' + title + '</h4>' +
+            '<h4><svg class="ic ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/></svg> ' + title + '</h4>' +
             '<p>' + message + '</p>' +
             '<div class="confirm-actions">' +
                 '<button class="btn-confirm-no" id="btnConfirmNo">Batal</button>' +
@@ -162,7 +165,7 @@ function htmlEscape(str) {
 
 function buildEditFormHtml(schema, current) {
     var html = '<div class="confirm-box" style="text-align:left;max-width:540px;width:95%;max-height:82vh;overflow-y:auto;padding:28px;">';
-    html += '<h4 style="margin:0 0 18px;font-size:17px;color:#1a5276;">✏️ Edit ' + htmlEscape(schema.title) + '</h4>';
+    html += '<h4 style="margin:0 0 18px;font-size:17px;color:#1a5276;"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"/></svg> Edit ' + htmlEscape(schema.title) + '</h4>';
     html += '<div id="editFormBody">';
 
     schema.fields.forEach(function(field) {
@@ -202,7 +205,7 @@ function buildEditFormHtml(schema, current) {
     html += '</div>'; // editFormBody
     html += '<div class="confirm-actions" style="margin-top:18px;justify-content:flex-end;gap:10px;">';
     html += '<button class="btn-confirm-no" id="btnEditCancel">Batal</button>';
-    html += '<button class="btn-confirm-yes" style="background:#1a5276;" id="btnEditSave">💾 Simpan</button>';
+    html += '<button class="btn-confirm-yes" style="background:#1a5276;" id="btnEditSave"><svg class="ic ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Simpan</button>';
     html += '</div>';
     html += '</div>'; // confirm-box
     return html;
@@ -296,13 +299,13 @@ function wireEditForm(overlay, schema, modelName, pk) {
                 setTimeout(function() { location.reload(); }, 1200);
             } else {
                 saveBtn.disabled = false;
-                saveBtn.textContent = "💾 Simpan";
+                saveBtn.textContent = "Simpan";
                 showToast("Gagal", data.error || "Terjadi kesalahan.", "error");
             }
         })
         .catch(function() {
             saveBtn.disabled = false;
-            saveBtn.textContent = "💾 Simpan";
+            saveBtn.textContent = "Simpan";
             showToast("Gagal", "Gagal menyimpan data.", "error");
         });
     };

@@ -1,17 +1,15 @@
-/* Dashboard Onboarding Tour — Driver.js 0.9.8
+/* Dashboard Onboarding Tour — Driver.js 1.3.1
    Auto-starts once per browser after map is ready (and after the
    Hero Dashboard overlay has been dismissed).
    localStorage key: aquavision_dashboard_tour_completed = 'true'
    Reset:  window.resetTour()   — always works, ignores localStorage
    Replay: window.startTour()
 
-   Driver.js v0.9.8 z-index values (from driver.min.css):
-     #driver-page-overlay              → 100002
-     #driver-highlighted-element-stage → 100003
-     .driver-highlighted-element       → 100004
-     #driver-popover-item              → 1000000000
-   All containers that need to be visible during the tour must be set
-   to at least 100004 so they are not covered by the overlay (100002).
+   Driver.js v1 ships its own spotlight/stage/popover positioning,
+   auto-flip near viewport edges and smooth-scroll-into-view, so this
+   file only wires AQUAVISION-specific behaviour (locking the sidebar,
+   opening the right accordion per step, restoring state on exit) on
+   top of it instead of re-implementing positioning logic.
 
    RULES:
    - #sidebar (Panel Fitur Peta) must remain visible for the entire
@@ -27,11 +25,10 @@
 */
 (function () {
     var TOUR_KEY    = 'aquavision_dashboard_tour_completed';
-    var TOUR_Z      = '100004';   // Above Driver.js overlay (100002) and stage (100003)
+    var TOUR_Z      = '100004';   // Above Driver.js overlay/stage layers.
     var ACCORDION_BODIES = ['statsBody', 'debitBody', 'simBody'];
 
     var activeDriver  = null;
-    var currentSteps  = [];
     var currentAccordion = null;
     var originalAccordionState = {};
     var legendWasHidden = false;
@@ -174,21 +171,6 @@
         legendOriginalHTML = null;
     }
 
-    /* ── Driver.js stale-DOM cleanup ──────────────────────────────── */
-    /* Defensive cleanup in case a previous tour was interrupted before
-       Driver.js finished its own reset (cause of the empty white
-       popover bug when restarting via "Lihat Panduan Dashboard"). */
-    function cleanupDriverArtifacts() {
-        ['#driver-popover-item', '#driver-page-overlay', '#driver-highlighted-element-stage'].forEach(function (sel) {
-            var el = document.querySelector(sel);
-            if (el && el.parentNode) el.parentNode.removeChild(el);
-        });
-        document.querySelectorAll('.driver-highlighted-element, .driver-position-relative, .driver-fix-stacking')
-            .forEach(function (el) {
-                el.classList.remove('driver-highlighted-element', 'driver-position-relative', 'driver-fix-stacking');
-            });
-    }
-
     /* ── Steps — adapt to login state ────────────────────────────────
        Guest      (9 steps):  Panel Peta → Cari → Export → Tentang →
                                Data Portal → Bantuan → Login → Daftar → Selesai
@@ -205,10 +187,11 @@
             // ── 1. PANEL FITUR PETA ──────────────────────────────────
             {
                 element: '#sidebar',
+                __accordionId: null,
                 popover: {
-                    title:       '🗂️ Panel Fitur Peta',
+                    title:       'Panel Fitur Peta',
                     description: 'Panel ini digunakan untuk mengakses seluruh fitur utama AQUAVISION seperti menampilkan layer peta, membaca informasi spasial, mencari lokasi, dan melakukan analisis sederhana.',
-                    position:    'right'
+                    side: 'right', align: 'start'
                 }
             },
 
@@ -216,9 +199,9 @@
             {
                 element: '#mapSearchInput',
                 popover: {
-                    title:       '🔍 Cari Lokasi',
+                    title:       'Cari Lokasi',
                     description: 'Ketik nama tempat atau desa untuk langsung menemukan lokasinya di peta. Tekan <b>Enter</b> untuk mulai mencari.',
-                    position:    'bottom'
+                    side: 'bottom', align: 'start'
                 }
             },
 
@@ -226,9 +209,9 @@
             {
                 element: '#btnPrintMap',
                 popover: {
-                    title:       '🖨️ Simpan Gambar Peta',
+                    title:       'Simpan Gambar Peta',
                     description: 'Simpan tampilan peta saat ini sebagai gambar. Aktifkan layer yang diinginkan terlebih dahulu, lalu klik tombol ini.',
-                    position:    'bottom'
+                    side: 'bottom', align: 'start'
                 }
             },
 
@@ -236,9 +219,9 @@
             {
                 element: '.nav-links a[href="/tentang/"]',
                 popover: {
-                    title:       'ℹ️ Tentang AQUAVISION',
+                    title:       'Tentang AQUAVISION',
                     description: 'Lihat informasi mengenai sistem AQUAVISION — fitur-fitur yang tersedia, tujuan pembuatannya, dan pihak-pihak yang terlibat.',
-                    position:    'bottom'
+                    side: 'bottom', align: 'start'
                 }
             },
 
@@ -246,9 +229,9 @@
             {
                 element: '.nav-links a[href="/data/"]',
                 popover: {
-                    title:       '📊 Data Portal',
+                    title:       'Data Portal',
                     description: 'Unduh data sumber daya air dalam berbagai format — CSV, GeoJSON, KML, dan Shapefile untuk keperluan analisis lanjutan.',
-                    position:    'bottom'
+                    side: 'bottom', align: 'start'
                 }
             }
         ];
@@ -258,36 +241,36 @@
             steps.push({
                 element: '.nav-links a[href="/hubungi/"]',
                 popover: {
-                    title:       '✉️ Hubungi Admin',
+                    title:       'Hubungi Admin',
                     description: 'Sampaikan masukan atau pertanyaan kepada pengelola sistem AQUAVISION.',
-                    position:    'bottom'
+                    side: 'bottom', align: 'start'
                 }
             });
             // ── 7. PUSAT BANTUAN ──────────────────────────────────────
             steps.push({
                 element: '.nav-links a[href="/bantuan/"]',
                 popover: {
-                    title:       '❓ Pusat Bantuan',
+                    title:       'Pusat Bantuan',
                     description: 'Akses panduan penggunaan sistem, cara membaca peta, dan cara mengunduh data.',
-                    position:    'bottom'
+                    side: 'bottom', align: 'start'
                 }
             });
             // ── 8. PROFIL ─────────────────────────────────────────────
             steps.push({
                 element: '.nav-user',
                 popover: {
-                    title:       '👤 Profil',
+                    title:       'Profil',
                     description: 'Lihat informasi akun yang sedang Anda gunakan untuk masuk ke sistem.',
-                    position:    'bottom'
+                    side: 'bottom', align: 'end'
                 }
             });
             // ── 9. LOGOUT ─────────────────────────────────────────────
             steps.push({
                 element: '.nav-btn-logout',
                 popover: {
-                    title:       '🚪 Logout',
+                    title:       'Logout',
                     description: 'Keluar dari sistem AQUAVISION dengan aman setelah selesai menggunakan platform.',
-                    position:    'bottom'
+                    side: 'bottom', align: 'end'
                 }
             });
         } else {
@@ -295,27 +278,27 @@
             steps.push({
                 element: '.nav-links a[href="/bantuan/"]',
                 popover: {
-                    title:       '❓ Pusat Bantuan',
+                    title:       'Pusat Bantuan',
                     description: 'Akses panduan penggunaan sistem, cara membaca peta, dan cara mengunduh data.',
-                    position:    'bottom'
+                    side: 'bottom', align: 'start'
                 }
             });
             // ── 7. LOGIN ──────────────────────────────────────────────
             steps.push({
                 element: '.nav-btn-login',
                 popover: {
-                    title:       '🔑 Login',
+                    title:       'Login',
                     description: 'Masuk dengan akun Anda untuk mengakses fitur lengkap AQUAVISION, termasuk mengirim pertanyaan ke admin.',
-                    position:    'bottom'
+                    side: 'bottom', align: 'end'
                 }
             });
             // ── 8. DAFTAR ────────────────────────────────────────────
             steps.push({
                 element: '.nav-btn-register',
                 popover: {
-                    title:       '📝 Daftar',
+                    title:       'Daftar',
                     description: 'Belum punya akun? Daftar gratis untuk mengakses semua fitur AQUAVISION.',
-                    position:    'bottom'
+                    side: 'bottom', align: 'end'
                 }
             });
         }
@@ -324,9 +307,9 @@
         steps.push({
             element: '#btnGuide',
             popover: {
-                title:       '🎉 Siap Menjelajah!',
-                description: 'Panduan selesai. Sekarang Anda bisa mulai menjelajahi data sumber daya air Desa Wonotoro. Untuk mengulang panduan ini kapan saja, klik tombol <b>ⓘ Lihat Panduan Dashboard</b> ini.',
-                position:    'top'
+                title:       'Siap Menjelajah!',
+                description: 'Panduan selesai. Sekarang Anda bisa mulai menjelajahi data sumber daya air Desa Wonotoro. Untuk mengulang panduan ini kapan saja, klik tombol <b>Lihat Panduan Dashboard</b> ini.',
+                side: 'top', align: 'start'
             }
         });
 
@@ -345,20 +328,24 @@
         prepareLegend();
     }
 
+    function getDriverFactory() {
+        return window.driver && window.driver.js && window.driver.js.driver;
+    }
+
     /* ── Run ──────────────────────────────────────────────────────── */
 
     function runTour() {
-        if (typeof Driver === 'undefined') {
+        var driverFactory = getDriverFactory();
+        if (!driverFactory) {
             console.warn('[AQUAVISION Tour] Driver.js not loaded — aborted.');
             return;
         }
 
         // Kill any running tour instance before starting a new one.
         if (activeDriver) {
-            try { activeDriver.reset(); } catch (e) {}
+            try { activeDriver.destroy(); } catch (e) {}
             activeDriver = null;
         }
-        cleanupDriverArtifacts();
 
         console.log('[AQUAVISION Tour] started');
         prepareUI();
@@ -391,55 +378,42 @@
             return;
         }
 
-        currentSteps = steps;
-
         try {
-            var d = new Driver({
-                animate:      true,
-                opacity:      0.65,
-                padding:      8,
-                allowClose:   true,
-                doneBtnText:  'Selesai',
-                closeBtnText: 'Lewati',
-                nextBtnText:  'Lanjut →',
-                prevBtnText:  '← Kembali',
-                onHighlightStarted: function (element) {
-                    // Elevate containers above Driver.js overlay (z-index 100002) for every step.
+            var d = driverFactory({
+                animate:        true,
+                smoothScroll:   true,
+                overlayOpacity: 0.65,
+                stagePadding:   6,
+                stageRadius:    6,
+                allowClose:     true,
+                showProgress:   true,
+                progressText:   '{{current}} / {{total}}',
+                popoverClass:   'aq-tour-popover',
+                doneBtnText:    'Selesai',
+                nextBtnText:    'Lanjut →',
+                prevBtnText:    '← Kembali',
+                steps:          steps,
+                onHighlightStarted: function (element, step) {
+                    // Elevate containers above Driver.js overlay for every step.
                     lockSidebar();
                     lockMapControls();
                     lockNavbar();
-
-                    // Find which step is being highlighted (by matching its DOM node)
-                    // so the matching accordion can be opened/closed.
-                    var node = element && (element.node || (element.getNode && element.getNode()));
-                    var matched = null;
-                    if (node) {
-                        for (var i = 0; i < currentSteps.length; i++) {
-                            var step = currentSteps[i];
-                            if (step.element && document.querySelector(step.element) === node) {
-                                matched = step;
-                                break;
-                            }
-                        }
-                    }
-                    setAccordionForStep(matched);
-
-                    if (node) {
-                        console.log('[AQUAVISION Tour] Highlighting:', node.id || node.className || node.tagName);
+                    setAccordionForStep(step);
+                    if (element) {
+                        console.log('[AQUAVISION Tour] Highlighting:', element.id || element.className || element.tagName);
                     }
                 },
-                onReset: function () {
+                onDestroyed: function () {
                     localStorage.setItem(TOUR_KEY, 'true');
                     unlockAll();
                     // Never leave the user scrolled down (e.g. near the footer).
                     window.scrollTo({ top: 0, behavior: 'smooth' });
-                    console.log('[AQUAVISION Tour] tour ended / reset');
+                    console.log('[AQUAVISION Tour] tour ended / destroyed');
                 }
             });
 
             activeDriver = d;
-            d.defineSteps(steps);
-            d.start();
+            d.drive();
 
         } catch (e) {
             console.warn('[AQUAVISION Tour] Failed to start:', e);
@@ -452,12 +426,12 @@
     var _driverCssLoaded = false;
     function ensureDriverCss(callback) {
         if (_driverCssLoaded) { callback(); return; }
-        if (document.querySelector('link[href*="driver.min.css"]')) {
+        if (document.querySelector('link[href*="driver.css"]')) {
             _driverCssLoaded = true; callback(); return;
         }
         var link = document.createElement('link');
         link.rel  = 'stylesheet';
-        link.href = 'https://cdn.jsdelivr.net/npm/driver.js@0.9.8/dist/driver.min.css';
+        link.href = 'https://cdn.jsdelivr.net/npm/driver.js@1.3.1/dist/driver.css';
         link.crossOrigin = 'anonymous';
         link.onload = function () { _driverCssLoaded = true; callback(); };
         link.onerror = function () { _driverCssLoaded = true; callback(); }; // still try tour
@@ -468,7 +442,6 @@
 
     window.startTour = function () {
         ensureDriverCss(function () {
-            cleanupDriverArtifacts();
             waitForElement('#sidebar', function () {
                 setTimeout(runTour, 300);
             }, 5000);
@@ -479,7 +452,7 @@
     window.resetTour = function () {
         localStorage.removeItem(TOUR_KEY);
         if (activeDriver) {
-            try { activeDriver.reset(); } catch (e) {}
+            try { activeDriver.destroy(); } catch (e) {}
             activeDriver = null;
         }
         unlockAll();

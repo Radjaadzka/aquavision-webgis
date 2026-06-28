@@ -15,6 +15,7 @@
 .log-head p { font-size: 14px; color: #64748B; font-weight: 300; }
 .log-nav { display:flex; gap:12px; margin-bottom:20px; flex-wrap:wrap; }
 .log-nav a {
+    display: inline-flex; align-items: center; gap: 6px;
     font-size:13px; color:#64748B; text-decoration:none;
     border:1px solid #E2E8F0; border-radius:8px; padding:6px 14px;
     transition:all .15s;
@@ -45,14 +46,14 @@ tr:hover td { background:#F8FAFC; }
 {% block content %}
 <div class="log-wrap">
     <div class="log-head">
-        <h1>Riwayat <em>Download</em></h1>
+        <h1>Riwayat <em>Unduhan</em></h1>
         <p>Catatan seluruh aktivitas unduhan dataset dari Data Portal AQUAVISION.</p>
     </div>
 
     <div class="log-nav">
         <a href="{% url 'map' %}">← Dashboard</a>
-        <a href="{% url 'audit_log' %}">🔍 Audit Log</a>
-        <a href="{% url 'data_list' %}">📊 Data Portal</a>
+        <a href="{% url 'audit_log' %}"><svg class="ic ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> Audit Log</a>
+        <a href="{% url 'data_list' %}"><svg class="ic ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> Data Portal</a>
     </div>
 
     <div class="log-table-wrap">

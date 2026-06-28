@@ -38,10 +38,13 @@ document.addEventListener("DOMContentLoaded", function () {
         var existing = document.getElementById("notifPopup");
         if (existing) existing.remove();
 
+        var ICON_X_CIRCLE = '<svg class="ic ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>';
+        var ICON_CHECK    = '<svg class="ic ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>';
+        var ICON_ALERT    = '<svg class="ic ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>';
         var colors = {
-            error:   { bg: "#fdedec", border: "#e74c3c", icon: "🚫" },
-            success: { bg: "#e8f6f3", border: "#27ae60", icon: "✅" },
-            warning: { bg: "#fef9e7", border: "#e67e22", icon: "⚠️" }
+            error:   { bg: "#fdedec", border: "#e74c3c", icon: ICON_X_CIRCLE },
+            success: { bg: "#e8f6f3", border: "#27ae60", icon: ICON_CHECK },
+            warning: { bg: "#fef9e7", border: "#e67e22", icon: ICON_ALERT }
         };
         var c = colors[type] || colors.warning;
 
@@ -62,7 +65,8 @@ document.addEventListener("DOMContentLoaded", function () {
                     '<div style="font-size:13px;color:#555;line-height:1.5;">' + message + "</div>" +
                 "</div>" +
                 '<button onclick="this.parentElement.parentElement.remove()" ' +
-                    'style="background:none;border:none;font-size:18px;cursor:pointer;color:#aaa;padding:0;width:auto;line-height:1;">✕</button>' +
+                    'style="background:none;border:none;cursor:pointer;color:#aaa;padding:0;width:auto;line-height:1;">' +
+                    '<svg class="ic ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>' +
             "</div>";
 
         document.body.appendChild(div);
@@ -243,7 +247,7 @@ document.addEventListener("DOMContentLoaded", function () {
             tooltipDebit.style.left    = (eX + 16) + "px";
             tooltipDebit.style.top     = (eY + (offsetY || 0)) + "px";
             tooltipDebit.innerHTML =
-                '<div style="font-weight:600;font-size:13px;margin-bottom:4px;color:' + warna + ';border-bottom:1px solid #eee;padding-bottom:4px;">🌊 Debit Puncak — ' + bulanLabel + "</div>" +
+                '<div style="font-weight:600;font-size:13px;margin-bottom:4px;color:' + warna + ';border-bottom:1px solid #eee;padding-bottom:4px;">Debit Puncak — ' + bulanLabel + "</div>" +
                 '<div style="font-size:12px;">Debit Puncak: <b>' + foundVal.toFixed(2) + " m³/s</b></div>";
         } else {
             tooltipDebit.style.display = "none";
@@ -327,7 +331,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                         l.bindPopup(
                             '<div style="font-family:var(--font-body);padding:2px 0;min-width:160px;">' +
-                                '<div style="font-weight:700;font-size:13px;color:' + color + ';margin-bottom:8px;border-bottom:1px solid rgba(0,0,0,.08);padding-bottom:6px;">💧 Potensi Air Tanah</div>' +
+                                '<div style="font-weight:700;font-size:13px;color:' + color + ';margin-bottom:8px;border-bottom:1px solid rgba(0,0,0,.08);padding-bottom:6px;">Potensi Air Tanah</div>' +
                                 '<div style="font-size:22px;font-weight:700;color:' + color + ';letter-spacing:-.3px;">' + label + '</div>' +
                             '</div>'
                         );
@@ -351,7 +355,7 @@ document.addEventListener("DOMContentLoaded", function () {
                             tooltipPotensi.style.left    = (eX + 16) + "px";
                             tooltipPotensi.style.top     = (eY - 12) + "px";
                             tooltipPotensi.innerHTML =
-                                '<div style="font-weight:600;font-size:13px;margin-bottom:4px;color:' + color + ';border-bottom:1px solid #eee;padding-bottom:4px;">💧 Daerah Potensi Air Tanah</div>' +
+                                '<div style="font-weight:600;font-size:13px;margin-bottom:4px;color:' + color + ';border-bottom:1px solid #eee;padding-bottom:4px;">Daerah Potensi Air Tanah</div>' +
                                 '<div style="font-size:12px;">Potensi: <b style="color:' + color + ';">' + label + "</b></div>";
 
                             updateTooltipDebit(ev.latlng.lat, ev.latlng.lng, eX, eY, 80);
@@ -596,7 +600,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     },
                     onEachFeature: function (f, l) {
                         var p = f.properties;
-                        l.bindPopup(makePopup('#2563EB', '💧 Sumber Air', p.nama, [
+                        l.bindPopup(makePopup('#2563EB', 'Sumber Air', p.nama, [
                             { label: 'Jenis',   value: p.jenis_sumber },
                             { label: 'Kondisi', value: p.kondisi },
                             { label: 'Debit',   value: p.debit ? p.debit + ' L/det' : null }
@@ -623,7 +627,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         var p = f.properties;
                         var jenis = p.jenis;
                         var accent = jenis === 'hotel' ? '#EA580C' : jenis === 'resto' ? '#CA8A04' : '#7C3AED';
-                        var icon   = jenis === 'hotel' ? '🏨 Hotel' : jenis === 'resto' ? '🍽️ Tempat Makan' : '🔧 Jasa';
+                        var icon   = jenis === 'hotel' ? 'Hotel' : jenis === 'resto' ? 'Tempat Makan' : 'Jasa';
                         l.bindPopup(makePopup(accent, icon, p.nama, [
                             { label: 'Kategori',  value: JENIS_LABEL[p.jenis] || p.jenis },
                             { label: 'Kamar',     value: p.kamar    ? p.kamar + ' kamar'  : null },
@@ -649,7 +653,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     },
                     onEachFeature: function (f, l) {
                         var p = f.properties;
-                        l.bindPopup(makePopup('#8e44ad', '🏠 Permukiman', p.nama_dusun, [
+                        l.bindPopup(makePopup('#8e44ad', 'Permukiman', p.nama_dusun, [
                             { label: 'Jumlah KK',      value: p.jumlah_kk       ? p.jumlah_kk + ' KK'      : null },
                             { label: 'Jumlah Penduduk', value: p.jumlah_penduduk ? p.jumlah_penduduk + ' jiwa' : null }
                         ]));
@@ -671,7 +675,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     },
                     onEachFeature: function (f, l) {
                         var p = f.properties;
-                        l.bindPopup(makePopup('#0891B2', '🏗️ Tandon Air', p.nama, [
+                        l.bindPopup(makePopup('#0891B2', 'Tandon Air', p.nama, [
                             { label: 'Kapasitas', value: p.kapasitas_m3 ? p.kapasitas_m3 + ' m³' : null },
                             { label: 'Elevasi',   value: p.elevasi      ? p.elevasi + ' m dpl'    : null }
                         ]));
@@ -689,7 +693,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     style: { color: "#F59E0B", weight: 3, opacity: 0.85 },
                     onEachFeature: function (f, l) {
                         var p = f.properties;
-                        l.bindPopup(makePopup('#D97706', '🔗 Jaringan Pipa', p.nama, [
+                        l.bindPopup(makePopup('#D97706', 'Jaringan Pipa', p.nama, [
                             { label: 'Diameter', value: p.diameter_mm ? p.diameter_mm + ' mm' : null },
                             { label: 'Kondisi',  value: p.kondisi }
                         ]));
@@ -1043,7 +1047,7 @@ document.addEventListener("DOMContentLoaded", function () {
             .then(function (r) { return r.json(); })
             .then(function (data) {
                 btn.disabled = false;
-                btn.textContent = '⚡ Hitung Simulasi';
+                btn.textContent = 'Hitung Simulasi';
                 var p = data.pemanfaatan_persen;
                 // Update Ketersediaan Air panel
                 document.getElementById("debitSupply").textContent  = data.ketersediaan_m3.toLocaleString('id-ID');
@@ -1077,7 +1081,7 @@ document.addEventListener("DOMContentLoaded", function () {
             })
             .catch(function () {
                 btn.disabled = false;
-                btn.textContent = '⚡ Hitung Simulasi';
+                btn.textContent = 'Hitung Simulasi';
                 console.warn("Simulasi debit gagal.");
             });
     });
@@ -1186,13 +1190,13 @@ document.addEventListener("DOMContentLoaded", function () {
                 var dWarna = getDebitColor(dKelas);
                 debitHtml =
                     '<div style="margin-top:6px;padding-top:6px;border-top:1px solid #eee;">' +
-                        '<div style="font-weight:600;color:' + dWarna + ';font-size:11px;margin-bottom:4px;">🌊 Debit Puncak — ' + dLabel + '</div>' +
+                        '<div style="font-weight:600;color:' + dWarna + ';font-size:11px;margin-bottom:4px;">Debit Puncak — ' + dLabel + '</div>' +
                         '<div><b>Nilai:</b> <span style="color:' + dWarna + ';font-weight:600;">' + debitVal.toFixed(2) + ' m³/s</span></div>' +
                     '</div>';
             } else {
                 debitHtml =
                     '<div style="margin-top:6px;padding-top:6px;border-top:1px solid #eee;">' +
-                        '<div style="font-weight:600;color:#60A5FA;font-size:11px;margin-bottom:4px;">🌊 Debit Puncak — ' + dLabel + '</div>' +
+                        '<div style="font-weight:600;color:#60A5FA;font-size:11px;margin-bottom:4px;">Debit Puncak — ' + dLabel + '</div>' +
                         '<div style="font-size:11px;color:#999;">Memuat nilai piksel...</div>' +
                     '</div>';
             }
@@ -1200,7 +1204,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         L.popup().setLatLng(e.latlng).setContent(
             '<div style="font-size:13px;line-height:1.8;min-width:200px;">' +
-                '<div style="font-weight:600;color:#1a5276;margin-bottom:6px;border-bottom:1px solid #eee;padding-bottom:4px;">📍 Koordinat Titik</div>' +
+                '<div style="font-weight:600;color:#1a5276;margin-bottom:6px;border-bottom:1px solid #eee;padding-bottom:4px;display:flex;align-items:center;gap:5px;"><svg class="ic ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 1 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> Koordinat Titik</div>' +
                 "<div><b>Lat:</b> " + lat.toFixed(6) + "</div>" +
                 "<div><b>Lng:</b> " + lng.toFixed(6) + "</div>" +
                 '<div style="margin-top:6px;padding-top:6px;border-top:1px solid #eee;">' +

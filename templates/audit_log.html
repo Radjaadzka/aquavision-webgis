@@ -15,6 +15,7 @@
 .log-head p { font-size: 14px; color: #64748B; font-weight: 300; }
 .log-nav { display:flex; gap:12px; margin-bottom:20px; flex-wrap:wrap; }
 .log-nav a {
+    display: inline-flex; align-items: center; gap: 6px;
     font-size:13px; color:#64748B; text-decoration:none;
     border:1px solid #E2E8F0; border-radius:8px; padding:6px 14px;
     transition:all .15s;
@@ -54,8 +55,8 @@ tr:hover td { background:#F8FAFC; }
 
     <div class="log-nav">
         <a href="{% url 'map' %}">← Dashboard</a>
-        <a href="{% url 'download_log' %}">📥 Riwayat Download</a>
-        <a href="{% url 'hubungi_admin_page' %}">✉️ Percakapan</a>
+        <a href="{% url 'download_log' %}"><svg class="ic ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Riwayat Download</a>
+        <a href="{% url 'hubungi_admin_page' %}"><svg class="ic ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></svg> Percakapan</a>
     </div>
 
     <div class="log-table-wrap">

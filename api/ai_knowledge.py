@@ -308,10 +308,10 @@ FAQ_ENTRIES = [
      "Untuk mengelola layer, klik tombol 'Daftar Layer' di sidebar kiri Dashboard. Anda dapat mengaktifkan atau menonaktifkan lapisan data seperti Potensi Air Tanah, Debit Puncak Aliran, Infrastruktur Air, dan lainnya secara bersamaan."),
 
     (('potensi air tanah', 'recharge', 'resapan', 'zonasi', 'ahp'),
-     "Layer Daerah Potensi Air Tanah menampilkan zonasi resapan air tanah dengan resolusi 10m × 10m. Data dihasilkan menggunakan metode AHP (Analytical Hierarchy Process) berdasarkan tutupan lahan, kemiringan lereng, jenis tanah, dan curah hujan. Warna menunjukkan tingkat potensi dari rendah hingga sangat tinggi."),
+     "Layer Daerah Potensi Air Tanah menampilkan zonasi resapan air tanah dengan resolusi 30m × 30m. Data dihasilkan menggunakan metode AHP (Analytical Hierarchy Process) berdasarkan 7 parameter berbobot: curah hujan (40%), geologi (23%), kepadatan kelurusan (13%), tutupan lahan (10%), kelerengan (7%), kerapatan drainase (4%), dan jenis tanah (3%). Warna menunjukkan tingkat potensi dari rendah hingga sangat tinggi."),
 
     (('debit puncak', 'catchment', 'aliran', 'curah hujan', 'bulan'),
-     "Layer Debit Puncak Aliran menampilkan peta debit puncak (m³/s) dengan resolusi 30m × 30m. Data tersedia untuk 12 bulan (Januari–Desember). Pilih bulan dari dropdown di panel layer, kemudian klik area pada peta untuk membaca nilai debit di lokasi tersebut."),
+     "Layer Debit Puncak Aliran menampilkan peta debit puncak (m³/s) dengan resolusi 10m × 10m. Data tersedia untuk 12 bulan (Januari–Desember). Pilih bulan dari dropdown di panel layer, kemudian klik area pada peta untuk membaca nilai debit di lokasi tersebut."),
 
     (('infrastruktur', 'sumber air', 'pipa', 'tandon', 'reservoir', 'fasilitas'),
      "Layer Infrastruktur Air menampilkan lokasi sumber mata air, jaringan pipa distribusi, tandon air, permukiman, dan fasilitas wisata (hotel, restoran, jasa). Klik titik atau garis di peta untuk melihat atribut detail setiap objek."),
