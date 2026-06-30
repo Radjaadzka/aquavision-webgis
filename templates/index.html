@@ -41,12 +41,17 @@
 .health-label { color:rgba(255,255,255,.5); flex:1; }
 .health-val   { color:rgba(255,255,255,.3); font-size:11px; }
 
-/* Hero Dashboard — panel info di pojok atas peta, BUKAN kartu sambutan
-   terpusat-melayang ala splash screen produk SaaS/AI. */
+/* Hero Dashboard — panel info di area peta aktif (di luar sidebar),
+   BUKAN kartu sambutan terpusat di seluruh viewport ala splash screen
+   produk SaaS/AI (tidak ada backdrop dim, sidebar tetap terlihat).
+   left dihitung agar area "centering" mengecualikan sidebar
+   (.sidebar: left 14px + width 280px = right edge 294px). */
 .hero-dashboard {
-    position:absolute; inset:0; z-index:480;
-    display:flex; align-items:flex-start; justify-content:flex-start;
-    padding:24px 24px 24px 336px;
+    position:absolute; top:0; right:0; bottom:0;
+    left: calc(294px + 24px);
+    z-index:480;
+    display:flex; align-items:center; justify-content:center;
+    padding:24px;
     pointer-events:none;
     transition:opacity .35s ease, visibility .35s ease;
 }
@@ -86,7 +91,7 @@
 .hero-btn-secondary:hover { background:rgba(59,130,246,.22); }
 
 @media (max-width:1024px) {
-    .hero-dashboard { padding:16px; align-items:flex-end; }
+    .hero-dashboard { left:0; padding:16px; align-items:flex-end; }
     .hero-card { max-width:100%; padding:24px 22px; }
 }
 @media (max-width:480px) {
