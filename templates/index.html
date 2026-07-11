@@ -469,8 +469,8 @@
                     <label title="Jalur jaringan pipa distribusi air dari sumber ke tandon dan permukiman."><input type="checkbox" id="chkPipa">      Jaringan Pipa</label>
                     <hr>
                     <p>Potensi Sumber Daya Air</p>
-                    <label title="Area berpotensi menyimpan cadangan air tanah, hasil analisis AHP 7 parameter berbobot. Resolusi Spasial: 30m × 30m."><input type="checkbox" id="chkPotensiAirTanah"> Daerah Potensi Air Tanah <small style="color:rgba(255,255,255,.25);font-size:10px;">30m×30m</small></label>
-                    <label title="Estimasi debit puncak aliran permukaan bulanan, tersedia untuk 12 bulan. Resolusi Spasial: 10m × 10m."><input type="checkbox" id="chkDebitPuncak">     Debit Puncak Aliran <small style="color:rgba(255,255,255,.25);font-size:10px;">10m×10m</small></label>
+                    <label title="Area berpotensi menyimpan cadangan air tanah, hasil analisis AHP 7 parameter berbobot. Resolusi spasial: 30m × 30m (detail di Tentang AQUAVISION)."><input type="checkbox" id="chkPotensiAirTanah"> Daerah Potensi Air Tanah</label>
+                    <label title="Estimasi debit puncak aliran permukaan bulanan, tersedia untuk 12 bulan. Resolusi spasial: 10m × 10m (detail di Tentang AQUAVISION)."><input type="checkbox" id="chkDebitPuncak">     Debit Puncak Aliran</label>
                     <div id="debitBulanPanel" style="display:none; margin:4px 0 4px 6px;">
                         <select id="selectDebitBulan" style="font-size:12px;">
                             <option value="">-- Pilih Bulan --</option>
@@ -568,7 +568,7 @@
                             </div>
                         </div>
                         <div class="status-bar" id="statusBar" style="background:rgba(22,163,74,.12);">
-                            <div class="status-dot" id="statusDot" style="background:#F59E0B;"></div>
+                            <div class="status-dot" id="statusDot" style="background:#EAB308;"></div>
                             <div>
                                 <span id="statusLabel"  style="font-weight:600; font-size:13px; color:rgba(255,255,255,.8);">-</span>
                                 <span id="statusPersen" style="font-size:11px; color:rgba(255,255,255,.3); margin-left:6px;">0%</span>
@@ -591,9 +591,8 @@
                         <input type="number" id="simPenduduk"  placeholder="Jumlah Penduduk (orang)" style="margin-top:4px;" min="0">
                         <input type="number" id="simHotel"     placeholder="Jumlah Kamar Hotel" min="0">
                         <input type="number" id="simResto"     placeholder="Jumlah Kursi Restoran" min="0">
-                        <input type="number" id="simPertanian" placeholder="Luas Pertanian (ha)" step="0.1" min="0">
                         <p style="font-size:10px; color:rgba(255,255,255,.2); margin:4px 0 8px; line-height:1.6;">
-                            Asumsi: 120 L/org/hari · 250 L/kamar/hari · 25 L/kursi/hari · 86.4 m³/ha/hari
+                            Asumsi: 120 L/org/hari · 250 L/kamar/hari · 25 L/kursi/hari
                         </p>
                         <button id="btnSimulasi"><svg class="ic ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Hitung Simulasi</button>
                         <div id="simResult" style="display:none; margin-top:10px; padding:10px 12px; border-radius:8px; border:1px solid rgba(255,255,255,.08); background:rgba(255,255,255,.03);">
@@ -780,7 +779,7 @@
     <div class="mobile-bottom-sheet" id="mobileBottomSheet" role="region" aria-label="Ringkasan Dashboard">
         <div class="mobile-bs-handle" id="mobileBsHandle">
             <div class="mobile-bs-title">
-                <span id="mobileBsStatusDot" style="width:8px;height:8px;border-radius:50%;background:#F59E0B;flex-shrink:0;display:inline-block;"></span>
+                <span id="mobileBsStatusDot" style="width:8px;height:8px;border-radius:50%;background:#EAB308;flex-shrink:0;display:inline-block;"></span>
                 <span>Ringkasan Dashboard</span>
             </div>
             <span class="mobile-bs-arrow" id="mobileBsArrow">▲</span>
@@ -1072,12 +1071,14 @@ var LEGEND_DEFS = [
     // Potensi Sumber Daya Air
     { id:'chkPotensiAirTanah', type:'gradient',
       colors:['#e74c3c','#e67e22','#f1c40f','#27ae60'],
-      rangeMin:'Rendah', rangeMax:'S.Tinggi',
-      label:'Potensi Air Tanah' },
+      rangeMin:'Rendah', rangeMax:'S. Tinggi',
+      label:'Potensi Air Tanah',
+      sublabel:'Cadangan air tanah: rendah → sangat tinggi' },
     { id:'chkDebitPuncak', type:'gradient',
       colors:['#c7e9ff','#5fb5de','#1a7fad','#022d4d'],
-      rangeMin:'Rendah', rangeMax:'Tinggi',
-      label:'Debit Puncak Aliran' },
+      rangeMin:'Kecil', rangeMax:'Besar',
+      label:'Debit Puncak Aliran',
+      sublabel:'Debit puncak: semakin kecil → semakin besar' },
     // Fasilitas & Penduduk
     { id:'chkHotel',  type:'svgmark', bg:'#EA580C',
       svg:'<path d="M12 3L4 8v13h16V8L12 3zm-3 13H7v-5h2v5zm3 0h-2v-5h2v5zm3 0h-2v-5h2v5zm0-7H8V8h8v2z"/>',
@@ -1127,7 +1128,10 @@ function updateLegend() {
                      'flex-shrink:0;display:inline-block;"></span>';
         }
         return '<div class="legend-item">' + swatch +
-               '<span style="margin-left:2px;">' + d.label + '</span></div>';
+               '<div style="margin-left:2px;">' +
+               '<span>' + d.label + '</span>' +
+               (d.sublabel ? '<div style="font-size:9px;color:rgba(255,255,255,.3);margin-top:1px;line-height:1.3;">' + d.sublabel + '</div>' : '') +
+               '</div></div>';
     }).join('');
 }
 
@@ -1346,7 +1350,7 @@ LEGEND_DEFS.forEach(function(d) {
         // Status dot color
         var srcDot = document.getElementById('statusDot');
         var dstDot = document.getElementById('mobileBsStatusDot');
-        if (srcDot && dstDot) dstDot.style.background = srcDot.style.background || '#F59E0B';
+        if (srcDot && dstDot) dstDot.style.background = srcDot.style.background || '#EAB308';
 
         // Supply / Demand
         function syncText(srcId, dstId) {

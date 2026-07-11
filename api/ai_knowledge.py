@@ -320,7 +320,7 @@ FAQ_ENTRIES = [
      "Ketersediaan Air membandingkan total ketersediaan air dari sumber dengan kebutuhan harian. Status AMAN berarti pemanfaatan di bawah 50% dari ketersediaan, WASPADA berarti 50–80%, dan KRITIS berarti 80% ke atas. Data diperbarui secara berkala dari sistem AQUAVISION."),
 
     (('simulasi', 'skenario', 'proyeksi', 'hitung kebutuhan', 'penduduk', 'hotel'),
-     "Fitur Simulasi Skenario memungkinkan Anda memasukkan parameter hipotetis — jumlah penduduk, kamar hotel, kursi restoran, atau luas pertanian — untuk menghitung proyeksi kebutuhan air. Berguna untuk perencanaan pengembangan wisata dan infrastruktur."),
+     "Fitur Simulasi Skenario memungkinkan Anda memasukkan parameter hipotetis — jumlah penduduk, kamar hotel, atau kursi restoran — untuk menghitung proyeksi kebutuhan air. Berguna untuk perencanaan pengembangan wisata dan infrastruktur."),
 
     (('data portal', 'unduh', 'download', 'ekspor', 'csv', 'geojson', 'shapefile', 'kml'),
      "Data Portal AQUAVISION menyediakan akses ke seluruh dataset spasial. Anda dapat mengunduh data dalam format CSV, GeoJSON, KML, atau Shapefile untuk analisis lanjutan di perangkat lunak GIS desktop atau spreadsheet. Kunjungi menu 'Data Portal' di navbar."),

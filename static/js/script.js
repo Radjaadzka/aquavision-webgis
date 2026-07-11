@@ -534,9 +534,9 @@ document.addEventListener("DOMContentLoaded", function () {
     // 12. HELPER STATUS NERACA AIR
     // ================================================================
 
-    function getStatusColor(p) { return p < 50 ? "#22C55E" : p < 80 ? "#F59E0B" : "#EF4444"; }
+    function getStatusColor(p) { return p < 50 ? "#22C55E" : p < 80 ? "#EAB308" : "#EF4444"; }
     function getStatusLabel(p) { return p < 50 ? "AMAN"    : p < 80 ? "WASPADA" : "KRITIS";  }
-    function getStatusBg(p)    { return p < 50 ? "rgba(34,197,94,.12)" : p < 80 ? "rgba(245,158,11,.12)" : "rgba(239,68,68,.12)"; }
+    function getStatusBg(p)    { return p < 50 ? "rgba(34,197,94,.12)" : p < 80 ? "rgba(234,179,8,.12)" : "rgba(239,68,68,.12)"; }
 
 
     // ================================================================
@@ -1034,16 +1034,15 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     document.getElementById("btnSimulasi")?.addEventListener("click", function () {
-        var hotel     = document.getElementById("simHotel")?.value     || 0;
-        var penduduk  = document.getElementById("simPenduduk")?.value  || 0;
-        var resto     = document.getElementById("simResto")?.value     || 0;
-        var pertanian = document.getElementById("simPertanian")?.value || 0;
+        var hotel    = document.getElementById("simHotel")?.value    || 0;
+        var penduduk = document.getElementById("simPenduduk")?.value || 0;
+        var resto    = document.getElementById("simResto")?.value    || 0;
 
         var btn = this;
         btn.disabled = true;
         btn.textContent = 'Menghitung...';
 
-        fetch("/api/informasi-debit/?hotel=" + hotel + "&penduduk=" + penduduk + "&resto=" + resto + "&pertanian=" + pertanian)
+        fetch("/api/informasi-debit/?hotel=" + hotel + "&penduduk=" + penduduk + "&resto=" + resto)
             .then(function (r) { return r.json(); })
             .then(function (data) {
                 btn.disabled = false;
@@ -1070,7 +1069,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     sisaEl.style.color = sisa >= 0 ? '#4ADE80' : '#F87171';
                     var badge = document.getElementById('simStatusBadge');
                     var statusColors = { AMAN: { bg:'rgba(34,197,94,.15)', color:'#4ADE80', border:'rgba(34,197,94,.3)' },
-                                         WASPADA: { bg:'rgba(245,158,11,.15)', color:'#FCD34D', border:'rgba(245,158,11,.3)' },
+                                         WASPADA: { bg:'rgba(234,179,8,.15)', color:'#EAB308', border:'rgba(234,179,8,.3)' },
                                          KRITIS:  { bg:'rgba(239,68,68,.15)',  color:'#F87171', border:'rgba(239,68,68,.3)' } };
                     var sc = statusColors[data.status] || statusColors.AMAN;
                     badge.textContent = data.status;
